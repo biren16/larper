@@ -30,7 +30,7 @@ describe("discovery view-model services", () => {
     expect(niche?.isFollowed).toBe(true);
     expect(niche?.currentTopics.every((item) => item.topic.nicheId === "fragrance")).toBe(true);
     expect(niche?.deepLore.every((item) => item.topic.nicheId === "fragrance")).toBe(true);
+    expect(niche?.relatedNicheCards.every((item) => item.niche.id && item.media)).toBe(true);
     expect(await buildNichePage(seedRepository, "missing", [])).toBeNull();
   });
 });
-

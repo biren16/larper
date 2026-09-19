@@ -29,6 +29,7 @@ export interface NichePageViewModel {
   currentTopics: TopicViewModel[];
   deepLore: TopicViewModel[];
   relatedNiches: Niche[];
+  relatedNicheCards: Array<{ niche: Niche; media: MediaAsset | null }>;
 }
 
 export async function buildDiscoveryHome(
@@ -122,6 +123,13 @@ export async function buildNichePage(
     relatedNiches: niche.relatedNicheIds
       .map((id) => niches.find((item) => item.id === id))
       .filter((item): item is Niche => Boolean(item)),
+    relatedNicheCards: niche.relatedNicheIds
+      .map((id) => niches.find((item) => item.id === id))
+      .filter((item): item is Niche => Boolean(item))
+      .map((item) => ({
+        niche: item,
+        media: media.find((asset) => asset.id === item.heroMediaId) ?? null,
+      })),
   };
 }
 

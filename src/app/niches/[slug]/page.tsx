@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { Artwork } from "@/components/discovery/artwork";
-import { LoreTile, TopicRow } from "@/components/discovery/topic-pieces";
+import { DiscoveryCard } from "@/components/discovery/discovery-card";
+import { selectCardKind } from "@/components/discovery/topic-presentation";
 import { FollowButton } from "@/components/preferences/follow-button";
 import { seedRepository } from "@/data/seed/repository";
 import { buildNichePage } from "@/domain/discovery/services";
@@ -46,25 +47,30 @@ export default async function NichePage({ params }: { params: Promise<{ slug: st
           <h2 id="current-heading">What’s happening</h2>
           <p>Ranked signals from inside {page.niche.name.toLowerCase()}.</p>
         </div>
-        <div className={styles.rows}>{page.currentTopics.map((item, index) => <TopicRow key={item.topic.id} item={item} index={index} />)}</div>
+        <div className={styles.rows}>{page.currentTopics.map((item, index) => (
+          <DiscoveryCard key={item.topic.id} item={item} kind={selectCardKind(item.topic, item.niche, { lead: index === 0 })} priority={index === 0} />
+        ))}</div>
       </section>
 
       {page.deepLore.length > 0 && (
         <section className={styles.lore} aria-labelledby="lore-heading">
           <div className={styles.heading}><h2 id="lore-heading">Learn the lore</h2><p>Start here if you’re new.</p></div>
-          <div className={styles.loreGrid}>{page.deepLore.map((item) => <LoreTile key={item.topic.id} item={item} />)}</div>
+          <div className={styles.loreGrid}>{page.deepLore.map((item) => <DiscoveryCard key={item.topic.id} item={item} kind="lore" />)}</div>
         </section>
       )}
 
       <section className={styles.related} aria-labelledby="related-niches">
         <h2 id="related-niches">Adjacent obsessions</h2>
         <div>
-          {page.relatedNiches.map((niche) => (
-            <Link key={niche.id} href={`/niches/${niche.slug}`}><span>{niche.name}</span><ArrowRight aria-hidden /></Link>
+          {page.relatedNicheCards.map(({ niche, media }) => (
+            <Link key={niche.id} href={`/niches/${niche.slug}`}>
+              <Artwork media={media} />
+              <span><small>{niche.parentCategory}</small>{niche.name}</span>
+              <ArrowRight aria-hidden />
+            </Link>
           ))}
         </div>
       </section>
     </main>
   );
 }
-

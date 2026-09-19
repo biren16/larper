@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Artwork } from "@/components/discovery/artwork";
-import { TopicRow } from "@/components/discovery/topic-pieces";
+import { DiscoveryCard } from "@/components/discovery/discovery-card";
+import { buildSignalCue, selectCardKind } from "@/components/discovery/topic-presentation";
 import { seedRepository } from "@/data/seed/repository";
 import { buildTopicDetail } from "@/domain/discovery/services";
 import styles from "./page.module.css";
@@ -24,6 +25,7 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
   const { slug } = await params;
   const detail = await buildTopicDetail(seedRepository, slug);
   if (!detail) notFound();
+  const cue = buildSignalCue(detail.topic, detail.sources);
 
   return (
     <main id="main-content" className={styles.main}>
@@ -37,25 +39,28 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
           <Link className={styles.nicheLink} href={`/niches/${detail.niche.slug}`}>{detail.niche.name}</Link>
           <h1>{detail.topic.title}</h1>
           <p>{detail.topic.hook}</p>
-          <div className={styles.signals}><span>{detail.topic.freshnessLabel}</span><span>{detail.sourceCount} source signals</span></div>
+          <div className={styles.signals}>
+            <span>{cue.status}</span><span>{detail.sourceCount} source signals</span>
+            {cue.sourceLabels.map((label) => <span key={label}>{label}</span>)}
+          </div>
         </div>
         <Artwork media={detail.media} priority className={styles.heroArt} />
       </header>
 
       <article className={styles.story}>
-        <section>
+        <section id="what-happened">
           <h2>What happened?</h2>
           <p>{detail.topic.summary}</p>
         </section>
-        <section>
+        <section id="why-it-matters">
           <h2>Why people care</h2>
           <p>{detail.topic.whyItMatters}</p>
         </section>
-        <section className={styles.loreSection}>
+        <section id="lore" className={styles.loreSection}>
           <h2>The lore</h2>
           <p>{detail.topic.lore}</p>
         </section>
-        <aside>
+        <aside id="beginner-context">
           <h2>If you’re new</h2>
           <p>{detail.topic.beginnerContext}</p>
         </aside>
@@ -76,9 +81,10 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
 
       <section className={styles.related} aria-labelledby="related-heading">
         <h2 id="related-heading">Keep going</h2>
-        <div>{detail.relatedTopics.map((item) => <TopicRow key={item.topic.id} item={item} />)}</div>
+        <div>{detail.relatedTopics.map((item) => (
+          <DiscoveryCard key={item.topic.id} item={item} kind={selectCardKind(item.topic, item.niche, { compact: true })} />
+        ))}</div>
       </section>
     </main>
   );
 }
-

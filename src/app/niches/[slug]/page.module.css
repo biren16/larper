@@ -1,31 +1,39 @@
-.main { margin: 0 auto; max-width: var(--content); padding: 1.5rem var(--gutter) 7rem; }
-.back { align-items: center; color: var(--muted); display: inline-flex; font: 650 0.76rem/1 var(--font-sans); gap: 0.45rem; margin-bottom: 2.5rem; }
+.main { margin: 0 auto; max-width: var(--content); padding: 1rem var(--gutter) 7rem; }
+.back { align-items: center; color: var(--muted); display: inline-flex; font: 650 0.76rem/1 var(--font-sans); gap: 0.45rem; margin-bottom: 1rem; min-height: 2.75rem; }
 .back svg { height: 1rem; width: 1rem; }
-.hero { display: grid; grid-template-columns: 0.72fr 1.28fr; }
-.copy { background: var(--paper-bright); display: flex; flex-direction: column; min-height: 31rem; padding: clamp(1.5rem, 4vw, 4rem); }
-.copy > p:first-child { color: var(--muted); font: 650 0.72rem/1 var(--font-sans); }
-.copy h1 { font: 540 clamp(4.2rem, 8vw, 8rem)/0.82 var(--font-serif); letter-spacing: -0.065em; margin: auto 0 1.5rem; overflow-wrap: anywhere; }
-.description { color: var(--muted); font: 460 1rem/1.5 var(--font-sans); margin-bottom: 2rem; max-width: 38ch; }
+.hero { border: 1px solid var(--line); display: grid; grid-template-columns: minmax(18rem, 0.7fr) minmax(0, 1.3fr); }
+.copy { background: var(--surface); display: flex; flex-direction: column; min-height: 28rem; padding: clamp(1.4rem, 3.5vw, 3.5rem); }
+.copy > p:first-child { color: var(--muted); font: 680 0.7rem/1 var(--font-sans); }
+.copy h1 { font: 650 clamp(3.6rem, 7.2vw, 7.2rem)/0.82 var(--font-sans); letter-spacing: -0.07em; margin: auto 0 1.2rem; overflow-wrap: anywhere; }
+.description { color: var(--muted); font: 460 0.95rem/1.5 var(--font-sans); margin-bottom: 1.5rem; max-width: 40ch; }
 .copy button { width: fit-content; }
-.art { min-height: 31rem; }
-.hero blockquote { background: var(--acid); color: var(--acid-ink); font: 540 clamp(1.8rem, 3vw, 3rem)/1.05 var(--font-serif); grid-column: 2; margin: 0; padding: clamp(1.5rem, 3vw, 3rem); }
-.current, .lore, .related { border-top: 1px solid var(--line); margin-top: clamp(4rem, 9vw, 9rem); padding-top: clamp(2rem, 4vw, 4rem); }
-.heading h2, .related h2 { font: 560 clamp(2.8rem, 5.5vw, 5.3rem)/0.9 var(--font-serif); letter-spacing: -0.05em; }
-.heading p { color: var(--muted); font: 450 0.9rem/1.5 var(--font-sans); margin-top: 0.75rem; }
-.rows { margin: 2rem 0 0 auto; max-width: 66rem; }
-.loreGrid { display: grid; gap: clamp(1.5rem, 3vw, 3rem); grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2.5rem; }
-.related > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2rem; }
-.related a { align-items: center; border-bottom: 1px solid var(--line); display: flex; font: 560 clamp(1.7rem, 3vw, 3rem)/1 var(--font-serif); justify-content: space-between; min-height: 7rem; padding: 1rem; }
-.related a:nth-child(odd) { border-right: 1px solid var(--line); }
-.related a:hover { background: var(--paper-deep); }
-.related svg { height: 1.2rem; width: 1.2rem; }
+.art { min-height: 28rem; }
+.hero blockquote { background: var(--acid); color: var(--acid-ink); font: 530 clamp(1.55rem, 2.7vw, 2.7rem)/1.05 var(--font-serif); grid-column: 2; margin: 0; max-width: none; padding: clamp(1.25rem, 2.5vw, 2.5rem); }
+.current, .lore, .related { border-top: 1px solid var(--line); margin-top: clamp(3.5rem, 7vw, 7rem); padding-top: clamp(2rem, 3.5vw, 3.5rem); }
+.heading h2, .related h2 { font: 650 clamp(2.5rem, 5vw, 4.8rem)/0.9 var(--font-sans); letter-spacing: -0.055em; }
+.heading p { color: var(--muted); font: 450 0.88rem/1.5 var(--font-sans); margin-top: 0.7rem; }
+.rows { display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 2rem; }
+.rows > :first-child { grid-column: span 2; }
+.loreGrid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2rem; }
+.related > div { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2rem; }
+.related a { align-items: center; background: var(--surface); border: 1px solid var(--line); display: grid; grid-template-columns: 7rem 1fr auto; min-height: 7rem; overflow: hidden; }
+.related a > div { height: 100%; min-height: 7rem; }
+.related span { font: 620 clamp(1.4rem, 2.5vw, 2.5rem)/0.95 var(--font-sans); letter-spacing: -0.04em; padding: 1rem; }
+.related small { color: var(--muted); display: block; font: 650 0.64rem/1 var(--font-sans); letter-spacing: 0; margin-bottom: 0.55rem; }
+.related a:hover { background: var(--surface-strong); }
+.related svg { height: 1.2rem; margin-right: 1.25rem; width: 1.2rem; }
+
+@media (max-width: 900px) {
+  .rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 @media (max-width: 767px) {
   .hero { grid-template-columns: 1fr; }
-  .copy { min-height: 28rem; }
-  .copy h1 { font-size: clamp(4.2rem, 18vw, 6.2rem); }
-  .art { min-height: 22rem; }
+  .copy { min-height: 23rem; }
+  .copy h1 { font-size: clamp(3.7rem, 17vw, 5.5rem); }
+  .art { min-height: 19rem; }
   .hero blockquote { grid-column: 1; }
-  .loreGrid, .related > div { grid-template-columns: 1fr; }
-  .related a:nth-child(odd) { border-right: 0; }
+  .rows, .loreGrid, .related > div { grid-template-columns: 1fr; }
+  .rows > :first-child { grid-column: auto; }
+  .related a { grid-template-columns: 6rem 1fr auto; }
 }
