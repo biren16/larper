@@ -38,7 +38,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
       <section className={styles.now} aria-labelledby="larping-now">
         <div className={styles.sectionTitle}>
           <h2 id="larping-now">Larping RN</h2>
-          <p>Signals moving through niche communities, ranked by heat and freshness.</p>
+          <p>Authored demo signals moving through niche communities, ranked by heat and freshness.</p>
         </div>
         {lead && <LeadTopic item={lead} />}
         <div className={styles.storyList}>

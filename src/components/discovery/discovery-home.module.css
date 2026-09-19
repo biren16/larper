@@ -16,7 +16,7 @@
 .followedNiche h3 { font: 560 1.8rem/1 var(--font-serif); letter-spacing: -0.03em; }
 .followedNiche p { color: var(--muted); font: 450 0.8rem/1.4 var(--font-sans); margin-top: 0.65rem; max-width: 18ch; }
 .textLink { align-items: center; border: 1px solid var(--line); border-radius: 50%; display: flex; height: 2.75rem; justify-content: center; width: 2.75rem; }
-.textLink:hover { background: var(--acid); border-color: var(--acid); }
+.textLink:hover { background: var(--acid); border-color: var(--acid); color: var(--acid-ink); }
 .textLink svg { height: 1rem; width: 1rem; }
 .newNiches { border-top: 1px solid var(--line); }
 .curiosityGrid { display: grid; grid-template-columns: 1.3fr 0.9fr 1.1fr; }
@@ -29,7 +29,7 @@
 .curiosity button { margin-top: auto; width: fit-content; }
 .deepLore { border-top: 1px solid var(--line); }
 .loreGrid { display: grid; gap: clamp(1.5rem, 3vw, 3rem); grid-template-columns: 1.2fr 0.8fr 0.8fr; }
-.loreGrid > :first-child { grid-row: span 2; }
+.loreGrid > :first-child { grid-row: span 2; grid-template-rows: minmax(28rem, auto) auto; }
 .loreGrid > :first-child > a { min-height: 28rem; }
 .moreLore { align-items: center; border-bottom: 1px solid var(--ink); display: flex; font: 650 0.9rem/1 var(--font-sans); gap: 0.5rem; margin: 3rem 0 0 auto; padding-bottom: 0.35rem; width: fit-content; }
 .moreLore svg { height: 1rem; width: 1rem; }
@@ -39,7 +39,7 @@
   .followedNiche:nth-child(3), .followedNiche:nth-child(4) { border-top: 1px solid var(--line); }
   .followedNiche:nth-child(4) { border-right: 1px solid var(--line); }
   .loreGrid { grid-template-columns: 1fr 1fr; }
-  .loreGrid > :first-child { grid-row: auto; }
+  .loreGrid > :first-child { grid-row: auto; grid-template-rows: 15rem auto; }
   .loreGrid > :first-child > a { min-height: 15rem; }
 }
 

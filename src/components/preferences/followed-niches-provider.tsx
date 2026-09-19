@@ -25,19 +25,25 @@ export function FollowedNichesProvider({ children, knownNicheIds }: { children: 
 
   useEffect(() => {
     queueMicrotask(() => {
-      setFollowedNicheIds(parseStoredPreferences(window.localStorage.getItem(PREFERENCES_STORAGE_KEY), knownIds));
+      try {
+        setFollowedNicheIds(parseStoredPreferences(window.localStorage.getItem(PREFERENCES_STORAGE_KEY), knownIds));
+      } catch {
+        setFollowedNicheIds(DEFAULT_FOLLOWED_NICHE_IDS.filter((id) => knownIds.has(id)));
+      }
     });
   }, [knownIds]);
 
   const toggleFollow = useCallback((id: string, name: string) => {
-    setFollowedNicheIds((current) => {
-      const next = toggleFollowedNiche(current, id);
-      const added = next.includes(id);
+    const next = toggleFollowedNiche(followedNicheIds, id);
+    const added = next.includes(id);
+    setFollowedNicheIds(next);
+    try {
       window.localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 1, followedNicheIds: next }));
-      setAnnouncement(`${name} ${added ? "added to" : "removed from"} Your Larps`);
-      return next;
-    });
-  }, []);
+    } catch {
+      // Preferences still work for this session when storage is unavailable.
+    }
+    setAnnouncement(`${name} ${added ? "added to" : "removed from"} Your Larps`);
+  }, [followedNicheIds]);
 
   const value = useMemo<FollowedNichesContextValue>(() => ({
     followedNicheIds,

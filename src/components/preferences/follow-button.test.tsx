@@ -1,12 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FollowedNichesProvider } from "./followed-niches-provider";
 import { FollowButton } from "./follow-button";
 import { PREFERENCES_STORAGE_KEY } from "@/domain/preferences/preferences";
 
 describe("FollowButton", () => {
-  beforeEach(() => window.localStorage.clear());
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
 
   it("toggles a niche, persists the change, and announces the result", async () => {
     const user = userEvent.setup();
@@ -28,5 +31,36 @@ describe("FollowButton", () => {
       followedNicheIds: expect.arrayContaining(["mechanical-keyboards"]),
     });
   });
-});
 
+  it("keeps defaults when stored preferences cannot be read", async () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("Storage blocked", "SecurityError");
+    });
+
+    render(
+      <FollowedNichesProvider knownNicheIds={["fragrance", "mechanical-keyboards"]}>
+        <FollowButton nicheId="fragrance" nicheName="Fragrance" />
+      </FollowedNichesProvider>,
+    );
+
+    expect(await screen.findByRole("button", { name: "Stop larping in Fragrance" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("keeps follow controls working when preferences cannot be written", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Storage blocked", "SecurityError");
+    });
+
+    render(
+      <FollowedNichesProvider knownNicheIds={["fragrance", "mechanical-keyboards"]}>
+        <FollowButton nicheId="mechanical-keyboards" nicheName="Mechanical Keyboards" />
+      </FollowedNichesProvider>,
+    );
+
+    const button = screen.getByRole("button", { name: "Start larping in Mechanical Keyboards" });
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("status")).toHaveTextContent("Mechanical Keyboards added to Your Larps");
+  });
+});

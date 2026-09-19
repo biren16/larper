@@ -2,10 +2,10 @@
 .backRow { align-items: center; color: var(--muted); display: flex; font: 650 0.76rem/1 var(--font-sans); justify-content: space-between; margin-bottom: 2.5rem; }
 .backRow a { align-items: center; display: flex; gap: 0.45rem; }
 .backRow svg { height: 1rem; width: 1rem; }
-.hero { display: grid; grid-template-columns: minmax(20rem, 0.8fr) minmax(0, 1.2fr); min-height: 39rem; }
-.titleBlock { align-items: flex-start; background: var(--paper-bright); display: flex; flex-direction: column; padding: clamp(1.5rem, 4vw, 4rem); }
+.hero { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); min-height: 39rem; }
+.titleBlock { align-items: flex-start; background: var(--paper-bright); display: flex; flex-direction: column; min-width: 0; padding: clamp(1.5rem, 4vw, 4rem); }
 .nicheLink { border-bottom: 1px solid var(--ink); font: 650 0.8rem/1 var(--font-sans); padding-bottom: 0.25rem; }
-.titleBlock h1 { font: 540 clamp(3.8rem, 7vw, 7.6rem)/0.84 var(--font-serif); letter-spacing: -0.06em; margin: auto 0 1.5rem; max-width: 8.5ch; }
+.titleBlock h1 { font: 540 clamp(3.8rem, 7vw, 7.6rem)/0.84 var(--font-serif); letter-spacing: -0.06em; margin: auto 0 1.5rem; max-width: 8.5ch; overflow-wrap: anywhere; }
 .titleBlock > p { color: var(--muted); font: 480 1.05rem/1.5 var(--font-sans); max-width: 40ch; }
 .signals { border-top: 1px solid var(--line); display: flex; font: 650 0.74rem/1 var(--font-sans); gap: 1rem; margin-top: 2rem; padding-top: 1rem; width: 100%; }
 .heroArt { min-height: 39rem; }
@@ -15,8 +15,8 @@
 .story h2 { font: 580 clamp(2rem, 3.5vw, 3.4rem)/0.95 var(--font-serif); letter-spacing: -0.04em; margin-bottom: 2rem; }
 .story p { color: var(--muted); font: 450 clamp(1rem, 1.4vw, 1.18rem)/1.7 var(--font-sans); max-width: 46ch; }
 .loreSection p { color: var(--ink); font-family: var(--font-serif); font-size: clamp(1.35rem, 2vw, 1.8rem); line-height: 1.55; }
-.story aside { background: var(--acid); }
-.story aside p { color: var(--ink); }
+.story aside { background: var(--acid); color: var(--acid-ink); }
+.story aside p { color: var(--acid-ink); }
 .sources, .related { border-top: 1px solid var(--line); padding: 4rem 0; }
 .sources > h2, .related > h2 { font: 560 clamp(2.7rem, 5vw, 5rem)/0.92 var(--font-serif); letter-spacing: -0.05em; }
 .sourceNote { color: var(--muted); font: 450 0.85rem/1.5 var(--font-sans); margin: 1rem 0 2rem; max-width: 52ch; }
@@ -31,7 +31,7 @@
 
 @media (max-width: 767px) {
   .main { padding-top: 1rem; }
-  .hero { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: minmax(0, 1fr); }
   .titleBlock { min-height: 31rem; }
   .titleBlock h1 { font-size: clamp(3.9rem, 16vw, 5.5rem); }
   .heroArt { min-height: 22rem; }
@@ -42,4 +42,3 @@
   .sourceGrid article, .sourceGrid a { border-bottom: 1px solid var(--line); border-left: 0; min-height: 10rem; padding-inline: 0; }
   .sourceGrid > :last-child { border-right: 0; }
 }
-

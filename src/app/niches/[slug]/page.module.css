@@ -8,7 +8,7 @@
 .description { color: var(--muted); font: 460 1rem/1.5 var(--font-sans); margin-bottom: 2rem; max-width: 38ch; }
 .copy button { width: fit-content; }
 .art { min-height: 31rem; }
-.hero blockquote { background: var(--acid); font: 540 clamp(1.8rem, 3vw, 3rem)/1.05 var(--font-serif); grid-column: 2; margin: 0; padding: clamp(1.5rem, 3vw, 3rem); }
+.hero blockquote { background: var(--acid); color: var(--acid-ink); font: 540 clamp(1.8rem, 3vw, 3rem)/1.05 var(--font-serif); grid-column: 2; margin: 0; padding: clamp(1.5rem, 3vw, 3rem); }
 .current, .lore, .related { border-top: 1px solid var(--line); margin-top: clamp(4rem, 9vw, 9rem); padding-top: clamp(2rem, 4vw, 4rem); }
 .heading h2, .related h2 { font: 560 clamp(2.8rem, 5.5vw, 5.3rem)/0.9 var(--font-serif); letter-spacing: -0.05em; }
 .heading p { color: var(--muted); font: 450 0.9rem/1.5 var(--font-sans); margin-top: 0.75rem; }
@@ -29,4 +29,3 @@
   .loreGrid, .related > div { grid-template-columns: 1fr; }
   .related a:nth-child(odd) { border-right: 0; }
 }
-

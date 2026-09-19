@@ -8,8 +8,7 @@ export function SiteFooter() {
         <Link className={styles.mark} href="/">LARPer</Link>
         <p>Find new shit to get obsessed with.</p>
       </div>
-      <p className={styles.note}>Part 1 discovery foundation. No fake live feeds.</p>
+      <p className={styles.note}>Seeded Part 1 edition. Live ingestion comes later.</p>
     </footer>
   );
 }
-
