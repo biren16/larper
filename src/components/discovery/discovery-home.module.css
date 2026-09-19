@@ -1,0 +1,57 @@
+.main { overflow: hidden; }
+.intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.3fr); margin: 0 auto; max-width: var(--content); padding: clamp(2rem, 5vw, 5rem) var(--gutter) clamp(3.5rem, 8vw, 7rem); position: relative; }
+.intro::after { background: var(--acid); content: ""; height: clamp(0.65rem, 1vw, 1rem); position: absolute; right: var(--gutter); top: 3rem; width: clamp(3rem, 7vw, 7rem); }
+.kicker { align-self: start; font: 650 0.82rem/1.2 var(--font-sans); grid-column: 1 / -1; margin-bottom: clamp(2.5rem, 7vw, 7rem); }
+.intro h1 { font: 520 clamp(3.5rem, 8.8vw, 8.6rem)/0.84 var(--font-serif); grid-column: 1 / -1; letter-spacing: -0.064em; max-width: 10.5ch; }
+.dek { align-self: end; color: var(--muted); font: 500 clamp(1rem, 1.4vw, 1.25rem)/1.4 var(--font-sans); grid-column: 2; margin-top: -2.4rem; max-width: 26ch; }
+.now, .yours, .newNiches, .deepLore { margin: 0 auto; max-width: var(--content); padding: clamp(4rem, 8vw, 8rem) var(--gutter); }
+.now { background: var(--paper-bright); max-width: none; padding-left: max(var(--gutter), calc((100vw - var(--content)) / 2 + var(--gutter))); padding-right: max(var(--gutter), calc((100vw - var(--content)) / 2 + var(--gutter))); }
+.sectionTitle { margin-bottom: clamp(1.7rem, 3vw, 3rem); max-width: 48rem; }
+.sectionTitle h2 { font: 570 clamp(2.5rem, 5.5vw, 5.25rem)/0.92 var(--font-serif); letter-spacing: -0.05em; }
+.sectionTitle p { color: var(--muted); font: 450 0.95rem/1.5 var(--font-sans); margin-top: 0.8rem; max-width: 48ch; }
+.storyList { margin-left: auto; margin-top: 2.5rem; max-width: 65rem; }
+.nicheRail { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.followedNiche { align-items: flex-end; border-left: 1px solid var(--line); display: flex; justify-content: space-between; min-height: 14rem; padding: 1.25rem; }
+.followedNiche:last-child { border-right: 1px solid var(--line); }
+.followedNiche h3 { font: 560 1.8rem/1 var(--font-serif); letter-spacing: -0.03em; }
+.followedNiche p { color: var(--muted); font: 450 0.8rem/1.4 var(--font-sans); margin-top: 0.65rem; max-width: 18ch; }
+.textLink { align-items: center; border: 1px solid var(--line); border-radius: 50%; display: flex; height: 2.75rem; justify-content: center; width: 2.75rem; }
+.textLink:hover { background: var(--acid); border-color: var(--acid); }
+.textLink svg { height: 1rem; width: 1rem; }
+.newNiches { border-top: 1px solid var(--line); }
+.curiosityGrid { display: grid; grid-template-columns: 1.3fr 0.9fr 1.1fr; }
+.curiosity { border-top: 1px solid var(--line); display: flex; flex-direction: column; min-height: 25rem; padding: 1.25rem; }
+.curiosity:nth-child(2), .curiosity:nth-child(5) { background: var(--paper-deep); }
+.curiosity:nth-child(4) { grid-column: 1 / 3; min-height: 20rem; }
+.curiosityIndex { color: var(--muted); font: 600 0.72rem/1 var(--font-sans); }
+.curiosity h3 { font: 560 clamp(2rem, 3.6vw, 3.5rem)/0.95 var(--font-serif); letter-spacing: -0.045em; margin: 2.5rem 0 1rem; }
+.curiosity p { color: var(--muted); font: 450 1rem/1.5 var(--font-sans); margin-bottom: 2rem; max-width: 32ch; }
+.curiosity button { margin-top: auto; width: fit-content; }
+.deepLore { border-top: 1px solid var(--line); }
+.loreGrid { display: grid; gap: clamp(1.5rem, 3vw, 3rem); grid-template-columns: 1.2fr 0.8fr 0.8fr; }
+.loreGrid > :first-child { grid-row: span 2; }
+.loreGrid > :first-child > a { min-height: 28rem; }
+.moreLore { align-items: center; border-bottom: 1px solid var(--ink); display: flex; font: 650 0.9rem/1 var(--font-sans); gap: 0.5rem; margin: 3rem 0 0 auto; padding-bottom: 0.35rem; width: fit-content; }
+.moreLore svg { height: 1rem; width: 1rem; }
+
+@media (max-width: 900px) {
+  .nicheRail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .followedNiche:nth-child(3), .followedNiche:nth-child(4) { border-top: 1px solid var(--line); }
+  .followedNiche:nth-child(4) { border-right: 1px solid var(--line); }
+  .loreGrid { grid-template-columns: 1fr 1fr; }
+  .loreGrid > :first-child { grid-row: auto; }
+  .loreGrid > :first-child > a { min-height: 15rem; }
+}
+
+@media (max-width: 767px) {
+  .intro { display: block; padding-top: 2rem; }
+  .intro::after { top: 2.2rem; }
+  .kicker { margin-bottom: 4.5rem; }
+  .intro h1 { font-size: clamp(3.5rem, 17vw, 5.4rem); }
+  .dek { margin: 1.5rem 0 0; max-width: 22ch; }
+  .nicheRail { display: flex; margin-right: calc(var(--gutter) * -1); overflow-x: auto; scroll-snap-type: x mandatory; }
+  .followedNiche { flex: 0 0 76vw; scroll-snap-align: start; }
+  .followedNiche:nth-child(3), .followedNiche:nth-child(4) { border-top: 0; }
+  .curiosityGrid, .loreGrid { grid-template-columns: 1fr; }
+  .curiosity, .curiosity:nth-child(4) { grid-column: auto; min-height: 19rem; }
+}

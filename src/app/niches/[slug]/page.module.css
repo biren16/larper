@@ -1,0 +1,32 @@
+.main { margin: 0 auto; max-width: var(--content); padding: 1.5rem var(--gutter) 7rem; }
+.back { align-items: center; color: var(--muted); display: inline-flex; font: 650 0.76rem/1 var(--font-sans); gap: 0.45rem; margin-bottom: 2.5rem; }
+.back svg { height: 1rem; width: 1rem; }
+.hero { display: grid; grid-template-columns: 0.72fr 1.28fr; }
+.copy { background: var(--paper-bright); display: flex; flex-direction: column; min-height: 31rem; padding: clamp(1.5rem, 4vw, 4rem); }
+.copy > p:first-child { color: var(--muted); font: 650 0.72rem/1 var(--font-sans); }
+.copy h1 { font: 540 clamp(4.2rem, 8vw, 8rem)/0.82 var(--font-serif); letter-spacing: -0.065em; margin: auto 0 1.5rem; overflow-wrap: anywhere; }
+.description { color: var(--muted); font: 460 1rem/1.5 var(--font-sans); margin-bottom: 2rem; max-width: 38ch; }
+.copy button { width: fit-content; }
+.art { min-height: 31rem; }
+.hero blockquote { background: var(--acid); font: 540 clamp(1.8rem, 3vw, 3rem)/1.05 var(--font-serif); grid-column: 2; margin: 0; padding: clamp(1.5rem, 3vw, 3rem); }
+.current, .lore, .related { border-top: 1px solid var(--line); margin-top: clamp(4rem, 9vw, 9rem); padding-top: clamp(2rem, 4vw, 4rem); }
+.heading h2, .related h2 { font: 560 clamp(2.8rem, 5.5vw, 5.3rem)/0.9 var(--font-serif); letter-spacing: -0.05em; }
+.heading p { color: var(--muted); font: 450 0.9rem/1.5 var(--font-sans); margin-top: 0.75rem; }
+.rows { margin: 2rem 0 0 auto; max-width: 66rem; }
+.loreGrid { display: grid; gap: clamp(1.5rem, 3vw, 3rem); grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2.5rem; }
+.related > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2rem; }
+.related a { align-items: center; border-bottom: 1px solid var(--line); display: flex; font: 560 clamp(1.7rem, 3vw, 3rem)/1 var(--font-serif); justify-content: space-between; min-height: 7rem; padding: 1rem; }
+.related a:nth-child(odd) { border-right: 1px solid var(--line); }
+.related a:hover { background: var(--paper-deep); }
+.related svg { height: 1.2rem; width: 1.2rem; }
+
+@media (max-width: 767px) {
+  .hero { grid-template-columns: 1fr; }
+  .copy { min-height: 28rem; }
+  .copy h1 { font-size: clamp(4.2rem, 18vw, 6.2rem); }
+  .art { min-height: 22rem; }
+  .hero blockquote { grid-column: 1; }
+  .loreGrid, .related > div { grid-template-columns: 1fr; }
+  .related a:nth-child(odd) { border-right: 0; }
+}
+

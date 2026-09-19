@@ -1,0 +1,7 @@
+.main { display: grid; gap: 1rem; grid-template-columns: 2fr 1fr; margin: 0 auto; max-width: var(--content); min-height: 70dvh; padding: 4rem var(--gutter); }
+.main div { animation: pulse 1.4s ease-in-out infinite alternate; background: var(--paper-deep); min-height: 24rem; }
+.main div:first-child { grid-row: span 2; }
+@keyframes pulse { to { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .main div { animation: none; } }
+@media (max-width: 767px) { .main { grid-template-columns: 1fr; } .main div { min-height: 12rem; } }
+

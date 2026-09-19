@@ -1,0 +1,71 @@
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/newsreader";
+
+:root {
+  --paper: #f2f0e7;
+  --paper-bright: #f8f7f1;
+  --paper-deep: #e6e3d7;
+  --paper-muted: #d8d6cc;
+  --ink: #20211f;
+  --muted: #666860;
+  --line: #b8b8ae;
+  --acid: #d7f263;
+  --focus: #3155a4;
+  --font-sans: "Space Grotesk Variable", "Arial Narrow", sans-serif;
+  --font-serif: "Newsreader Variable", Georgia, serif;
+  --content: 92rem;
+  --gutter: clamp(1rem, 3vw, 2.75rem);
+  --radius-control: 0.35rem;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--paper); color: var(--ink); scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-sans); margin: 0; min-height: 100dvh; }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
+img { display: block; max-width: 100%; }
+::selection { background: var(--acid); color: var(--ink); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+
+.srOnly {
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.skipLink {
+  background: var(--acid);
+  color: var(--ink);
+  font-weight: 700;
+  left: 1rem;
+  padding: 0.75rem 1rem;
+  position: fixed;
+  top: 1rem;
+  transform: translateY(-200%);
+  z-index: 20;
+}
+.skipLink:focus { transform: translateY(0); }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1f211f;
+    --paper-bright: #252724;
+    --paper-deep: #30322e;
+    --paper-muted: #c9c9c0;
+    --ink: #efeee6;
+    --muted: #b4b5ad;
+    --line: #51534e;
+    --acid: #c9e75a;
+    --focus: #8da7ff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
+

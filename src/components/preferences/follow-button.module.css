@@ -1,0 +1,25 @@
+.button {
+  align-items: center;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-control);
+  color: var(--paper);
+  cursor: pointer;
+  display: inline-flex;
+  font: 650 0.82rem/1 var(--font-sans);
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.button svg { height: 1rem; width: 1rem; }
+.button:hover { background: var(--acid); border-color: var(--acid); color: var(--ink); }
+.button:active { transform: translateY(1px); }
+.following { background: transparent; color: var(--ink); }
+.compact { min-height: 2.5rem; padding: 0.62rem 0.8rem; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .button { transition: background-color 160ms ease, color 160ms ease, transform 100ms ease; }
+}

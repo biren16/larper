@@ -1,0 +1,8 @@
+.header { border-bottom: 1px solid var(--line); }
+.inner { align-items: center; display: flex; justify-content: space-between; margin: 0 auto; max-width: var(--content); min-height: 4.5rem; padding: 0 var(--gutter); }
+.wordmark { font: 700 1.45rem/1 var(--font-sans); letter-spacing: -0.06em; }
+.wordmark::after { background: var(--acid); content: ""; display: inline-block; height: 0.52rem; margin-left: 0.18rem; width: 0.52rem; }
+.inner nav { align-items: center; display: flex; font: 600 0.82rem/1 var(--font-sans); gap: clamp(1rem, 3vw, 2.5rem); }
+.inner nav a { padding: 1rem 0; }
+.inner nav a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+
