@@ -23,12 +23,12 @@
 .action svg { height: 0.9rem; transition: transform 160ms ease; width: 0.9rem; }
 .action:hover svg { transform: translate(2px, -2px); }
 
-.lead { grid-template-columns: minmax(0, 1.35fr) minmax(17rem, 0.65fr); }
-.lead .media { min-height: 23rem; }
+.lead { grid-template-columns: minmax(0, 1fr); }
+.lead .media { min-height: 14rem; }
 .lead .copy { background: var(--ink); color: var(--paper); padding: clamp(1.25rem, 2.5vw, 2.25rem); }
 .lead .meta, .lead .hook, .lead .signals { color: var(--feature-muted); }
 .lead .meta a { color: var(--paper); }
-.lead h3 { font-size: clamp(2.25rem, 4vw, 4.6rem); line-height: 0.88; margin-top: auto; }
+.lead h3 { font-size: clamp(2rem, 3.2vw, 3.6rem); line-height: 0.9; margin-top: 2.25rem; }
 
 .trend { min-height: 14rem; }
 .drop .media, .place .media { min-height: 12rem; }
@@ -49,7 +49,6 @@
 .compact .signals span:not(:first-child) { display: none; }
 
 @media (max-width: 767px) {
-  .lead { grid-template-columns: 1fr; }
   .lead .media { min-height: 18rem; }
   .lead .copy { min-height: 18rem; }
   .lead h3 { font-size: clamp(2.35rem, 12vw, 3.8rem); }

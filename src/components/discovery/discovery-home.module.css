@@ -1,13 +1,13 @@
 .main { overflow: clip; }
-.intro { display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr) 18rem; margin: 0 auto; max-width: var(--content); min-height: 24rem; padding: clamp(2rem, 4vw, 4rem) var(--gutter) 2.5rem; }
+.intro { display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr) 18rem; margin: 0 auto; max-width: var(--content); min-height: 19rem; padding: clamp(1.75rem, 3vw, 2.75rem) var(--gutter) 2rem; }
 .introCopy { align-self: end; }
-.kicker { font: 700 0.78rem/1.2 var(--font-sans); margin-bottom: clamp(1.25rem, 3vw, 2.75rem); }
-.intro h1 { font: 700 clamp(3.65rem, 7.5vw, 7.75rem)/0.82 var(--font-sans); letter-spacing: -0.075em; max-width: 9ch; text-wrap: balance; }
+.kicker { font: 700 0.78rem/1.2 var(--font-sans); margin-bottom: clamp(0.9rem, 2vw, 1.5rem); }
+.intro h1 { font: 700 clamp(3.65rem, 6.5vw, 5.8rem)/0.82 var(--font-sans); letter-spacing: -0.075em; max-width: 13ch; text-wrap: balance; }
 .dek { color: var(--muted); font: 560 clamp(1rem, 1.25vw, 1.18rem)/1.35 var(--font-sans); margin-top: 1.25rem; max-width: 44ch; }
-.introStamp { align-self: end; background: var(--cobalt); color: var(--cobalt-ink); min-height: 12rem; padding: 1.25rem; position: relative; transform: rotate(1.25deg); }
+.introStamp { align-self: end; background: var(--cobalt); color: var(--cobalt-ink); min-height: 10.5rem; padding: 1.15rem; position: relative; transform: rotate(1.25deg); }
 .introStamp::after { background: radial-gradient(circle, rgb(21 21 21 / 0.18) 0 1px, transparent 1.5px); background-size: 5px 5px; content: ""; inset: 0; mix-blend-mode: multiply; opacity: 0.4; pointer-events: none; position: absolute; }
 .introStamp span { font: 700 0.68rem/1 var(--font-sans); }
-.introStamp strong { display: block; font: 700 2rem/0.95 var(--font-sans); letter-spacing: -0.05em; margin-top: 2.5rem; max-width: 8ch; }
+.introStamp strong { display: block; font: 700 1.8rem/0.95 var(--font-sans); letter-spacing: -0.05em; margin-top: 2rem; max-width: 8ch; }
 .introStamp p { font: 560 0.78rem/1.3 var(--font-sans); margin-top: 0.7rem; }
 .now, .yours, .newNiches, .deepLore { margin: 0 auto; max-width: var(--content); padding: clamp(3.75rem, 7vw, 7rem) var(--gutter); }
 .now { background: var(--surface); max-width: none; padding-left: max(var(--gutter), calc((100vw - var(--content)) / 2 + var(--gutter))); padding-right: max(var(--gutter), calc((100vw - var(--content)) / 2 + var(--gutter))); padding-top: 2.5rem; }
@@ -18,12 +18,10 @@
 .liveMark { align-items: center; display: flex !important; gap: 0.45rem; }
 .liveMark::before { background: var(--acid); border: 1px solid var(--ink); border-radius: 50%; content: ""; height: 0.65rem; width: 0.65rem; }
 .signalGrid { display: grid; gap: 0.75rem; grid-auto-flow: dense; grid-template-columns: repeat(12, minmax(0, 1fr)); }
-.signalGrid > :nth-child(1) { grid-column: span 7; grid-row: span 2; }
-.signalGrid > :nth-child(2) { grid-column: span 5; }
-.signalGrid > :nth-child(3), .signalGrid > :nth-child(4) { grid-column: span 3; }
-.signalGrid > :nth-child(5) { grid-column: span 6; }
-.signalGrid > :nth-child(6) { grid-column: span 4; }
-.signalGrid > :nth-child(7) { grid-column: span 2; }
+.signalGrid > :nth-child(1) { grid-column: span 4; }
+.signalGrid > :nth-child(n + 2):nth-child(-n + 5) { grid-column: span 2; }
+.signalGrid > :nth-child(6) { grid-column: span 5; }
+.signalGrid > :nth-child(7) { grid-column: span 7; }
 .yours { display: grid; gap: clamp(2rem, 4vw, 5rem); grid-template-columns: minmax(13rem, 0.28fr) minmax(0, 1fr); }
 .stickyHeading { align-self: start; position: sticky; top: 6.25rem; }
 .stickyHeading p { margin-top: 1rem; }
@@ -75,6 +73,11 @@
   .signalGrid > :nth-child(n + 3) { grid-column: span 4; }
   .yours { grid-template-columns: 1fr; }
   .stickyHeading { position: static; }
+}
+@media (min-width: 768px) and (max-width: 900px) {
+  .signalGrid { display: flex; margin-right: calc(var(--gutter) * -1); overflow-x: auto; padding-bottom: 0.5rem; scroll-snap-type: x mandatory; }
+  .signalGrid > * { flex: 0 0 58vw; scroll-snap-align: start; }
+  .signalGrid > :first-child { flex-basis: 68vw; }
 }
 @media (max-width: 767px) {
   .intro { display: block; min-height: 0; padding-block: 2rem 2.5rem; }
