@@ -57,13 +57,13 @@ describe("discovery ranking", () => {
     expect(calculateEvidenceScore(signals as never[])).toBe(100);
   });
 
-  it("applies the exact current-topic weights and followed affinity", () => {
+  it("applies the live heat weights and caps followed affinity at ten percent", () => {
     const ranked = rankCurrentTopics(
       [topic()],
       [signal("source-1", "reddit"), signal("source-2", "youtube")] as never[],
       new Set(["niche-a"]),
     );
-    expect(ranked[0].score).toBe(69);
+    expect(ranked[0].score).toBe(56.8);
   });
 
   it("excludes drafts and deep-lore topics from the current feed", () => {

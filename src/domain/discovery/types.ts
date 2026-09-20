@@ -45,6 +45,15 @@ export interface Niche {
   origin: ContentOrigin;
 }
 
+export interface TopicSignals {
+  freshness: number;
+  momentum: number;
+  novelty: number;
+  sourceDiversity?: number;
+  indiaRelevance?: number;
+  crossover?: number;
+}
+
 export interface DiscoveryTopic {
   id: string;
   slug: string;
@@ -67,7 +76,7 @@ export interface DiscoveryTopic {
   freshnessLabel: string;
   confidence: number;
   evidenceSummary: string;
-  signals: { freshness: number; momentum: number; novelty: number };
+  signals: TopicSignals;
   mediaId?: string;
   tags: string[];
   relatedTopicIds: string[];
