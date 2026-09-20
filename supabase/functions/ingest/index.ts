@@ -36,6 +36,13 @@ function canonical(value: string) {
   return url.toString();
 }
 
+function publicHttpUrl(value: string) {
+  const url = new URL(value);
+  const host = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (!new Set(["http:", "https:"]).has(url.protocol) || host === "localhost" || host === "::1" || host === "0.0.0.0" || /^(?:127\.|10\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(host)) throw new Error("Source URL must be public");
+  return url;
+}
+
 function text(value: unknown): string {
   if (typeof value === "string" || typeof value === "number") return String(value).trim();
   if (value && typeof value === "object") {
@@ -63,8 +70,8 @@ function sensitiveFlags(value: string): string[] {
 
 async function rssSignals(source: Source, observedAt: string): Promise<Signal[]> {
   const feedUrl = String(source.config.url ?? "");
-  if (!feedUrl.startsWith("http")) throw new Error("RSS source has no approved public URL");
-  const fetched = await fetch(feedUrl, { headers: { "user-agent": "LARPer-Culture-Radar/1.0" }, signal: AbortSignal.timeout(15000) });
+  const approvedUrl = publicHttpUrl(feedUrl);
+  const fetched = await fetch(approvedUrl, { headers: { "user-agent": "LARPer-Culture-Radar/1.0" }, signal: AbortSignal.timeout(15000), redirect: "error" });
   if (!fetched.ok) throw new Error(`RSS returned ${fetched.status}`);
   const parsed = parser.parse(await fetched.text()) as Record<string, unknown>;
   const channel = parsed.rss && typeof parsed.rss === "object" ? (parsed.rss as Record<string, unknown>).channel as Record<string, unknown> : undefined;

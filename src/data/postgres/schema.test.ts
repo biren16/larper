@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 const migration = readFileSync("supabase/migrations/202609200001_live_culture.sql", "utf8");
 const evidenceMigration = readFileSync("supabase/migrations/202609200002_public_evidence.sql", "utf8");
 const editorialMigration = readFileSync("supabase/migrations/202609200003_editorial_publication.sql", "utf8");
+const profileProtectionMigration = readFileSync("supabase/migrations/202609200006_profile_role_protection.sql", "utf8");
+const schedulingMigration = readFileSync("supabase/migrations/202609200007_story_scheduling.sql", "utf8");
 
 describe("live culture database migration", () => {
   it.each([
@@ -45,5 +47,18 @@ describe("live culture database migration", () => {
     expect(editorialMigration).toMatch(/insert into public\.story_revisions/i);
     expect(editorialMigration).toMatch(/grant execute .* service_role/i);
     expect(editorialMigration).toMatch(/for update/i);
+  });
+
+  it("prevents members from promoting their own editorial role", () => {
+    expect(profileProtectionMigration).toMatch(/revoke update on public\.profiles from authenticated/i);
+    expect(profileProtectionMigration).toMatch(/grant update\(display_name\)/i);
+    expect(profileProtectionMigration).not.toMatch(/grant update\(role\)/i);
+  });
+
+  it("publishes founder-scheduled stories through an auditable database job", () => {
+    expect(schedulingMigration).toMatch(/scheduled_for timestamptz/i);
+    expect(schedulingMigration).toMatch(/publish_due_stories/i);
+    expect(schedulingMigration).toMatch(/scheduled_publish/i);
+    expect(schedulingMigration).toMatch(/\*\/5 \* \* \* \*/);
   });
 });

@@ -1,4 +1,5 @@
 import styles from "./story-editor.module.css";
+import { StoryPreview } from "./story-preview";
 
 export interface StudioCandidateDetail {
   id: string;
@@ -8,16 +9,25 @@ export interface StudioCandidateDetail {
   confidence: number;
   sensitiveFlags: string[];
   evidence: Array<{ id: string; title: string; sourceName: string; sourceUrl: string; trustTier: string; availability: string }>;
+  revisions?: Array<{ revision: number; createdAt: string; editorId: string }>;
 }
 
 export function StoryEditor({
   candidate,
   publishAction,
   error,
+  transitionAction,
+  mergeAction,
+  splitAction,
+  scheduleAction,
 }: {
   candidate: StudioCandidateDetail;
   publishAction?: (formData: FormData) => void | Promise<void>;
   error?: string;
+  transitionAction?: (formData: FormData) => void | Promise<void>;
+  mergeAction?: (formData: FormData) => void | Promise<void>;
+  splitAction?: (formData: FormData) => void | Promise<void>;
+  scheduleAction?: (formData: FormData) => void | Promise<void>;
 }) {
   return (
     <main id="main-content" className={styles.main}>
@@ -47,7 +57,10 @@ export function StoryEditor({
           <div className={styles.twoCol}><label>Regions<input name="regions" required defaultValue="india,global" /></label><label>Freshness label<input name="freshnessLabel" required /></label></div>
           <label>Evidence summary<textarea name="evidenceSummary" required rows={3} /></label>
           <label>Tags<input name="tags" placeholder="books,f1,romance" /></label>
+          {scheduleAction && <label>Schedule for (IST)<input name="scheduledFor" type="datetime-local" /></label>}
+          <StoryPreview />
           <div className={styles.actionBar}><button type="submit">Publish story</button><button type="submit" name="format" value="brief" formNoValidate className={styles.secondary}>Publish brief</button></div>
+          {scheduleAction && <button type="submit" formAction={scheduleAction}>Schedule reviewed story</button>}
         </form>
         <aside className={styles.evidence} aria-labelledby="evidence-heading">
           <h2 id="evidence-heading">Evidence</h2>
@@ -57,6 +70,13 @@ export function StoryEditor({
             <h3>{item.title}</h3><p>{item.sourceName}</p>
             <a href={item.sourceUrl} target="_blank" rel="noreferrer">Open source: {item.sourceName}</a>
           </article>)}
+          <h2>Cluster controls</h2>
+          {mergeAction && <form action={mergeAction}><input type="hidden" name="targetId" value={candidate.id} /><label>Duplicate cluster ID<input name="sourceId" required /></label><button type="submit">Merge into this cluster</button></form>}
+          {splitAction && <form action={splitAction}><input type="hidden" name="clusterId" value={candidate.id} /><label>Signal IDs to move<input name="signalIds" required placeholder="id-1,id-2" /></label><button type="submit">Split evidence</button></form>}
+          {transitionAction && <form action={transitionAction}><input type="hidden" name="candidateId" value={candidate.id} /><label>Review note<textarea name="notes" required rows={3} /></label><div className={styles.actionBar}><button type="submit" name="action" value="reject">Reject</button><button type="submit" name="action" value="expire">Expire</button><button type="submit" name="action" value="unpublish">Unpublish</button></div></form>}
+          <h2>Revision history</h2>
+          {candidate.revisions?.map((revision) => <p key={revision.revision}>Revision {revision.revision} · {new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(revision.createdAt))}</p>)}
+          {!candidate.revisions?.length && <p>No published revisions yet.</p>}
         </aside>
       </div>
     </main>

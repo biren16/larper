@@ -22,7 +22,7 @@ function readScore(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 0;
 }
 
-export function mapStoryRow(row: Omit<StoryRow, "reviewed_by" | "created_at" | "updated_at"> & Partial<Pick<StoryRow, "reviewed_by" | "created_at" | "updated_at">>): DiscoveryTopic {
+export function mapStoryRow(row: Omit<StoryRow, "reviewed_by" | "created_at" | "updated_at" | "scheduled_for"> & Partial<Pick<StoryRow, "reviewed_by" | "created_at" | "updated_at" | "scheduled_for">>): DiscoveryTopic {
   const scores = row.signals && !Array.isArray(row.signals) && typeof row.signals === "object" ? row.signals : {};
   const score = (camel: string, snake: string) => readScore(scores[camel] ?? scores[snake]);
   return {

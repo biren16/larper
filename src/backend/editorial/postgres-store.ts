@@ -43,6 +43,16 @@ export class PostgresEditorialStore implements EditorialStore {
     if (!row) throw new Error("Publish story: no revision returned");
     return { storyId: row.story_id, revision: row.revision };
   }
+  async schedulePublication(command: PublicationCommand & { scheduledFor: string }) {
+    const result = await this.client.rpc("schedule_editorial_story", {
+      p_candidate_id: command.candidateId, p_reviewer_id: command.reviewerId,
+      p_draft: command.draft as unknown as Json, p_scheduled_for: command.scheduledFor,
+    });
+    failure("Schedule story", result.error);
+    const row = result.data?.[0];
+    if (!row) throw new Error("Schedule story: no revision returned");
+    return { storyId: row.story_id, revision: row.revision };
+  }
   async recordReview(event: ReviewEvent) {
     const result = await this.client.from("review_events").insert({ cluster_id: event.candidateId, reviewer_id: event.reviewerId, action: event.action, notes: event.notes ?? null });
     failure("Record review", result.error);

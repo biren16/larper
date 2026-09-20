@@ -28,6 +28,7 @@ export interface EditorialStore {
   mergeClusters(targetId: string, sourceId: string): Promise<void>;
   splitCluster(clusterId: string, signalIds: string[]): Promise<string>;
   addManualSignal(signal: NormalizedSignal): Promise<string>;
+  schedulePublication(command: PublicationCommand & { scheduledFor: string }): Promise<{ storyId: string; revision: number }>;
 }
 
 const REQUIRED_STORY_FIELDS: Array<keyof StoryDraft> = [
@@ -89,6 +90,22 @@ export class EditorialService {
       draft,
     });
     await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "publish_story" });
+    return result;
+  }
+
+  async scheduleStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft, scheduledFor: string, now: string) {
+    const context = await this.candidate(actor, candidateId);
+    validateStory(draft);
+    const evidence = [...independentEvidence(context.candidate)];
+    if (evidence.length < 2) throw new Error("A story requires two independent available sources");
+    if (!evidence.some((item) => item.trustTier === "primary" || item.trustTier === "publication")) throw new Error("A factual story requires at least one credible source");
+    const target = Date.parse(scheduledFor);
+    if (!Number.isFinite(target) || target <= Date.parse(now)) throw new Error("Scheduled publication must be in the future");
+    const result = await this.store.schedulePublication({
+      candidateId, reviewerId: context.actor.id, lifecycle: "published_story", publicationFormat: "story", draft,
+      scheduledFor: new Date(target).toISOString(),
+    });
+    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "schedule_story", notes: new Date(target).toISOString() });
     return result;
   }
 

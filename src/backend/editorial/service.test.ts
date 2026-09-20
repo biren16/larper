@@ -45,6 +45,7 @@ class MemoryStore implements EditorialStore {
   merges: Array<[string, string]> = [];
   splits: Array<[string, string[]]> = [];
   manuals: unknown[] = [];
+  schedules: Array<{ candidateId: string; scheduledFor: string }> = [];
 
   async getCandidate() { return this.current; }
   async commitPublication(command: PublicationCommand) { this.publications.push(command); return { storyId: "story-1", revision: this.publications.length }; }
@@ -53,6 +54,7 @@ class MemoryStore implements EditorialStore {
   async mergeClusters(target: string, source: string) { this.merges.push([target, source]); }
   async splitCluster(id: string, signalIds: string[]) { this.splits.push([id, signalIds]); return "cluster-2"; }
   async addManualSignal(signal: unknown) { this.manuals.push(signal); return "signal-1"; }
+  async schedulePublication(command: PublicationCommand & { scheduledFor: string }) { this.schedules.push({ candidateId: command.candidateId, scheduledFor: command.scheduledFor }); return { storyId: "story-1", revision: 1 }; }
 }
 
 describe("EditorialService", () => {
@@ -87,6 +89,12 @@ describe("EditorialService", () => {
     store.current = candidate({ sensitiveFlags: ["minors"], heat: 100, confidence: 100 });
     await expect(service.publishBrief(actor, "cluster-1", { nicheId: "books", slug: "blocked", title: "Blocked", regions: ["india"], freshnessLabel: "Moving", evidenceSummary: "Evidence", tags: [] }))
       .rejects.toThrow("sensitive:minors");
+  });
+
+  it("schedules a reviewed story for a future publication time", async () => {
+    await service.scheduleStory(actor, "cluster-1", draft, "2026-09-21T10:00:00.000Z", "2026-09-20T10:00:00.000Z");
+    expect(store.schedules).toEqual([{ candidateId: "cluster-1", scheduledFor: "2026-09-21T10:00:00.000Z" }]);
+    expect(store.reviews.at(-1)).toMatchObject({ action: "schedule_story" });
   });
 
   it("records reject, expire, and unpublish transitions", async () => {

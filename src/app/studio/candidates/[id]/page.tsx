@@ -1,13 +1,13 @@
 import { notFound, redirect } from "next/navigation";
 import { getEditorialRuntime } from "@/backend/editorial/runtime";
 import { StoryEditor } from "../story-editor";
-import { publishCandidateAction } from "../../actions";
+import { mergeCandidateAction, publishCandidateAction, scheduleCandidateAction, splitCandidateAction, transitionCandidateAction } from "../../actions";
 
 export default async function StudioCandidatePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const [{ id }, query, runtime] = await Promise.all([params, searchParams, authorizedRuntime()]);
   const candidate = await runtime.reader.candidate(id);
   if (!candidate) notFound();
-  return <StoryEditor candidate={candidate} publishAction={publishCandidateAction} error={query.error} />;
+  return <StoryEditor candidate={candidate} publishAction={publishCandidateAction} scheduleAction={scheduleCandidateAction} transitionAction={transitionCandidateAction} mergeAction={mergeCandidateAction} splitAction={splitCandidateAction} error={query.error} />;
 }
 
 async function authorizedRuntime() {

@@ -32,7 +32,7 @@ export class StudioReader {
         sourceCount: signalCounts.get(row.id) ?? 0, lastCheckedAt: row.last_checked_at, sensitiveFlags: row.sensitive_flags,
       })),
       sources: (sources.data ?? []).map((row) => ({
-        id: row.id, name: row.name, adapterType: row.adapter_type,
+        id: row.id, name: row.name, adapterType: row.adapter_type, active: row.active,
         healthy: row.active && (failureCounts.get(row.id) ?? 0) === 0, lastPolledAt: row.last_polled_at,
         failureCount: failureCounts.get(row.id) ?? 0,
       })),
@@ -51,10 +51,17 @@ export class StudioReader {
       ? await this.client.from("raw_signals").select("id, title, source_name, canonical_url, trust_tier, availability").in("id", ids)
       : { data: [], error: null };
     check("Load studio evidence", signals.error);
+    const story = await this.client.from("stories").select("id").eq("cluster_id", id).maybeSingle();
+    check("Load candidate story", story.error);
+    const revisions = story.data
+      ? await this.client.from("story_revisions").select("revision, created_at, editor_id").eq("story_id", story.data.id).order("revision", { ascending: false })
+      : { data: [], error: null };
+    check("Load revision history", revisions.error);
     return {
       id: cluster.data.id, title: cluster.data.title, nicheId: cluster.data.niche_id,
       heat: Number(cluster.data.heat), confidence: Number(cluster.data.confidence), sensitiveFlags: cluster.data.sensitive_flags,
       evidence: (signals.data ?? []).map((row) => ({ id: row.id, title: row.title, sourceName: row.source_name, sourceUrl: row.canonical_url, trustTier: row.trust_tier, availability: row.availability })),
+      revisions: (revisions.data ?? []).map((row) => ({ revision: row.revision, createdAt: row.created_at, editorId: row.editor_id })),
     };
   }
 }

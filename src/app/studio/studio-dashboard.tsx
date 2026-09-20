@@ -3,7 +3,7 @@ import styles from "./studio.module.css";
 
 export interface StudioDashboardData {
   candidates: Array<{ id: string; title: string; nicheName: string; heat: number; confidence: number; state: string; sourceCount: number; lastCheckedAt: string; sensitiveFlags: string[] }>;
-  sources: Array<{ id: string; name: string; adapterType: string; healthy: boolean; lastPolledAt: string | null; failureCount: number }>;
+  sources: Array<{ id: string; name: string; adapterType: string; active: boolean; healthy: boolean; lastPolledAt: string | null; failureCount: number }>;
   runs: Array<{ id: string; status: string; startedAt: string; insertedCount: number; errorCount: number }>;
 }
 
@@ -11,7 +11,7 @@ const time = (value: string | null) => value
   ? new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(value))
   : "Never";
 
-export function StudioDashboard({ data, manualSignalAction }: { data: StudioDashboardData; manualSignalAction?: (form: FormData) => void | Promise<void> }) {
+export function StudioDashboard({ data, manualSignalAction, createSourceAction, toggleSourceAction }: { data: StudioDashboardData; manualSignalAction?: (form: FormData) => void | Promise<void>; createSourceAction?: (form: FormData) => void | Promise<void>; toggleSourceAction?: (form: FormData) => void | Promise<void> }) {
   const latestRun = data.runs[0];
   return (
     <main id="main-content" className={styles.main}>
@@ -49,8 +49,17 @@ export function StudioDashboard({ data, manualSignalAction }: { data: StudioDash
               <span className={styles.health} data-healthy={source.healthy} aria-label={source.healthy ? "Healthy" : "Needs attention"} />
               <div><strong>{source.name}</strong><small>{source.adapterType} · polled {time(source.lastPolledAt)}</small></div>
               <span>{source.failureCount} failures</span>
+              {toggleSourceAction && <form action={toggleSourceAction}><input type="hidden" name="sourceId" value={source.id} /><input type="hidden" name="active" value={source.active ? "false" : "true"} /><button type="submit">{source.active ? "Pause" : "Activate"}</button></form>}
             </article>
           ))}</div>
+          {createSourceAction && <form className={styles.manualForm} action={createSourceAction} aria-label="Add a source definition">
+            <label>Source name<input name="name" required /></label>
+            <div><label>Adapter<select name="adapterType"><option value="rss">RSS / Atom</option><option value="youtube">YouTube</option></select></label><label>Trust<select name="trustTier"><option value="publication">Publication</option><option value="primary">Primary</option><option value="community">Community</option><option value="watchlist">Watchlist</option></select></label></div>
+            <label>Public feed URL, channel ID, or search query<input name="locator" required /></label>
+            <div><label>Locale<input name="locale" defaultValue="en-IN" required /></label><label>Region<input name="region" defaultValue="india" required /></label></div>
+            <label><input name="allowlisted" type="checkbox" /> Allow for brief corroboration</label>
+            <button type="submit">Add paused source</button>
+          </form>}
         </section>
 
         <section aria-labelledby="manual-heading">

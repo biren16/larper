@@ -17,7 +17,7 @@ export interface Database {
       signal_snapshots: Table<{ id: string; raw_signal_id: string; metrics: Json; captured_at: string }>;
       topic_clusters: Table<{ id: string; niche_id: string | null; title: string; normalized_terms: string[]; regions: string[]; state: string; momentum: number; source_diversity: number; freshness: number; novelty: number; india_relevance: number; crossover: number; heat: number; confidence: number; sensitive_flags: string[]; first_detected_at: string; last_checked_at: string; expires_at: string | null; created_at: string; updated_at: string }>;
       cluster_signals: Table<{ cluster_id: string; raw_signal_id: string; match_score: number; match_reasons: string[]; created_at: string }>;
-      stories: Table<{ id: string; cluster_id: string | null; niche_id: string; slug: string; title: string; hook: string; summary: string; why_it_matters: string; lore: string; beginner_context: string; discovery_type: string; mode: string; publication_format: string; lifecycle: string; regions: string[]; freshness_label: string; confidence: number; evidence_summary: string; signals: Json; media_id: string | null; tags: string[]; related_story_ids: string[]; first_detected_at: string; last_updated_at: string; last_checked_at: string; published_at: string | null; reviewed_by: string | null; created_at: string; updated_at: string }>;
+      stories: Table<{ id: string; cluster_id: string | null; niche_id: string; slug: string; title: string; hook: string; summary: string; why_it_matters: string; lore: string; beginner_context: string; discovery_type: string; mode: string; publication_format: string; lifecycle: string; regions: string[]; freshness_label: string; confidence: number; evidence_summary: string; signals: Json; media_id: string | null; tags: string[]; related_story_ids: string[]; first_detected_at: string; last_updated_at: string; last_checked_at: string; published_at: string | null; scheduled_for: string | null; reviewed_by: string | null; created_at: string; updated_at: string }>;
       story_revisions: Table<{ id: string; story_id: string; revision: number; snapshot: Json; editor_id: string; created_at: string }>;
       niche_aliases: Table<{ id: string; niche_id: string; alias: string; locale: string; created_at: string }>;
       profiles: Table<{ id: string; display_name: string | null; role: string; created_at: string; updated_at: string }>;
@@ -35,6 +35,11 @@ export interface Database {
         Returns: Array<{ story_id: string; revision: number }>;
       };
       process_unclustered_signals: { Args: Record<never, never>; Returns: number };
+      schedule_editorial_story: {
+        Args: { p_candidate_id: string; p_reviewer_id: string; p_draft: Json; p_scheduled_for: string };
+        Returns: Array<{ story_id: string; revision: number }>;
+      };
+      publish_due_stories: { Args: Record<never, never>; Returns: number };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
