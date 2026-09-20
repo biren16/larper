@@ -1,5 +1,5 @@
 .main { overflow: clip; }
-.intro { align-items: center; display: grid; gap: clamp(2rem, 5vw, 6rem); grid-template-columns: repeat(12, minmax(0, 1fr)); margin: 0 auto; max-width: var(--content); min-height: clamp(38rem, 72dvh, 47rem); overflow: clip; padding: clamp(2rem, 4vw, 4rem) var(--gutter); position: relative; }
+.intro { align-items: center; display: grid; gap: clamp(2rem, 5vw, 6rem); grid-template-columns: repeat(12, minmax(0, 1fr)); margin: 0 auto; max-width: var(--content); min-height: calc(100vh - 4.5rem); min-height: calc(100svh - 4.5rem); overflow: clip; padding: clamp(2rem, 4vw, 4rem) var(--gutter); position: relative; }
 .introCopy { align-self: center; grid-column: 1 / span 6; position: relative; z-index: 2; }
 .kicker { font: 700 0.82rem/1.2 var(--font-sans); margin-bottom: clamp(1.25rem, 2vw, 2rem); }
 .intro h1 { font: 700 clamp(4.6rem, 7vw, 6.7rem)/0.82 var(--font-sans); letter-spacing: -0.078em; max-width: 10.5ch; text-wrap: balance; }
