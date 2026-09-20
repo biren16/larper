@@ -32,6 +32,10 @@ const sourceLabels: Record<SourceSignal["sourceType"], string> = {
   blog: "Blog signal",
   publication: "Publication signal",
   trend: "Search rising",
+  instagram: "Instagram signal",
+  tiktok: "TikTok signal",
+  manual: "Curated signal",
+  web: "Web signal",
 };
 
 export function selectCardKind(
