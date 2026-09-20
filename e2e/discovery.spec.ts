@@ -28,7 +28,7 @@ test("the opening is a tall ranked-culture collage that hands off to Larping RN"
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await page.evaluate(() => document.fonts.ready);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Find your next niche to larp bout' rn");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Wanna larp about smth new? Find your next niche rn.");
   await expect(page.getByText(/Niche obsessions, drops, memes, debates and lore/).first()).toBeVisible();
 
   const hero = page.locator("main > header").first();
