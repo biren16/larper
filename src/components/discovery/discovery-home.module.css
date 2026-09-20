@@ -81,7 +81,7 @@
   .nicheRail { margin-right: calc(var(--gutter) * -1); }
 }
 @media (min-width: 768px) and (max-width: 900px) {
-  .signalGrid { display: flex; margin-right: calc(var(--gutter) * -1); overflow-x: auto; padding-bottom: 0.5rem; scroll-snap-type: x mandatory; }
+  .signalGrid { align-items: flex-start; display: flex; margin-right: calc(var(--gutter) * -1); overflow-x: auto; padding-bottom: 0.5rem; scroll-snap-type: x mandatory; }
   .signalGrid > * { flex: 0 0 58vw; scroll-snap-align: start; }
   .signalGrid > :first-child { flex-basis: 68vw; }
   .curiosityGrid { display: flex; margin-right: calc(var(--gutter) * -1); overflow-x: auto; padding-bottom: 0.75rem; scroll-snap-type: x mandatory; }
@@ -95,9 +95,10 @@
   .chapterHeading { display: block; }
   .chapterHeading > p { margin-top: 0.75rem; }
   .signalGrid, .nicheRail, .curiosityGrid { display: flex; margin-right: calc(var(--gutter) * -1); overflow-x: auto; padding-bottom: 0.5rem; scroll-snap-type: x mandatory; }
+  .signalGrid { align-items: flex-start; }
   .signalGrid > * { flex: 0 0 82vw; scroll-snap-align: start; }
   .signalGrid > :first-child { flex-basis: 90vw; }
-  .followedNiche { flex: 0 0 84vw; grid-template-columns: 7.5rem minmax(0, 1fr); grid-template-rows: none; min-height: 11rem; scroll-snap-align: start; }
+  .followedNiche { flex: 0 0 84vw; grid-template-columns: 1fr; grid-template-rows: 9rem minmax(9rem, auto); min-height: 18rem; scroll-snap-align: start; }
   .curiosity, .curiosity:nth-child(4) { flex: 0 0 82vw; grid-template-columns: 1fr; min-height: 27rem; scroll-snap-align: start; }
   .printField { display: none; }
   .deepLore { display: block; }

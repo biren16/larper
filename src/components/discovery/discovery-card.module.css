@@ -62,6 +62,9 @@
 
 @media (min-width: 768px) and (max-width: 1100px) {
   .footer { align-items: flex-start; flex-direction: column; gap: 0.5rem; }
+  .card[data-density="compact"] .copy { padding: 1rem; }
+  .card[data-density="compact"] h3 { -webkit-line-clamp: 2; }
+  .card[data-density="compact"] .footer { align-items: center; bottom: auto; flex-direction: row; gap: 0.75rem; margin-top: auto; padding-top: 0.85rem; position: static; right: auto; }
 }
 
 @media (max-width: 767px) {
@@ -72,6 +75,11 @@
   .lead h3 { font-size: clamp(2.35rem, 12vw, 3.8rem); }
   .card { min-height: 0; }
   .meme .media, .visual .media { min-height: 14rem; }
+  .card[data-density="compact"] { min-height: 0; }
+  .card[data-density="compact"] .copy { padding: 1.1rem; }
+  .card[data-density="compact"] h3 { display: block; font-size: 1.6rem; overflow: visible; -webkit-line-clamp: unset; }
+  .card[data-density="compact"] .hook { display: block; font-size: 0.82rem; }
+  .card[data-density="compact"] .footer { align-items: center; bottom: auto; flex-direction: row; gap: 0.75rem; margin-top: auto; padding-top: 1rem; position: static; right: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

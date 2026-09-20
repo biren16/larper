@@ -71,10 +71,54 @@ test("mobile rails work without horizontal page overflow", async ({ page, isMobi
   test.skip(!isMobile, "mobile project only");
   await page.setViewportSize({ width: 320, height: 720 });
   await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
   const rail = page.locator('section[aria-labelledby="your-larps"] > div').last();
   await expect.poll(() => rail.evaluate((element) => getComputedStyle(element).overflowX)).toBe("auto");
   const overflows = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(overflows).toBe(false);
+});
+
+test("narrow signal rails keep compact stories readable without stretching them", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop project owns the exact 320px viewport");
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const card = page.locator('section[aria-labelledby="larping-now"] article').nth(1);
+  const metrics = await card.evaluate((element) => {
+    const title = element.querySelector("h3")!;
+    const cardBox = element.getBoundingClientRect();
+    const titleBox = title.getBoundingClientRect();
+    return {
+      cardHeight: cardBox.height,
+      titleContained: titleBox.left >= cardBox.left && titleBox.right <= cardBox.right,
+      titleOverflow: getComputedStyle(title).overflow,
+      lineClamp: getComputedStyle(title).webkitLineClamp,
+    };
+  });
+  expect(metrics.cardHeight).toBeLessThan(260);
+  expect(metrics.titleContained).toBe(true);
+  expect(metrics.titleOverflow).toBe("visible");
+  expect(metrics.lineClamp).toBe("none");
+});
+
+test("Your Larps keeps its title and metadata inside a 320px card", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop project owns the exact 320px viewport");
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const section = page.locator('section[aria-labelledby="your-larps"]').filter({ visible: true }).first();
+  const card = section.locator("article").first();
+  const contained = await card.evaluate((element) => {
+    const cardBox = element.getBoundingClientRect();
+    const title = element.querySelector("h3")!;
+    const titleBox = title.querySelector("a")!.getBoundingClientRect();
+    const metaItems = [...title.previousElementSibling!.children];
+    const actionBox = element.querySelector('a[aria-label^="Explore"]')!.getBoundingClientRect();
+    return titleBox.right <= cardBox.right
+      && title.scrollWidth <= title.clientWidth
+      && metaItems.every((item) => item.getBoundingClientRect().right <= actionBox.left);
+  });
+  expect(contained).toBe(true);
 });
 
 test("tablet recommendations stay readable instead of collapsing into narrow columns", async ({ page, isMobile }) => {
