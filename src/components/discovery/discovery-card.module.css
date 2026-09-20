@@ -23,13 +23,15 @@
 .action svg { height: 0.9rem; transition: transform 160ms ease; width: 0.9rem; }
 .action:hover svg { transform: translate(2px, -2px); }
 
-.lead { grid-template-columns: minmax(0, 1fr); }
-.lead .media { min-height: 11rem; }
-.lead .media > div { min-height: 11rem; }
-.lead .copy { background: var(--feature-bg); color: var(--feature-text); padding: clamp(1.25rem, 2.5vw, 2.25rem); }
+.lead { grid-template-columns: minmax(0, 1fr); min-height: 21.5rem; }
+.lead .media { min-height: 21.5rem; }
+.lead .media > div { min-height: 21.5rem; }
+.lead .copy { background-color: rgb(15 16 15 / 0.9); background-image: linear-gradient(to top, rgb(15 16 15 / 0.98), rgb(15 16 15 / 0.6)); bottom: 0; color: var(--feature-text); left: 0; padding: 1.15rem 1.35rem; position: absolute; right: 0; }
 .lead .meta, .lead .hook, .lead .signals { color: var(--feature-muted); }
 .lead .meta a { color: var(--feature-text); }
-.lead h3 { font-size: clamp(2rem, 3.2vw, 3.6rem); line-height: 0.9; margin-top: 2.25rem; }
+.lead h3 { font-size: clamp(2rem, 3vw, 3.15rem); line-height: 0.9; margin: 0.85rem 0 0.45rem; max-width: 17ch; }
+.lead .hook { display: -webkit-box; font-size: 0.8rem; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; }
+.lead .footer { padding-top: 0.65rem; }
 
 .trend { min-height: 14rem; }
 .drop .media, .place .media { min-height: 12rem; }
@@ -51,14 +53,22 @@
 .compact h3 { font-size: clamp(1.2rem, 1.7vw, 1.65rem); }
 .compact .signals span:not(:first-child) { display: none; }
 
+.card[data-density="compact"] { min-height: 6.75rem; }
+.card[data-density="compact"] .copy { padding: 0.9rem 8rem 0.9rem 1rem; }
+.card[data-density="compact"] h3 { display: -webkit-box; font-size: clamp(1.25rem, 1.5vw, 1.55rem); margin: 0.5rem 0 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.card[data-density="compact"] .hook { display: none; }
+.card[data-density="compact"] .footer { align-items: flex-end; bottom: 0.75rem; flex-direction: column; gap: 0; margin: 0; padding: 0; position: absolute; right: 0.9rem; }
+.card[data-density="compact"] .signals { white-space: nowrap; }
+
 @media (min-width: 768px) and (max-width: 1100px) {
   .footer { align-items: flex-start; flex-direction: column; gap: 0.5rem; }
 }
 
 @media (max-width: 767px) {
-  .lead .media { min-height: 18rem; }
-  .lead .media > div { min-height: 18rem; }
-  .lead .copy { min-height: 18rem; }
+  .lead { min-height: 32rem; }
+  .lead .media { min-height: 32rem; }
+  .lead .media > div { min-height: 32rem; }
+  .lead .copy { min-height: 0; }
   .lead h3 { font-size: clamp(2.35rem, 12vw, 3.8rem); }
   .card { min-height: 0; }
   .meme .media, .visual .media { min-height: 14rem; }

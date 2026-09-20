@@ -11,6 +11,8 @@ export type DiscoveryCardKind =
   | "lore"
   | "compact";
 
+export type DiscoveryCardDensity = "feature" | "standard" | "compact";
+
 export interface SignalCue {
   status: string;
   sourceLabels: string[];

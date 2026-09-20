@@ -23,20 +23,27 @@ async function contrastRatio(locator: Locator) {
   });
 }
 
-test("the opening explains the product and shows five useful signals", async ({ page, isMobile }) => {
+test("the opening explains the product with a dominant lead and a readable signal stack", async ({ page, isMobile }) => {
   test.skip(isMobile, "desktop density check");
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("What the internet is larping rn.");
   await expect(page.getByText(/Niche obsessions, drops, memes, debates and lore/).first()).toBeVisible();
 
-  const intersecting = await page.locator('section[aria-labelledby="larping-now"] article h3').evaluateAll((items) => (
-    items.filter((item) => {
-      const box = item.getBoundingClientRect();
-      return box.top < window.innerHeight && box.bottom > 0;
-    }).length
-  ));
-  expect(intersecting).toBeGreaterThanOrEqual(5);
+  const section = page.locator('section[aria-labelledby="larping-now"]').filter({ visible: true }).first();
+  const cards = section.locator("article");
+  const layout = await cards.evaluateAll((items) => items.slice(0, 5).map((item) => {
+    const box = item.getBoundingClientRect();
+    return { top: box.top, bottom: box.bottom, left: box.left, right: box.right, width: box.width };
+  }));
+  const sectionWidth = await section.evaluate((element) => element.getBoundingClientRect().width);
+
+  expect(layout[0].width / sectionWidth).toBeGreaterThan(0.5);
+  expect(layout.slice(1, 4).every((card) => card.left >= layout[0].right)).toBe(true);
+  expect(layout[1].top).toBeLessThan(layout[2].top);
+  expect(layout[2].top).toBeLessThan(layout[3].top);
+  expect(layout.slice(0, 4).every((card) => card.bottom <= 900)).toBe(true);
+  expect(layout[4].top).toBeLessThan(900);
 });
 
 test("moves from a contextual action to its explanation and niche", async ({ page }) => {
@@ -68,6 +75,18 @@ test("mobile rails work without horizontal page overflow", async ({ page, isMobi
   await expect.poll(() => rail.evaluate((element) => getComputedStyle(element).overflowX)).toBe("auto");
   const overflows = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(overflows).toBe(false);
+});
+
+test("tablet recommendations stay readable instead of collapsing into narrow columns", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop project owns the exact tablet viewport");
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.goto("/");
+  const section = page.locator('section[aria-labelledby="new-larps"]').filter({ visible: true }).first();
+  const rail = section.locator("article").first().locator("..");
+  await expect.poll(() => rail.evaluate((element) => getComputedStyle(element).overflowX)).toBe("auto");
+  const widths = await section.locator("article").evaluateAll((items) => items.slice(0, 3).map((item) => item.getBoundingClientRect().width));
+  expect(widths.every((width) => width >= 340)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });
 
 test("reduced motion removes chapter choreography", async ({ page, isMobile }) => {

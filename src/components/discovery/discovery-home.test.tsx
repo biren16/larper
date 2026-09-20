@@ -20,7 +20,14 @@ describe("DiscoveryHome", () => {
     const nowHeading = screen.getByRole("heading", { name: "Larping RN" });
     const nowSection = nowHeading.closest("section");
     expect(nowSection).not.toBeNull();
-    expect(within(nowSection!).getAllByRole("article")).toHaveLength(7);
+    const nowStories = within(nowSection!).getAllByRole("article");
+    expect(nowStories).toHaveLength(7);
+    expect(nowStories[0]).toHaveAttribute("data-density", "feature");
+    nowStories.slice(1, 4).forEach((story) => {
+      expect(story).toHaveAttribute("data-density", "compact");
+      expect(within(story).getByLabelText(/source signals/i)).toHaveTextContent(/^\d+ signals$/);
+    });
+    expect(nowStories[4]).toHaveAttribute("data-density", "standard");
     expect(within(nowSection!).getAllByRole("link", { name: /go deeper|wtf is this|why do people care/i }).length).toBeGreaterThan(3);
     expect(screen.getByRole("heading", { name: "Your Larps" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Go larp something new" })).toBeInTheDocument();

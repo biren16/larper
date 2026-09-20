@@ -5,6 +5,7 @@ import { Artwork } from "./artwork";
 import {
   buildSignalCue,
   getCuriosityAction,
+  type DiscoveryCardDensity,
   type DiscoveryCardKind,
 } from "./topic-presentation";
 import styles from "./discovery-card.module.css";
@@ -12,19 +13,21 @@ import styles from "./discovery-card.module.css";
 export function DiscoveryCard({
   item,
   kind,
+  density = "standard",
   priority = false,
 }: {
   item: TopicViewModel;
   kind: DiscoveryCardKind;
+  density?: DiscoveryCardDensity;
   priority?: boolean;
 }) {
   const cue = buildSignalCue(item.topic, item.sources);
   const action = getCuriosityAction(item.topic);
-  const showMedia = ["lead", "meme", "drop", "visual", "place", "lore"].includes(kind);
+  const showMedia = density !== "compact" && ["lead", "meme", "drop", "visual", "place", "lore"].includes(kind);
   const showHook = !["meme", "compact"].includes(kind);
 
   return (
-    <article className={`${styles.card} ${styles[kind]}`} data-card-kind={kind}>
+    <article className={`${styles.card} ${styles[kind]}`} data-card-kind={kind} data-density={density}>
       {showMedia && (
         <Link
           className={styles.media}
@@ -44,8 +47,8 @@ export function DiscoveryCard({
         <div className={styles.footer}>
           <div className={styles.signals} aria-label={`${item.sourceCount} source signals`}>
             <span>{item.sourceCount} signals</span>
-            {cue.sourceLabels.map((label) => <span key={label}>{label}</span>)}
-            {cue.crossCommunity && <span>Cross-community</span>}
+            {density !== "compact" && cue.sourceLabels.map((label) => <span key={label}>{label}</span>)}
+            {density !== "compact" && cue.crossCommunity && <span>Cross-community</span>}
           </div>
           <Link className={styles.action} href={action.href}>
             {action.label}<ArrowUpRight aria-hidden />

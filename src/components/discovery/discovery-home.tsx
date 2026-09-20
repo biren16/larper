@@ -54,6 +54,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
               key={item.topic.id}
               item={item}
               kind={selectCardKind(item.topic, item.niche, { lead: index === 0, compact: index === 6 })}
+              density={index === 0 ? "feature" : index < 4 ? "compact" : "standard"}
               priority={index === 0}
             />
           ))}
