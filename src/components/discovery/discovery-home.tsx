@@ -33,7 +33,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
       <header className={styles.intro}>
         <div className={styles.introCopy}>
           <p className={styles.kicker}>Find new shit to get obsessed with.</p>
-          <h1>What the internet is larpin’ bout rn</h1>
+          <h1>Find your next niche to larp bout' rn</h1>
           <p className={styles.dek}>Niche obsessions, drops, memes, debates and lore. Before they hit your whole feed.</p>
         </div>
         <div className={styles.heroCollage} aria-label="Current ranked culture signals">
