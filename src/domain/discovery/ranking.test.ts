@@ -14,25 +14,37 @@ const topic = (overrides: Partial<DiscoveryTopic> = {}): DiscoveryTopic => ({
   beginnerContext: "Beginner",
   type: "TREND" as const,
   mode: "current" as const,
+  publicationFormat: "story" as const,
+  lifecycle: "published_story" as const,
+  regions: ["global"],
   firstDetectedAt: "2026-09-10T00:00:00.000Z",
   lastUpdatedAt: "2026-09-18T00:00:00.000Z",
+  lastCheckedAt: "2026-09-18T00:00:00.000Z",
   publishedAt: "2026-09-12T00:00:00.000Z",
   freshnessLabel: "Picking up",
+  confidence: 80,
+  evidenceSummary: "Two test signals",
   signals: { freshness: 80, momentum: 70, novelty: 60 },
   tags: [],
   relatedTopicIds: [],
   status: "published" as const,
   origin: "seed" as const,
   ...overrides,
-});
+} as DiscoveryTopic);
 
 const signal = (id: string, sourceType: SourceSignal["sourceType"]): SourceSignal => ({
   id,
   topicId: "topic-a",
   sourceType,
   sourceName: id,
+  sourceDefinitionId: `seed:${sourceType}`,
   title: id,
+  locale: "en",
+  region: "global",
   publishedAt: "2026-09-18T00:00:00.000Z",
+  observedAt: "2026-09-18T00:00:00.000Z",
+  trustTier: "community",
+  availability: "available",
   signalStrength: 70,
   origin: "seed" as const,
 });
@@ -45,13 +57,13 @@ describe("discovery ranking", () => {
     expect(calculateEvidenceScore(signals as never[])).toBe(100);
   });
 
-  it("applies the exact current-topic weights and followed affinity", () => {
+  it("applies the live heat weights and caps followed affinity at ten percent", () => {
     const ranked = rankCurrentTopics(
       [topic()],
       [signal("source-1", "reddit"), signal("source-2", "youtube")] as never[],
       new Set(["niche-a"]),
     );
-    expect(ranked[0].score).toBe(69);
+    expect(ranked[0].score).toBe(56.8);
   });
 
   it("excludes drafts and deep-lore topics from the current feed", () => {

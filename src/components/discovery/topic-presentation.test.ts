@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { DiscoveryTopic, Niche, SourceSignal } from "@/domain/discovery/types";
 import {
+  buildEvidenceProvenance,
   buildSignalCue,
   getCuriosityAction,
   selectCardKind,
@@ -18,17 +19,23 @@ const topic = (overrides: Partial<DiscoveryTopic> = {}): DiscoveryTopic => ({
   beginnerContext: "Beginner context",
   type: "TREND",
   mode: "current",
+  publicationFormat: "story",
+  lifecycle: "published_story",
+  regions: ["global"],
   firstDetectedAt: "2026-09-10T08:00:00.000Z",
   lastUpdatedAt: "2026-09-10T18:00:00.000Z",
+  lastCheckedAt: "2026-09-10T18:00:00.000Z",
   publishedAt: "2026-09-10T12:00:00.000Z",
   freshnessLabel: "New this week",
+  confidence: 80,
+  evidenceSummary: "Two test signals",
   signals: { freshness: 80, momentum: 78, novelty: 70 },
   tags: [],
   relatedTopicIds: [],
   status: "published",
   origin: "seed",
   ...overrides,
-});
+} as DiscoveryTopic);
 
 const niche = (overrides: Partial<Niche> = {}): Niche => ({
   id: "sneakers",
@@ -48,8 +55,14 @@ const signal = (sourceType: SourceSignal["sourceType"], id: string): SourceSigna
   topicId: "topic-1",
   sourceType,
   sourceName: "Source",
+  sourceDefinitionId: `seed:${sourceType}`,
   title: "Signal",
+  locale: "en",
+  region: "global",
   publishedAt: "2026-09-10T18:00:00.000Z",
+  observedAt: "2026-09-10T18:00:00.000Z",
+  trustTier: "community",
+  availability: "available",
   signalStrength: 80,
   origin: "seed",
 });
@@ -98,5 +111,20 @@ describe("topic presentation", () => {
     expect(getCuriosityAction(topic({ type: "DEBATE" }))).toEqual({ label: "Why do people care?", href: "/discover/topic-one#why-it-matters" });
     expect(getCuriosityAction(topic({ type: "LORE", mode: "deep-lore" }))).toEqual({ label: "Explain the lore", href: "/discover/topic-one#lore" });
     expect(getCuriosityAction(topic())).toEqual({ label: "Go deeper", href: "/discover/topic-one" });
+  });
+
+  it("describes live provenance without overstating unavailable evidence", () => {
+    expect(buildEvidenceProvenance(topic({ origin: "ingested", regions: ["IN", "global"] }), [
+      signal("rss", "r1"), signal("youtube", "y1"),
+    ])).toEqual({
+      note: "Evidence checked 10 Sep 2026, 11:30 pm IST · India + Global",
+      summary: "Two test signals",
+      sourceCountLabel: "2 independent source signals",
+    });
+
+    expect(buildEvidenceProvenance(topic(), [])).toEqual(expect.objectContaining({
+      note: expect.stringMatching(/development fixture/i),
+      sourceCountLabel: "No linked source signals",
+    }));
   });
 });

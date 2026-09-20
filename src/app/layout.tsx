@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import type { ReactNode } from "react";
-import { seedRepository } from "@/data/seed/repository";
+import { Suspense, type ReactNode } from "react";
 import { FollowedNichesProvider } from "@/components/preferences/followed-niches-provider";
 import { SiteHeader } from "@/components/shell/site-header";
+import { AccountChrome } from "@/components/accounts/account-chrome";
 import { SiteFooter } from "@/components/shell/site-footer";
 import "./globals.css";
 
@@ -16,14 +16,13 @@ export const viewport: Viewport = { colorScheme: "light dark", themeColor: "#e9e
 
 const introStateScript = `(function(){try{if(sessionStorage.getItem("larper:intro:v1")==="1"){document.documentElement.setAttribute("data-larper-intro","seen")}}catch(e){}})();`;
 
-export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const niches = await seedRepository.listNiches();
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <a className="skipLink" href="#main-content">Skip to content</a>
-        <FollowedNichesProvider knownNicheIds={niches.map((niche) => niche.id)}>
-          <SiteHeader />
+        <FollowedNichesProvider>
+          <Suspense fallback={<SiteHeader />}><AccountChrome /></Suspense>
           {children}
           <SiteFooter />
         </FollowedNichesProvider>

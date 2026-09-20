@@ -1,5 +1,7 @@
 import type {
   DiscoveryRepository,
+  DiscoveryTopicPage,
+  CurrentTopicPageOptions,
   DiscoveryTopic,
   MediaAsset,
   Niche,
@@ -25,6 +27,14 @@ class SeedDiscoveryRepository implements DiscoveryRepository {
   async listMedia(): Promise<MediaAsset[]> { return seedDataset.media; }
   async getMediaById(id: string): Promise<MediaAsset | null> {
     return seedDataset.media.find((asset) => asset.id === id) ?? null;
+  }
+  async listCurrentTopicsPage({ limit, cursor }: CurrentTopicPageOptions): Promise<DiscoveryTopicPage> {
+    const safeLimit = Math.max(1, Math.min(100, Math.trunc(limit)));
+    const offset = cursor && /^\d+$/.test(cursor) ? Number(cursor) : 0;
+    const current = seedDataset.topics.filter((topic) => topic.status === "published" && topic.mode === "current");
+    const items = current.slice(offset, offset + safeLimit);
+    const nextOffset = offset + items.length;
+    return { items, nextCursor: nextOffset < current.length ? String(nextOffset) : null };
   }
 }
 

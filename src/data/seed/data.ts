@@ -33,7 +33,7 @@ const niches: Niche[] = [
   { id: "film-photography", slug: "film-photography", name: "Film Photography", description: "Expired stocks, lab scans, compact cameras, and the beautiful inconvenience of twelve good frames.", curiosityHook: "Cameras discontinued 25 years ago are getting pricier because the flash looks wrong in exactly the right way.", parentCategory: "Creative", relatedNicheIds: ["streetwear", "cafe-culture"], heroMediaId: "film-flash-art", status: "active", origin: "seed" },
 ];
 
-type TopicInput = Omit<DiscoveryTopic, "firstDetectedAt" | "lastUpdatedAt" | "publishedAt" | "status" | "origin"> & {
+type TopicInput = Omit<DiscoveryTopic, "firstDetectedAt" | "lastUpdatedAt" | "lastCheckedAt" | "publishedAt" | "publicationFormat" | "lifecycle" | "regions" | "confidence" | "evidenceSummary" | "status" | "origin"> & {
   recency?: number;
 };
 
@@ -43,7 +43,13 @@ function makeTopic(input: TopicInput): DiscoveryTopic {
     ...input,
     firstDetectedAt: `2026-09-${day}T08:00:00.000Z`,
     lastUpdatedAt: `2026-09-${day}T18:00:00.000Z`,
+    lastCheckedAt: `2026-09-${day}T18:00:00.000Z`,
     publishedAt: `2026-09-${day}T12:00:00.000Z`,
+    publicationFormat: "story",
+    lifecycle: "published_story",
+    regions: ["global"],
+    confidence: 80,
+    evidenceSummary: "Development-only seed evidence.",
     status: "published",
     origin: "seed",
   };
@@ -123,8 +129,15 @@ const sourceSignals: SourceSignal[] = topics.flatMap((item, topicIndex) => {
     topicId: item.id,
     sourceType,
     sourceName,
+    sourceDefinitionId: `seed:${item.nicheId}:${sourceType}`,
     title,
+    locale: "en",
+    region: "global",
     publishedAt: item.lastUpdatedAt,
+    observedAt: item.lastUpdatedAt,
+    metricSnapshot: {},
+    trustTier: "community" as const,
+    availability: "available" as const,
     signalStrength: Math.min(100, 64 + index * 11 + (topicIndex % 7)),
     origin: "seed" as const,
   }));

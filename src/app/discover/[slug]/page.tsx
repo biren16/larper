@@ -3,32 +3,31 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Artwork } from "@/components/discovery/artwork";
+import { InteractionBeacon } from "@/components/accounts/interaction-beacon";
+import { SavedStoryControl } from "@/components/accounts/saved-story-control";
+import { Suspense } from "react";
 import { DiscoveryCard } from "@/components/discovery/discovery-card";
-import { buildSignalCue, selectCardKind } from "@/components/discovery/topic-presentation";
-import { seedRepository } from "@/data/seed/repository";
-import { buildTopicDetail } from "@/domain/discovery/services";
+import { buildEvidenceProvenance, buildSignalCue, selectCardKind } from "@/components/discovery/topic-presentation";
+import { getCachedTopicDetail } from "@/data/discovery-cache";
 import styles from "./page.module.css";
-
-export async function generateStaticParams() {
-  const topics = await seedRepository.listTopics();
-  return topics.filter((topic) => topic.status === "published").map((topic) => ({ slug: topic.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const detail = await buildTopicDetail(seedRepository, slug);
+  const detail = await getCachedTopicDetail(slug);
   if (!detail) return { title: "Rabbit hole not found" };
   return { title: detail.topic.title, description: detail.topic.hook };
 }
 
 export default async function TopicDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const detail = await buildTopicDetail(seedRepository, slug);
+  const detail = await getCachedTopicDetail(slug);
   if (!detail) notFound();
   const cue = buildSignalCue(detail.topic, detail.sources);
+  const provenance = buildEvidenceProvenance(detail.topic, detail.sources);
 
   return (
     <main id="main-content" className={styles.main}>
+      <InteractionBeacon storyId={detail.topic.id} nicheId={detail.niche.id} />
       <div className={styles.backRow}>
         <Link href="/"><ArrowLeft aria-hidden /> Discovery</Link>
         <span>{detail.topic.type.replace("_", " ")}</span>
@@ -40,9 +39,10 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
           <h1>{detail.topic.title}</h1>
           <p>{detail.topic.hook}</p>
           <div className={styles.signals}>
-            <span>{cue.status}</span><span>{detail.sourceCount} source signals</span>
+            <span>{cue.status}</span><span>{provenance.sourceCountLabel}</span>
             {cue.sourceLabels.map((label) => <span key={label}>{label}</span>)}
           </div>
+          <Suspense fallback={<span>Checking saves…</span>}><SavedStoryControl storyId={detail.topic.id} returnPath={`/discover/${detail.topic.slug}`} /></Suspense>
         </div>
         <Artwork media={detail.media} priority className={styles.heroArt} />
       </header>
@@ -68,7 +68,8 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
 
       <section className={styles.sources} aria-labelledby="sources-heading">
         <h2 id="sources-heading">Source signals</h2>
-        <p className={styles.sourceNote}>Seed provenance for this development story. Fictional records are never linked as real reporting.</p>
+        <p className={styles.sourceNote}>{provenance.note}</p>
+        <p>{provenance.summary}</p>
         <div className={styles.sourceGrid}>
           {detail.sources.map((source) => {
             const content = <><span>{source.sourceType}</span><h3>{source.sourceName}</h3><p>{source.title}</p></>;

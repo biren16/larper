@@ -16,7 +16,21 @@ export type TopicMode = "current" | "deep-lore";
 export type ContentOrigin = "seed" | "ingested";
 export type ContentStatus = "active" | "inactive";
 export type TopicStatus = "published" | "draft";
-export type SourceType = "reddit" | "youtube" | "rss" | "blog" | "publication" | "trend";
+export type PublicationFormat = "story" | "brief";
+export type TopicLifecycle = "detected" | "reviewing" | "published_story" | "published_brief" | "rejected" | "expired";
+export type SourceType = "reddit" | "youtube" | "rss" | "blog" | "publication" | "trend" | "instagram" | "tiktok" | "manual" | "web";
+export type SourceTrustTier = "primary" | "publication" | "community" | "watchlist";
+export type SourceAvailability = "available" | "deleted" | "private" | "unreachable";
+
+export interface CurrentTopicPageOptions {
+  limit: number;
+  cursor?: string | null;
+}
+
+export interface DiscoveryTopicPage {
+  items: DiscoveryTopic[];
+  nextCursor: string | null;
+}
 
 export interface Niche {
   id: string;
@@ -31,6 +45,15 @@ export interface Niche {
   origin: ContentOrigin;
 }
 
+export interface TopicSignals {
+  freshness: number;
+  momentum: number;
+  novelty: number;
+  sourceDiversity?: number;
+  indiaRelevance?: number;
+  crossover?: number;
+}
+
 export interface DiscoveryTopic {
   id: string;
   slug: string;
@@ -43,11 +66,17 @@ export interface DiscoveryTopic {
   beginnerContext: string;
   type: DiscoveryType;
   mode: TopicMode;
+  publicationFormat: PublicationFormat;
+  lifecycle: TopicLifecycle;
+  regions: string[];
   firstDetectedAt: string;
   lastUpdatedAt: string;
+  lastCheckedAt: string;
   publishedAt: string;
   freshnessLabel: string;
-  signals: { freshness: number; momentum: number; novelty: number };
+  confidence: number;
+  evidenceSummary: string;
+  signals: TopicSignals;
   mediaId?: string;
   tags: string[];
   relatedTopicIds: string[];
@@ -60,11 +89,20 @@ export interface SourceSignal {
   topicId: string;
   sourceType: SourceType;
   sourceName: string;
+  sourceDefinitionId: string;
   sourceUrl?: string;
+  canonicalUrl?: string;
   externalId?: string;
+  author?: string;
   title: string;
+  locale: string;
+  region: string;
   publishedAt: string;
+  observedAt: string;
   engagement?: Record<string, number>;
+  metricSnapshot?: Record<string, number>;
+  trustTier: SourceTrustTier;
+  availability: SourceAvailability;
   signalStrength: number;
   origin: ContentOrigin;
 }
@@ -93,5 +131,5 @@ export interface DiscoveryRepository {
   listSignalsForTopic(topicId: string): Promise<SourceSignal[]>;
   listMedia(): Promise<MediaAsset[]>;
   getMediaById(id: string): Promise<MediaAsset | null>;
+  listCurrentTopicsPage(options: CurrentTopicPageOptions): Promise<DiscoveryTopicPage>;
 }
-

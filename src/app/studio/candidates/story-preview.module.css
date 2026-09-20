@@ -1,0 +1,7 @@
+.preview { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 1rem; }
+.trigger { background: transparent !important; color: var(--ink) !important; text-decoration: underline; text-underline-offset: 4px; }
+.preview section { background: var(--paper); border: 1px solid var(--line); margin-top: 1rem; padding: clamp(1rem, 3vw, 2.5rem); }
+.preview section > p:first-child { font: 750 0.65rem/1 var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; }
+.preview h2 { font: 700 clamp(2rem, 4vw, 4rem)/0.9 var(--font-sans); letter-spacing: -0.06em; margin: 0.8rem 0; }
+.preview h3 { font: 700 1rem/1.2 var(--font-sans); margin-top: 1.4rem; }
+.preview section p { color: var(--muted); line-height: 1.5; }

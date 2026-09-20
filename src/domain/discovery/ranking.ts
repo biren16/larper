@@ -1,4 +1,5 @@
 import type { DiscoveryTopic, SourceSignal } from "./types";
+import { calculateLiveHeat } from "./heat";
 
 export interface RankedTopic {
   topic: DiscoveryTopic;
@@ -34,12 +35,15 @@ export function rankCurrentTopics(
       const topicSignals = signalsForTopic(sourceSignals, topic.id);
       const evidenceScore = calculateEvidenceScore(topicSignals);
       const affinity = followedNicheIds.has(topic.nicheId) ? 100 : 0;
-      const score =
-        topic.signals.freshness * 0.3 +
-        topic.signals.momentum * 0.3 +
-        evidenceScore * 0.2 +
-        topic.signals.novelty * 0.15 +
-        affinity * 0.05;
+      const baseHeat = calculateLiveHeat({
+        momentum: topic.signals.momentum,
+        sourceDiversity: topic.signals.sourceDiversity ?? evidenceScore,
+        freshness: topic.signals.freshness,
+        novelty: topic.signals.novelty,
+        indiaRelevance: topic.signals.indiaRelevance ?? 0,
+        crossover: topic.signals.crossover ?? 0,
+      });
+      const score = Math.round((baseHeat * 0.9 + affinity * 0.1) * 10) / 10;
 
       return { topic, score, evidenceScore, sourceCount: topicSignals.length };
     })

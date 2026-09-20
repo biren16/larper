@@ -1,10 +1,14 @@
+import { Suspense } from "react";
+import { connection } from "next/server";
 import { DiscoveryHome } from "@/components/discovery/discovery-home";
-import { seedRepository } from "@/data/seed/repository";
-import { buildDiscoveryHome } from "@/domain/discovery/services";
-import { DEFAULT_FOLLOWED_NICHE_IDS } from "@/domain/preferences/preferences";
+import { getCachedDiscoveryHome } from "@/data/discovery-cache";
 
-export default async function HomePage() {
-  const home = await buildDiscoveryHome(seedRepository, DEFAULT_FOLLOWED_NICHE_IDS);
+async function LiveDiscoveryHome() {
+  await connection();
+  const home = await getCachedDiscoveryHome();
   return <DiscoveryHome home={home} />;
 }
 
+export default function HomePage() {
+  return <Suspense fallback={<main id="main-content"><p className="srOnly">Loading the latest verified edition…</p></main>}><LiveDiscoveryHome /></Suspense>;
+}

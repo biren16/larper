@@ -48,11 +48,14 @@ export function validateSeedDataset(dataset: SeedDataset): string[] {
     for (const field of ["firstDetectedAt", "lastUpdatedAt", "publishedAt"] as const) {
       if (!validDate(topic[field])) errors.push(`Topic ${topic.id} has invalid ${field}`);
     }
+    if (!validDate(topic.lastCheckedAt)) errors.push(`Topic ${topic.id} has invalid lastCheckedAt`);
+    if (topic.confidence < 0 || topic.confidence > 100) errors.push(`Topic ${topic.id} has confidence outside 0-100`);
   }
 
   for (const source of dataset.sourceSignals) {
     if (!topicIds.has(source.topicId)) errors.push(`Source ${source.id} references missing topic ${source.topicId}`);
     if (!validDate(source.publishedAt)) errors.push(`Source ${source.id} has invalid publishedAt`);
+    if (!validDate(source.observedAt)) errors.push(`Source ${source.id} has invalid observedAt`);
     if (source.signalStrength < 0 || source.signalStrength > 100) {
       errors.push(`Source ${source.id} has signalStrength outside 0-100`);
     }

@@ -16,6 +16,7 @@ export interface DiscoveryHomeViewModel {
   recommendedNiches: Niche[];
   currentTopics: TopicViewModel[];
   deepLore: TopicViewModel[];
+  verifiedAt: string | null;
 }
 
 export interface TopicDetailViewModel extends TopicViewModel {
@@ -53,6 +54,7 @@ export async function buildDiscoveryHome(
     recommendedNiches: niches.filter((niche) => !followedSet.has(niche.id)),
     currentTopics: rankCurrentTopics(topics, allSignals, followedSet).map((item) => toTopicViewModel(item, niches, media, allSignals)),
     deepLore: rankDeepLore(topics, allSignals).map((item) => toTopicViewModel(item, niches, media, allSignals)),
+    verifiedAt: topics.reduce<string | null>((latest, topic) => !latest || topic.lastCheckedAt > latest ? topic.lastCheckedAt : latest, null),
   };
 }
 

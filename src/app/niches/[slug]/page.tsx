@@ -6,26 +6,19 @@ import { Artwork } from "@/components/discovery/artwork";
 import { NicheSectionNav } from "@/components/discovery/niche-section-nav";
 import { NicheSignalCard } from "@/components/discovery/niche-signal-card";
 import { FollowButton } from "@/components/preferences/follow-button";
-import { seedRepository } from "@/data/seed/repository";
-import { buildNichePage } from "@/domain/discovery/services";
-import { DEFAULT_FOLLOWED_NICHE_IDS } from "@/domain/preferences/preferences";
+import { getCachedNichePage } from "@/data/discovery-cache";
 import styles from "./page.module.css";
-
-export async function generateStaticParams() {
-  const niches = await seedRepository.listNiches();
-  return niches.map((niche) => ({ slug: niche.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const niche = await seedRepository.getNicheBySlug(slug);
-  if (!niche) return { title: "Niche not found" };
-  return { title: niche.name, description: niche.description };
+  const page = await getCachedNichePage(slug);
+  if (!page) return { title: "Niche not found" };
+  return { title: page.niche.name, description: page.niche.description };
 }
 
 export default async function NichePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const page = await buildNichePage(seedRepository, slug, DEFAULT_FOLLOWED_NICHE_IDS);
+  const page = await getCachedNichePage(slug);
   if (!page) notFound();
 
   return (

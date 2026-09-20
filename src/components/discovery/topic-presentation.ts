@@ -25,6 +25,12 @@ export interface CuriosityAction {
   href: string;
 }
 
+export interface EvidenceProvenance {
+  note: string;
+  summary: string;
+  sourceCountLabel: string;
+}
+
 const sourceLabels: Record<SourceSignal["sourceType"], string> = {
   reddit: "Reddit ↑",
   youtube: "YouTube ↑",
@@ -32,6 +38,10 @@ const sourceLabels: Record<SourceSignal["sourceType"], string> = {
   blog: "Blog signal",
   publication: "Publication signal",
   trend: "Search rising",
+  instagram: "Instagram signal",
+  tiktok: "TikTok signal",
+  manual: "Curated signal",
+  web: "Web signal",
 };
 
 export function selectCardKind(
@@ -74,4 +84,32 @@ export function getCuriosityAction(topic: DiscoveryTopic): CuriosityAction {
     return { label: "Explain the lore", href: `${base}#lore` };
   }
   return { label: "Go deeper", href: base };
+}
+
+export function buildEvidenceProvenance(topic: DiscoveryTopic, signals: SourceSignal[]): EvidenceProvenance {
+  const count = new Set(signals.map((signal) => signal.sourceDefinitionId)).size;
+  if (topic.origin === "seed") {
+    return {
+      note: "Development fixture provenance. Fictional records are never presented as live reporting.",
+      summary: topic.evidenceSummary,
+      sourceCountLabel: count === 0 ? "No linked source signals" : `${count} fixture source signal${count === 1 ? "" : "s"}`,
+    };
+  }
+  const checked = formatIndiaTimestamp(topic.lastCheckedAt);
+  const regionLabel = topic.regions.map((region) => region.toLowerCase() === "global" ? "Global" : region.toUpperCase() === "IN" ? "India" : region).join(" + ");
+  return {
+    note: `Evidence checked ${checked}${regionLabel ? ` · ${regionLabel}` : ""}`,
+    summary: topic.evidenceSummary,
+    sourceCountLabel: count === 0 ? "No linked source signals" : `${count} independent source signal${count === 1 ? "" : "s"}`,
+  };
+}
+
+function formatIndiaTimestamp(value: string): string {
+  const parts = new Intl.DateTimeFormat("en-IN", {
+    day: "numeric", month: "numeric", year: "numeric", hour: "numeric", minute: "2-digit",
+    timeZone: "Asia/Kolkata", timeZoneName: "short", hour12: true,
+  }).formatToParts(new Date(value));
+  const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? "";
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${get("day")} ${months[Number(get("month")) - 1]} ${get("year")}, ${get("hour")}:${get("minute")} ${get("dayPeriod").toLowerCase()} ${get("timeZoneName")}`;
 }
