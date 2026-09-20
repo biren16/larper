@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "See what niche communities are obsessed with right now, then explore the context and lore behind it.",
 };
 
-export const viewport: Viewport = { colorScheme: "light dark", themeColor: "#f2f0e7" };
+export const viewport: Viewport = { colorScheme: "light dark", themeColor: "#e9ebee" };
 
 const introStateScript = `(function(){try{var k="larper:intro:v1",r=document.documentElement,s=sessionStorage.getItem(k)==="1";if(s){r.setAttribute("data-larper-intro","seen")}else if(location.pathname==="/"){r.setAttribute("data-larper-intro","playing")}}catch(e){}})();`;
 
