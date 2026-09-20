@@ -1,0 +1,47 @@
+name: Encrypted Supabase backup
+
+on:
+  schedule:
+    - cron: "0 2 * * 0"
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Export database
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: supabase db dump --db-url "$SUPABASE_DB_URL" --file larper-backup.sql
+      - name: Encrypt export
+        env:
+          BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+        run: openssl enc -aes-256-cbc -salt -pbkdf2 -iter 200000 -in larper-backup.sql -out larper-backup.sql.enc -pass env:BACKUP_ENCRYPTION_KEY
+      - name: Remove plaintext export
+        run: shred -u larper-backup.sql
+      - uses: actions/upload-artifact@v4
+        with:
+          name: larper-supabase-${{ github.run_id }}
+          path: larper-backup.sql.enc
+          retention-days: 14
+          if-no-files-found: error
+      - name: Restore test on monthly schedule
+        if: github.event.schedule == '0 3 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+        run: |
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in larper-backup.sql.enc -out restore.sql -pass env:BACKUP_ENCRYPTION_KEY
+          docker run --detach --name larper-restore -e POSTGRES_PASSWORD=restore -p 54329:5432 postgres:17
+          for attempt in {1..30}; do docker exec larper-restore pg_isready -U postgres && break; sleep 2; done
+          PGPASSWORD=restore psql "postgresql://postgres@127.0.0.1:54329/postgres" -v ON_ERROR_STOP=1 -f restore.sql
+          PGPASSWORD=restore psql "postgresql://postgres@127.0.0.1:54329/postgres" -v ON_ERROR_STOP=1 -c "select count(*) from public.niches"
+          shred -u restore.sql

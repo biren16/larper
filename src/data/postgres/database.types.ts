@@ -34,6 +34,7 @@ export interface Database {
         Args: { p_candidate_id: string; p_reviewer_id: string; p_lifecycle: string; p_publication_format: string; p_draft: Json };
         Returns: Array<{ story_id: string; revision: number }>;
       };
+      process_unclustered_signals: { Args: Record<never, never>; Returns: number };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

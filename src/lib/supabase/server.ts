@@ -11,9 +11,9 @@ function environment(): Environment {
 }
 
 export async function createServerSupabaseClient() {
+  const cookieStore = await cookies();
   const config = readPublicSupabaseConfig(process.env, environment());
   if (!config) return null;
-  const cookieStore = await cookies();
   return createServerClient<Database>(config.url, config.publishableKey, {
     cookies: {
       getAll: () => cookieStore.getAll(),

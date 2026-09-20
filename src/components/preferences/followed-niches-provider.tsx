@@ -18,10 +18,10 @@ interface FollowedNichesContextValue {
 
 const FollowedNichesContext = createContext<FollowedNichesContextValue | null>(null);
 
-export function FollowedNichesProvider({ children, knownNicheIds, syncFollow }: { children: ReactNode; knownNicheIds: string[]; syncFollow?: (id: string, followed: boolean) => Promise<unknown> }) {
-  const knownIds = useMemo(() => new Set(knownNicheIds), [knownNicheIds]);
+export function FollowedNichesProvider({ children, knownNicheIds, syncFollow }: { children: ReactNode; knownNicheIds?: string[]; syncFollow?: (id: string, followed: boolean) => Promise<unknown> }) {
+  const knownIds = useMemo(() => knownNicheIds ? new Set(knownNicheIds) : undefined, [knownNicheIds]);
   const [followedNicheIds, setFollowedNicheIds] = useState(() =>
-    DEFAULT_FOLLOWED_NICHE_IDS.filter((id) => knownIds.has(id)),
+    knownIds ? DEFAULT_FOLLOWED_NICHE_IDS.filter((id) => knownIds.has(id)) : [...DEFAULT_FOLLOWED_NICHE_IDS],
   );
   const [announcement, setAnnouncement] = useState("");
   const accountSync = useRef(syncFollow ?? null);
@@ -33,7 +33,7 @@ export function FollowedNichesProvider({ children, knownNicheIds, syncFollow }: 
       try {
         setFollowedNicheIds(parseStoredPreferences(window.localStorage.getItem(PREFERENCES_STORAGE_KEY), knownIds));
       } catch {
-        setFollowedNicheIds(DEFAULT_FOLLOWED_NICHE_IDS.filter((id) => knownIds.has(id)));
+        setFollowedNicheIds(knownIds ? DEFAULT_FOLLOWED_NICHE_IDS.filter((id) => knownIds.has(id)) : [...DEFAULT_FOLLOWED_NICHE_IDS]);
       }
     });
   }, [knownIds]);
@@ -52,7 +52,7 @@ export function FollowedNichesProvider({ children, knownNicheIds, syncFollow }: 
   }, [followedNicheIds]);
 
   const hydrateFollows = useCallback((ids: string[]) => {
-    const next = [...new Set(ids.filter((id) => knownIds.has(id)))];
+    const next = [...new Set(ids.filter((id) => !knownIds || knownIds.has(id)))];
     setFollowedNicheIds(next);
     try {
       window.localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 1, followedNicheIds: next }));
