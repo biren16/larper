@@ -78,6 +78,7 @@
   .heroSignal { animation: heroAssemble 680ms cubic-bezier(0.16, 1, 0.3, 1) both; }
   .heroSecondary { animation-delay: 100ms; }
   .heroTertiary { animation-delay: 180ms; }
+  :global(html[data-larper-intro="playing"]) .heroSignal { animation-play-state: paused; }
 }
 @keyframes introFold { to { opacity: 0.55; transform: translateY(2rem) scale(0.965); } }
 @keyframes printSweep { from { transform: scaleX(0.12); } to { transform: scaleX(1); } }

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import type { ReactNode } from "react";
 import { seedRepository } from "@/data/seed/repository";
 import { FollowedNichesProvider } from "@/components/preferences/followed-niches-provider";
@@ -13,10 +14,12 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { colorScheme: "light dark", themeColor: "#f2f0e7" };
 
+const introStateScript = `(function(){try{var k="larper:intro:v1",r=document.documentElement,s=sessionStorage.getItem(k)==="1";if(s){r.setAttribute("data-larper-intro","seen")}else if(location.pathname==="/"){r.setAttribute("data-larper-intro","playing")}}catch(e){}})();`;
+
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const niches = await seedRepository.listNiches();
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <a className="skipLink" href="#main-content">Skip to content</a>
         <FollowedNichesProvider knownNicheIds={niches.map((niche) => niche.id)}>
@@ -24,6 +27,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           {children}
           <SiteFooter />
         </FollowedNichesProvider>
+        <Script id="larper-intro-state" strategy="beforeInteractive">
+          {introStateScript}
+        </Script>
       </body>
     </html>
   );
