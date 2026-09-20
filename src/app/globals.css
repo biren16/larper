@@ -63,7 +63,7 @@ img { display: block; max-width: 100%; }
 .skipLink:focus { transform: translateY(0); }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --paper: #171816;
     --paper-bright: #20211e;
     --paper-deep: #2a2b27;
@@ -85,6 +85,29 @@ img { display: block; max-width: 100%; }
     --feature-line: rgb(255 255 255 / 0.25);
     --focus: #8da7ff;
   }
+}
+
+:root[data-theme="dark"] {
+  --paper: #171816;
+  --paper-bright: #20211e;
+  --paper-deep: #2a2b27;
+  --paper-muted: #c9c6bd;
+  --surface: #20211e;
+  --surface-strong: #2a2b27;
+  --ink: #f1eee6;
+  --muted: #b6b5ae;
+  --line: #4d4f49;
+  --acid: #c8f04a;
+  --acid-ink: #151515;
+  --cobalt: #617dff;
+  --cobalt-ink: #151515;
+  --signal-red: #ff6a4d;
+  --red-ink: #151515;
+  --feature-bg: #0f100f;
+  --feature-text: #f1eee6;
+  --feature-muted: #c9c6bd;
+  --feature-line: rgb(255 255 255 / 0.25);
+  --focus: #8da7ff;
 }
 
 @media (prefers-reduced-motion: reduce) {

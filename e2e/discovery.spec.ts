@@ -75,6 +75,16 @@ test("persists a newly followed niche inside Your Larps", async ({ page }) => {
   await expect(yourLarps.getByRole("heading", { name: "Mechanical Keyboards" })).toBeVisible();
 });
 
+test("theme control switches modes and remembers an explicit choice", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Switch to dark mode" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("button", { name: "Switch to light mode" })).toBeVisible();
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+});
+
 test("mobile rails work without horizontal page overflow", async ({ page, isMobile }) => {
   test.skip(!isMobile, "mobile project only");
   await page.setViewportSize({ width: 320, height: 720 });

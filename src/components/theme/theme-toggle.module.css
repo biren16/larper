@@ -1,0 +1,7 @@
+.toggle { align-items: center; background: transparent; border: 1px solid var(--line); border-radius: 50%; color: var(--ink); display: inline-flex; height: 2.5rem; justify-content: center; padding: 0; transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; width: 2.5rem; }
+.toggle:hover { background: var(--acid); border-color: var(--acid); color: var(--acid-ink); }
+.icon { font: 700 1.15rem/1 var(--font-sans); transform: rotate(-24deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle { transition: none; }
+}

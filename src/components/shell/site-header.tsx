@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import styles from "./site-header.module.css";
 
 export function SiteHeader() {
@@ -9,6 +10,7 @@ export function SiteHeader() {
         <nav aria-label="Primary navigation">
           <Link href="/">Discovery</Link>
           <Link href={{ pathname: "/", hash: "your-larps" }}>Your Larps</Link>
+          <ThemeToggle />
         </nav>
       </div>
     </header>
