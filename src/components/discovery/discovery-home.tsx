@@ -36,10 +36,17 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
           <h1>What the internet is larping rn.</h1>
           <p className={styles.dek}>Niche obsessions, drops, memes, debates and lore. Before they hit your whole feed.</p>
         </div>
-        <div className={styles.introStamp} aria-label="Authored demo signals">
-          <span>Demo signals</span>
-          <strong>Culture moves sideways.</strong>
-          <p>We keep the context attached.</p>
+        <div className={styles.heroCollage} aria-label="Current ranked culture signals">
+          {currentTopics.slice(0, 3).map((item, index) => (
+            <Link
+              className={`${styles.heroSignal} ${index === 0 ? styles.heroPrimary : index === 1 ? styles.heroSecondary : styles.heroTertiary}`}
+              href={`/discover/${item.topic.slug}`}
+              aria-label={`Hero signal: ${item.topic.title}`}
+              key={item.topic.id}
+            >
+              <Artwork media={item.media} priority={index === 0} />
+            </Link>
+          ))}
         </div>
       </header>
 
@@ -55,7 +62,6 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
               item={item}
               kind={selectCardKind(item.topic, item.niche, { lead: index === 0, compact: index === 6 })}
               density={index === 0 ? "feature" : index < 4 ? "compact" : "standard"}
-              priority={index === 0}
             />
           ))}
         </div>

@@ -23,14 +23,24 @@ async function contrastRatio(locator: Locator) {
   });
 }
 
-test("the opening explains the product with a dominant lead and a readable signal stack", async ({ page, isMobile }) => {
-  test.skip(isMobile, "desktop density check");
+test("the opening is a tall ranked-culture collage that hands off to Larping RN", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop hero composition check");
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("What the internet is larping rn.");
   await expect(page.getByText(/Niche obsessions, drops, memes, debates and lore/).first()).toBeVisible();
 
+  const hero = page.locator("main > header").first();
+  const heroBox = await hero.boundingBox();
+  expect(heroBox).not.toBeNull();
+  expect(heroBox!.height).toBeGreaterThanOrEqual(600);
+  await expect(hero.getByRole("link", { name: /Hero signal:/ })).toHaveCount(3);
+  const chapterTop = await page.getByRole("heading", { name: "Larping RN", exact: true }).evaluate((element) => element.getBoundingClientRect().top);
+  expect(chapterTop).toBeLessThan(900);
+
   const section = page.locator('section[aria-labelledby="larping-now"]').filter({ visible: true }).first();
+  await section.scrollIntoViewIfNeeded();
   const cards = section.locator("article");
   const layout = await cards.evaluateAll((items) => items.slice(0, 5).map((item) => {
     const box = item.getBoundingClientRect();
@@ -42,8 +52,6 @@ test("the opening explains the product with a dominant lead and a readable signa
   expect(layout.slice(1, 4).every((card) => card.left >= layout[0].right)).toBe(true);
   expect(layout[1].top).toBeLessThan(layout[2].top);
   expect(layout[2].top).toBeLessThan(layout[3].top);
-  expect(layout.slice(0, 4).every((card) => card.bottom <= 900)).toBe(true);
-  expect(layout[4].top).toBeLessThan(900);
 });
 
 test("moves from a contextual action to its explanation and niche", async ({ page }) => {

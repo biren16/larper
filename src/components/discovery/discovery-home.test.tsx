@@ -17,6 +17,14 @@ describe("DiscoveryHome", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: /what the internet is larping rn/i })).toBeInTheDocument();
     expect(screen.getByText(/niche obsessions, drops, memes, debates and lore/i)).toBeInTheDocument();
+    const heroSignals = screen.getAllByRole("link", { name: /hero signal:/i });
+    expect(heroSignals).toHaveLength(3);
+    home.currentTopics.slice(0, 3).forEach((item) => {
+      expect(screen.getByRole("link", { name: `Hero signal: ${item.topic.title}` })).toHaveAttribute(
+        "href",
+        `/discover/${item.topic.slug}`,
+      );
+    });
     const nowHeading = screen.getByRole("heading", { name: "Larping RN" });
     const nowSection = nowHeading.closest("section");
     expect(nowSection).not.toBeNull();
