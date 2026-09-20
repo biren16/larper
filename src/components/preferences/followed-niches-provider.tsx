@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   DEFAULT_FOLLOWED_NICHE_IDS,
   PREFERENCES_STORAGE_KEY,
@@ -12,16 +12,21 @@ interface FollowedNichesContextValue {
   followedNicheIds: string[];
   isFollowed: (id: string) => boolean;
   toggleFollow: (id: string, name: string) => void;
+  hydrateFollows: (ids: string[]) => void;
+  registerAccountSync: (sync: ((id: string, followed: boolean) => Promise<unknown>) | null) => void;
 }
 
 const FollowedNichesContext = createContext<FollowedNichesContextValue | null>(null);
 
-export function FollowedNichesProvider({ children, knownNicheIds }: { children: ReactNode; knownNicheIds: string[] }) {
+export function FollowedNichesProvider({ children, knownNicheIds, syncFollow }: { children: ReactNode; knownNicheIds: string[]; syncFollow?: (id: string, followed: boolean) => Promise<unknown> }) {
   const knownIds = useMemo(() => new Set(knownNicheIds), [knownNicheIds]);
   const [followedNicheIds, setFollowedNicheIds] = useState(() =>
     DEFAULT_FOLLOWED_NICHE_IDS.filter((id) => knownIds.has(id)),
   );
   const [announcement, setAnnouncement] = useState("");
+  const accountSync = useRef(syncFollow ?? null);
+
+  useEffect(() => { accountSync.current = syncFollow ?? accountSync.current; }, [syncFollow]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -37,6 +42,7 @@ export function FollowedNichesProvider({ children, knownNicheIds }: { children: 
     const next = toggleFollowedNiche(followedNicheIds, id);
     const added = next.includes(id);
     setFollowedNicheIds(next);
+    void accountSync.current?.(id, added);
     try {
       window.localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 1, followedNicheIds: next }));
     } catch {
@@ -45,11 +51,23 @@ export function FollowedNichesProvider({ children, knownNicheIds }: { children: 
     setAnnouncement(`${name} ${added ? "added to" : "removed from"} Your Larps`);
   }, [followedNicheIds]);
 
+  const hydrateFollows = useCallback((ids: string[]) => {
+    const next = [...new Set(ids.filter((id) => knownIds.has(id)))];
+    setFollowedNicheIds(next);
+    try {
+      window.localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 1, followedNicheIds: next }));
+    } catch {
+      // The server remains authoritative when local storage is unavailable.
+    }
+  }, [knownIds]);
+
   const value = useMemo<FollowedNichesContextValue>(() => ({
     followedNicheIds,
     isFollowed: (id) => followedNicheIds.includes(id),
     toggleFollow,
-  }), [followedNicheIds, toggleFollow]);
+    hydrateFollows,
+    registerAccountSync: (sync) => { accountSync.current = sync; },
+  }), [followedNicheIds, hydrateFollows, toggleFollow]);
 
   return (
     <FollowedNichesContext.Provider value={value}>

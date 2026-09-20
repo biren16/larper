@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Artwork } from "@/components/discovery/artwork";
+import { InteractionBeacon } from "@/components/accounts/interaction-beacon";
+import { SavedStoryControl } from "@/components/accounts/saved-story-control";
+import { Suspense } from "react";
 import { DiscoveryCard } from "@/components/discovery/discovery-card";
 import { buildEvidenceProvenance, buildSignalCue, selectCardKind } from "@/components/discovery/topic-presentation";
 import { getCachedTopicDetail } from "@/data/discovery-cache";
@@ -24,6 +27,7 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <main id="main-content" className={styles.main}>
+      <InteractionBeacon storyId={detail.topic.id} nicheId={detail.niche.id} />
       <div className={styles.backRow}>
         <Link href="/"><ArrowLeft aria-hidden /> Discovery</Link>
         <span>{detail.topic.type.replace("_", " ")}</span>
@@ -38,6 +42,7 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
             <span>{cue.status}</span><span>{provenance.sourceCountLabel}</span>
             {cue.sourceLabels.map((label) => <span key={label}>{label}</span>)}
           </div>
+          <Suspense fallback={<span>Checking saves…</span>}><SavedStoryControl storyId={detail.topic.id} returnPath={`/discover/${detail.topic.slug}`} /></Suspense>
         </div>
         <Artwork media={detail.media} priority className={styles.heroArt} />
       </header>

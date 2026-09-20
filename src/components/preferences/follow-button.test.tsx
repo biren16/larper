@@ -32,6 +32,19 @@ describe("FollowButton", () => {
     });
   });
 
+  it("syncs a follow mutation when an account bridge is active", async () => {
+    const user = userEvent.setup();
+    const syncFollow = vi.fn(async () => ({ ok: true as const }));
+    render(
+      <FollowedNichesProvider knownNicheIds={["books"]} syncFollow={syncFollow}>
+        <FollowButton nicheId="books" nicheName="Books" />
+      </FollowedNichesProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Start larping in Books" }));
+    expect(syncFollow).toHaveBeenCalledWith("books", true);
+  });
+
   it("keeps defaults when stored preferences cannot be read", async () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new DOMException("Storage blocked", "SecurityError");

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const migration = readFileSync("supabase/migrations/202609200001_live_culture.sql", "utf8");
 const evidenceMigration = readFileSync("supabase/migrations/202609200002_public_evidence.sql", "utf8");
+const editorialMigration = readFileSync("supabase/migrations/202609200003_editorial_publication.sql", "utf8");
 
 describe("live culture database migration", () => {
   it.each([
@@ -37,5 +38,12 @@ describe("live culture database migration", () => {
     expect(evidenceMigration).toMatch(/published cluster evidence links are publicly readable/i);
     expect(evidenceMigration).toMatch(/availability = 'available'/i);
     expect(evidenceMigration).not.toMatch(/signal_snapshots for select/i);
+  });
+
+  it("publishes a story and its immutable revision in one database transaction", () => {
+    expect(editorialMigration).toMatch(/function public\.publish_editorial_story/i);
+    expect(editorialMigration).toMatch(/insert into public\.story_revisions/i);
+    expect(editorialMigration).toMatch(/grant execute .* service_role/i);
+    expect(editorialMigration).toMatch(/for update/i);
   });
 });

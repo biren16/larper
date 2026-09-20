@@ -19,3 +19,10 @@ export function readServerSupabaseConfig(env: Env, environment: Environment) {
   const serviceRoleKey = required(env, "SUPABASE_SERVICE_ROLE_KEY", environment);
   return url && serviceRoleKey ? { url, serviceRoleKey } : null;
 }
+
+export function readSiteUrl(env: Env, environment: Environment): string {
+  const configured = env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+  if (environment === "production") throw new Error("NEXT_PUBLIC_SITE_URL is required in production");
+  return "http://localhost:3000";
+}

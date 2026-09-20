@@ -71,7 +71,8 @@
 }
 
 .navLink[data-active] { font-weight: 780; }
-.actions { align-items: center; display: flex; justify-self: end; }
+.actions { align-items: center; display: flex; gap: 0.45rem; justify-self: end; }
+.accountLink { background: transparent; border: 0; color: inherit; cursor: pointer; font: 680 0.7rem/1 var(--font-sans); min-height: 2.75rem; padding: 0.8rem 0.35rem; }
 
 @media (max-width: 600px) {
   .inner { gap: 0.7rem; grid-template-columns: auto 1fr auto; min-height: 4.25rem; }

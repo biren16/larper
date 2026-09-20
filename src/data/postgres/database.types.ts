@@ -29,7 +29,12 @@ export interface Database {
       review_events: Table<{ id: string; cluster_id: string | null; story_id: string | null; reviewer_id: string; action: string; notes: string | null; created_at: string }>;
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      publish_editorial_story: {
+        Args: { p_candidate_id: string; p_reviewer_id: string; p_lifecycle: string; p_publication_format: string; p_draft: Json };
+        Returns: Array<{ story_id: string; revision: number }>;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

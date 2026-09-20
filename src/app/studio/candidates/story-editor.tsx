@@ -13,9 +13,11 @@ export interface StudioCandidateDetail {
 export function StoryEditor({
   candidate,
   publishAction,
+  error,
 }: {
   candidate: StudioCandidateDetail;
   publishAction?: (formData: FormData) => void | Promise<void>;
+  error?: string;
 }) {
   return (
     <main id="main-content" className={styles.main}>
@@ -24,6 +26,7 @@ export function StoryEditor({
         <dl><div><dt>Heat</dt><dd>{candidate.heat}</dd></div><div><dt>Confidence</dt><dd>{candidate.confidence}</dd></div><div><dt>Signals</dt><dd>{candidate.evidence.length}</dd></div></dl>
       </header>
       {candidate.sensitiveFlags.length > 0 && <div className={styles.alert} role="alert"><strong>Mandatory review</strong><p>{candidate.sensitiveFlags.join(", ")}</p></div>}
+      {error && <div className={styles.alert} role="alert"><strong>Could not publish</strong><p>{error}</p></div>}
       <div className={styles.workspace}>
         <form className={styles.editor} action={publishAction} aria-label="Story editor">
           <input type="hidden" name="candidateId" value={candidate.id} />
@@ -44,7 +47,7 @@ export function StoryEditor({
           <div className={styles.twoCol}><label>Regions<input name="regions" required defaultValue="india,global" /></label><label>Freshness label<input name="freshnessLabel" required /></label></div>
           <label>Evidence summary<textarea name="evidenceSummary" required rows={3} /></label>
           <label>Tags<input name="tags" placeholder="books,f1,romance" /></label>
-          <div className={styles.actionBar}><button type="submit">Publish story</button><button type="submit" name="format" value="brief" className={styles.secondary}>Publish brief</button></div>
+          <div className={styles.actionBar}><button type="submit">Publish story</button><button type="submit" name="format" value="brief" formNoValidate className={styles.secondary}>Publish brief</button></div>
         </form>
         <aside className={styles.evidence} aria-labelledby="evidence-heading">
           <h2 id="evidence-heading">Evidence</h2>

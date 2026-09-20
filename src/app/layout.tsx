@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { getCachedNiches } from "@/data/discovery-cache";
 import { FollowedNichesProvider } from "@/components/preferences/followed-niches-provider";
 import { SiteHeader } from "@/components/shell/site-header";
+import { AccountChrome } from "@/components/accounts/account-chrome";
 import { SiteFooter } from "@/components/shell/site-footer";
 import "./globals.css";
 
@@ -23,7 +24,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body>
         <a className="skipLink" href="#main-content">Skip to content</a>
         <FollowedNichesProvider knownNicheIds={niches.map((niche) => niche.id)}>
-          <SiteHeader />
+          <Suspense fallback={<SiteHeader />}><AccountChrome /></Suspense>
           {children}
           <SiteFooter />
         </FollowedNichesProvider>

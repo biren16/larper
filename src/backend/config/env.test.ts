@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readPublicSupabaseConfig, readServerSupabaseConfig } from "./env";
+import { readPublicSupabaseConfig, readServerSupabaseConfig, readSiteUrl } from "./env";
 
 describe("Supabase environment configuration", () => {
   it("allows local development without Supabase", () => {
@@ -28,5 +28,11 @@ describe("Supabase environment configuration", () => {
       url: "https://demo.supabase.co",
       serviceRoleKey: "secret",
     });
+  });
+
+  it("requires a canonical site URL only in production", () => {
+    expect(readSiteUrl({}, "development")).toBe("http://localhost:3000");
+    expect(() => readSiteUrl({}, "production")).toThrow("NEXT_PUBLIC_SITE_URL");
+    expect(readSiteUrl({ NEXT_PUBLIC_SITE_URL: "https://larper.example/" }, "production")).toBe("https://larper.example");
   });
 });

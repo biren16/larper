@@ -11,7 +11,7 @@ const time = (value: string | null) => value
   ? new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(value))
   : "Never";
 
-export function StudioDashboard({ data }: { data: StudioDashboardData }) {
+export function StudioDashboard({ data, manualSignalAction }: { data: StudioDashboardData; manualSignalAction?: (form: FormData) => void | Promise<void> }) {
   const latestRun = data.runs[0];
   return (
     <main id="main-content" className={styles.main}>
@@ -55,7 +55,7 @@ export function StudioDashboard({ data }: { data: StudioDashboardData }) {
 
         <section aria-labelledby="manual-heading">
           <div className={styles.sectionHeading}><div><p>Hard-to-access platforms</p><h2 id="manual-heading">Add signal</h2></div></div>
-          <form className={styles.manualForm} aria-label="Add a manual signal">
+          <form className={styles.manualForm} aria-label="Add a manual signal" action={manualSignalAction}>
             <label>Public URL<input name="url" type="url" required placeholder="https://…" /></label>
             <label>What is moving?<input name="title" required maxLength={180} /></label>
             <div><label>Source name<input name="sourceName" required /></label><label>Region<select name="region" defaultValue="india"><option value="india">India</option><option value="global">Global</option></select></label></div>

@@ -1,0 +1,17 @@
+.main { display: grid; min-height: calc(100dvh - 9rem); padding: clamp(2rem, 7vw, 6rem) var(--gutter); place-items: center; }
+.card { background: var(--surface); border: 1px solid var(--line); box-shadow: 1rem 1rem 0 color-mix(in srgb, var(--cobalt) 28%, transparent); max-width: 38rem; padding: clamp(2rem, 5vw, 4.5rem); width: 100%; }
+.eyebrow { font: 760 0.7rem/1 var(--font-sans); letter-spacing: 0.14em; text-transform: uppercase; }
+.card h1 { font: 700 clamp(3rem, 7vw, 5.5rem)/0.86 var(--font-sans); letter-spacing: -0.07em; margin: 1rem 0 1.4rem; }
+.card > p:not(.eyebrow, .error) { color: var(--muted); font: 500 1rem/1.5 var(--font-sans); }
+.card form { margin-top: 1.5rem; }
+.card button, .back { align-items: center; background: var(--ink); border: 1px solid var(--ink); color: var(--paper); display: flex; font: 720 0.82rem/1 var(--font-sans); justify-content: center; min-height: 3.25rem; padding: 0 1.2rem; width: 100%; }
+.google { background: var(--paper-bright) !important; color: var(--ink) !important; }
+.divider { align-items: center; display: flex; gap: 0.8rem; margin: 1.5rem 0 0; }
+.divider::before, .divider::after { background: var(--line); content: ""; flex: 1; height: 1px; }
+.divider span { color: var(--muted); font-size: 0.75rem; }
+.emailForm { display: grid; gap: 0.65rem; }
+.emailForm label { font: 700 0.72rem/1 var(--font-sans); }
+.emailForm input { background: var(--paper); border: 1px solid var(--line); color: var(--ink); font: 500 1rem/1 var(--font-sans); min-height: 3.25rem; padding: 0 0.9rem; }
+.card small { color: var(--muted); display: block; line-height: 1.4; margin-top: 1.4rem; }
+.error { background: color-mix(in srgb, var(--signal-red) 12%, transparent); border-left: 3px solid var(--signal-red); margin-top: 1rem; padding: 0.8rem; }
+.back { margin-top: 2rem; text-decoration: none; }
