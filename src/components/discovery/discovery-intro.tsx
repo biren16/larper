@@ -33,6 +33,7 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
   const [phase, setPhase] = useState<IntroPhase>("playing");
   const phaseRef = useRef<IntroPhase>("playing");
   const exitTimerRef = useRef<number | null>(null);
+  const previousOverflowRef = useRef("");
 
   const dismiss = useCallback(() => {
     if (phaseRef.current !== "playing") return;
@@ -44,6 +45,7 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
     exitTimerRef.current = window.setTimeout(() => {
       phaseRef.current = "hidden";
       document.documentElement.dataset.larperIntro = "seen";
+      document.documentElement.style.overflow = previousOverflowRef.current;
       setPhase("hidden");
     }, 320);
   }, []);
@@ -69,6 +71,8 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
     introStartedInThisDocument = true;
     rememberIntro();
     root.dataset.larperIntro = "playing";
+    previousOverflowRef.current = root.style.overflow;
+    root.style.overflow = "hidden";
 
     const automaticExit = window.setTimeout(dismiss, 2680);
     const interrupt = () => dismiss();
@@ -83,6 +87,7 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
       window.removeEventListener("keydown", interrupt);
       window.removeEventListener("pointerdown", interrupt);
       window.removeEventListener("wheel", interrupt);
+      root.style.overflow = previousOverflowRef.current;
       activeIntroInstances -= 1;
       window.setTimeout(() => {
         if (activeIntroInstances === 0) root.dataset.larperIntro = "seen";

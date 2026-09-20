@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { colorScheme: "light dark", themeColor: "#e9ebee" };
 
-const introStateScript = `(function(){try{var k="larper:intro:v1",r=document.documentElement,s=sessionStorage.getItem(k)==="1";if(s){r.setAttribute("data-larper-intro","seen")}else if(location.pathname==="/"){r.setAttribute("data-larper-intro","playing")}}catch(e){}})();`;
+const introStateScript = `(function(){try{if(sessionStorage.getItem("larper:intro:v1")==="1"){document.documentElement.setAttribute("data-larper-intro","seen")}}catch(e){}})();`;
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const niches = await seedRepository.listNiches();
