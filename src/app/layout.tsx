@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import type { ReactNode } from "react";
-import { seedRepository } from "@/data/seed/repository";
+import { getCachedNiches } from "@/data/discovery-cache";
 import { FollowedNichesProvider } from "@/components/preferences/followed-niches-provider";
 import { SiteHeader } from "@/components/shell/site-header";
 import { SiteFooter } from "@/components/shell/site-footer";
@@ -17,7 +17,7 @@ export const viewport: Viewport = { colorScheme: "light dark", themeColor: "#e9e
 const introStateScript = `(function(){try{if(sessionStorage.getItem("larper:intro:v1")==="1"){document.documentElement.setAttribute("data-larper-intro","seen")}}catch(e){}})();`;
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const niches = await seedRepository.listNiches();
+  const niches = await getCachedNiches();
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>

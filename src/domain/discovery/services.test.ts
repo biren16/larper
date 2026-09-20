@@ -11,6 +11,7 @@ describe("discovery view-model services", () => {
     expect(home.followedNiches.map((niche) => niche.slug)).toEqual(["fragrance", "sneakers", "f1", "streetwear"]);
     expect(home.recommendedNiches.every((niche) => !home.followedNiches.some((followed) => followed.id === niche.id))).toBe(true);
     expect(home.currentTopics[0]).toMatchObject({ niche: expect.any(Object), sources: expect.any(Array), score: expect.any(Number) });
+    expect(home.verifiedAt).toBe("2026-09-19T18:00:00.000Z");
   });
 
   it("builds topic details with sources, media, and valid related topics", async () => {

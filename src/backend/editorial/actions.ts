@@ -22,6 +22,7 @@ export function createEditorialActions(dependencies: {
   service: EditorialService;
   getActor: () => Promise<EditorialActor | null>;
   now: () => string;
+  invalidatePublicContent?: (content: { slug?: string }) => void | Promise<void>;
 }) {
   return {
     publishStory: async (form: FormData) => {
@@ -47,6 +48,7 @@ export function createEditorialActions(dependencies: {
           evidenceSummary: required(form, "evidenceSummary"),
           tags: list(form, "tags"),
         });
+        await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });
         return { ok: true as const, storyId: result.storyId };
       } catch (error) {
         return { ok: false as const, error: message(error) };
@@ -63,6 +65,7 @@ export function createEditorialActions(dependencies: {
           evidenceSummary: required(form, "evidenceSummary"),
           tags: list(form, "tags"),
         });
+        await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });
         return { ok: true as const, storyId: result.storyId };
       } catch (error) {
         return { ok: false as const, error: message(error) };
@@ -78,6 +81,7 @@ export function createEditorialActions(dependencies: {
         else if (action === "expire") await dependencies.service.expire(actor, candidateId, notes);
         else if (action === "unpublish") await dependencies.service.unpublish(actor, candidateId, notes);
         else throw new Error("action is invalid");
+        if (action === "unpublish") await dependencies.invalidatePublicContent?.({ slug: String(form.get("slug") ?? "").trim() || undefined });
         return { ok: true as const };
       } catch (error) {
         return { ok: false as const, error: message(error) };

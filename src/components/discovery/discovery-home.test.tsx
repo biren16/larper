@@ -42,6 +42,18 @@ describe("DiscoveryHome", () => {
     expect(screen.getByRole("heading", { name: "Missed the origin story?" })).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: /silver runners are back in rotation/i }).length).toBeGreaterThan(0);
   });
+
+  it("renders an honest verified-edition state when no publishable signals exist", () => {
+    render(
+      <FollowedNichesProvider knownNicheIds={[]}>
+        <DiscoveryHome home={{ niches: [], followedNiches: [], recommendedNiches: [], currentTopics: [], deepLore: [], verifiedAt: null }} />
+      </FollowedNichesProvider>,
+    );
+
+    expect(screen.getByRole("heading", { name: "The radar is recalibrating." })).toBeInTheDocument();
+    expect(screen.getByText(/no verified stories are ready yet/i)).toBeInTheDocument();
+    expect(screen.queryByText(/fictional|demo trends/i)).not.toBeInTheDocument();
+  });
 });
 
 function currentTopicsTitle(home: Awaited<ReturnType<typeof buildDiscoveryHome>>, index: number) {

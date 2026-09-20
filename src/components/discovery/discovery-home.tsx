@@ -41,6 +41,19 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
   const followed = followedNicheIds.map((id) => home.niches.find((niche) => niche.id === id)).filter((niche): niche is DiscoveryHomeViewModel["niches"][number] => Boolean(niche));
   const recommended = home.niches.filter((niche) => !followedNicheIds.includes(niche.id));
 
+  if (currentTopics.length === 0) {
+    return (
+      <main id="main-content" className={styles.main}>
+        <section className={styles.emptyRadar} aria-labelledby="empty-radar-heading">
+          <span>Verified edition</span>
+          <h1 id="empty-radar-heading">The radar is recalibrating.</h1>
+          <p>No verified stories are ready yet. We’ll publish when independent evidence clears the bar—not just because a post is loud.</p>
+          {home.verifiedAt && <small>Latest verified check: {new Date(home.verifiedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</small>}
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main id="main-content" className={styles.main}>
       <DiscoveryIntro items={currentTopics.slice(0, 3)} />
@@ -82,10 +95,10 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
         })}</div>
       </section>
 
-      <section className={styles.deepLore} aria-labelledby="deep-lore">
+      {home.deepLore.length > 0 && <section className={styles.deepLore} aria-labelledby="deep-lore">
         <div className={styles.loreIntro}><span>Context before confidence</span><h2 id="deep-lore">Missed the origin story?</h2><p>Start here. Then go back to the discourse knowing why everyone is yelling.</p><Link className={styles.moreLore} href={`/discover/${home.deepLore[3]?.topic.slug ?? home.deepLore[0].topic.slug}`}>One more rabbit hole <ArrowRight aria-hidden /></Link></div>
         <div className={styles.loreStack}>{home.deepLore.slice(0, 3).map((item) => <HomeSignalCard key={item.topic.id} item={item} layout="lore" />)}</div>
-      </section>
+      </section>}
     </main>
   );
 }

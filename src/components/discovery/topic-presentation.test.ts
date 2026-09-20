@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { DiscoveryTopic, Niche, SourceSignal } from "@/domain/discovery/types";
 import {
+  buildEvidenceProvenance,
   buildSignalCue,
   getCuriosityAction,
   selectCardKind,
@@ -110,5 +111,20 @@ describe("topic presentation", () => {
     expect(getCuriosityAction(topic({ type: "DEBATE" }))).toEqual({ label: "Why do people care?", href: "/discover/topic-one#why-it-matters" });
     expect(getCuriosityAction(topic({ type: "LORE", mode: "deep-lore" }))).toEqual({ label: "Explain the lore", href: "/discover/topic-one#lore" });
     expect(getCuriosityAction(topic())).toEqual({ label: "Go deeper", href: "/discover/topic-one" });
+  });
+
+  it("describes live provenance without overstating unavailable evidence", () => {
+    expect(buildEvidenceProvenance(topic({ origin: "ingested", regions: ["IN", "global"] }), [
+      signal("rss", "r1"), signal("youtube", "y1"),
+    ])).toEqual({
+      note: "Evidence checked 10 Sep 2026, 11:30 pm IST · India + Global",
+      summary: "Two test signals",
+      sourceCountLabel: "2 independent source signals",
+    });
+
+    expect(buildEvidenceProvenance(topic(), [])).toEqual(expect.objectContaining({
+      note: expect.stringMatching(/development fixture/i),
+      sourceCountLabel: "No linked source signals",
+    }));
   });
 });

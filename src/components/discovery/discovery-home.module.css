@@ -1,4 +1,9 @@
 .main { overflow: clip; }
+.emptyRadar { align-items: flex-start; display: flex; flex-direction: column; justify-content: center; min-height: calc(100dvh - 9rem); padding: clamp(4rem, 10vw, 9rem) var(--gutter); }
+.emptyRadar > span { font: 700 0.72rem/1 var(--font-sans); letter-spacing: 0.14em; text-transform: uppercase; }
+.emptyRadar h1 { font-family: var(--font-serif); font-size: clamp(3.5rem, 9vw, 8.5rem); font-weight: 560; letter-spacing: -0.065em; line-height: 0.88; margin: 1rem 0 1.5rem; max-width: 9ch; }
+.emptyRadar p { font: 500 clamp(1rem, 1.6vw, 1.3rem)/1.5 var(--font-sans); max-width: 44rem; }
+.emptyRadar small { margin-top: 1.5rem; opacity: 0.68; }
 .intro { align-items: center; display: grid; gap: clamp(2rem, 4vw, 5rem); grid-template-columns: repeat(12, minmax(0, 1fr)); margin: 0 auto; max-width: var(--content); min-height: calc(100svh - 4.5rem); padding: clamp(2rem, 4vw, 4rem) var(--gutter); position: relative; }
 .intro::before { background: radial-gradient(circle, color-mix(in srgb, var(--ink) 22%, transparent) 0 1px, transparent 1.35px); background-size: 8px 8px; content: ""; height: 28%; left: 43%; opacity: 0.45; position: absolute; top: 4%; transform: rotate(-8deg); width: 27%; }
 .introCopy { grid-column: 1 / span 6; position: relative; z-index: 8; }
