@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import type { TopicViewModel } from "@/domain/discovery/services";
-import { Artwork } from "./artwork";
 import styles from "./discovery-intro.module.css";
 
 export const DISCOVERY_INTRO_STORAGE_KEY = "larper:intro:v1";
@@ -28,12 +26,20 @@ function rememberIntro(): void {
   }
 }
 
-export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
-  const [signals] = useState(() => items.slice(0, 3));
+export function DiscoveryIntro() {
   const [phase, setPhase] = useState<IntroPhase>("playing");
   const phaseRef = useRef<IntroPhase>("playing");
   const exitTimerRef = useRef<number | null>(null);
   const previousOverflowRef = useRef("");
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const wordmarkRef = useRef<HTMLDivElement>(null);
+
+  const finish = useCallback(() => {
+    phaseRef.current = "hidden";
+    document.documentElement.dataset.larperIntro = "seen";
+    document.documentElement.style.overflow = previousOverflowRef.current;
+    setPhase("hidden");
+  }, []);
 
   const dismiss = useCallback(() => {
     if (phaseRef.current !== "playing") return;
@@ -42,18 +48,15 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
     document.documentElement.dataset.larperIntro = "exiting";
     setPhase("exiting");
 
-    exitTimerRef.current = window.setTimeout(() => {
-      phaseRef.current = "hidden";
-      document.documentElement.dataset.larperIntro = "seen";
-      document.documentElement.style.overflow = previousOverflowRef.current;
-      setPhase("hidden");
-    }, 320);
-  }, []);
+    exitTimerRef.current = window.setTimeout(finish, 320);
+  }, [finish]);
 
   useLayoutEffect(() => {
     const root = document.documentElement;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const seenBeforeThisDocument = hasSeenIntro() && !introStartedInThisDocument;
+    const continuingStrictModePlayback =
+      introStartedInThisDocument && root.dataset.larperIntro === "playing";
+    const seenBeforeThisDocument = hasSeenIntro() && !continuingStrictModePlayback;
 
     activeIntroInstances += 1;
 
@@ -74,69 +77,80 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
     previousOverflowRef.current = root.style.overflow;
     root.style.overflow = "hidden";
 
-    const automaticExit = window.setTimeout(dismiss, 2680);
+    let measurementActive = true;
+    const measureWordmarkTarget = () => {
+      const overlay = overlayRef.current;
+      const wordmark = wordmarkRef.current;
+      const target = document.querySelector<HTMLElement>('a[aria-label="LARPer home"]');
+
+      if (!overlay || !wordmark || !target || wordmark.offsetWidth === 0) return;
+
+      const targetBox = target.getBoundingClientRect();
+      const scale = targetBox.width / wordmark.offsetWidth;
+      const scaledHeight = wordmark.offsetHeight * scale;
+      const targetY = targetBox.top + (targetBox.height - scaledHeight) / 2;
+
+      overlay.style.setProperty("--intro-target-x", `${targetBox.left}px`);
+      overlay.style.setProperty("--intro-target-y", `${targetY}px`);
+      overlay.style.setProperty("--intro-target-scale", `${scale}`);
+      overlay.style.setProperty("--intro-target-center-x", `${targetBox.left + targetBox.width / 2}px`);
+      overlay.style.setProperty("--intro-target-center-y", `${targetBox.top + targetBox.height / 2}px`);
+    };
+
+    measureWordmarkTarget();
+    void document.fonts?.ready.then(() => {
+      if (measurementActive) measureWordmarkTarget();
+    });
+
+    const automaticExit = window.setTimeout(dismiss, 2880);
+    const cleanupFailsafe = window.setTimeout(finish, 3450);
     const interrupt = () => dismiss();
 
     window.addEventListener("keydown", interrupt);
     window.addEventListener("pointerdown", interrupt);
     window.addEventListener("wheel", interrupt, { passive: true });
+    window.addEventListener("touchstart", interrupt, { passive: true });
+    window.addEventListener("resize", measureWordmarkTarget);
+    window.addEventListener("orientationchange", measureWordmarkTarget);
 
     return () => {
+      measurementActive = false;
       window.clearTimeout(automaticExit);
+      window.clearTimeout(cleanupFailsafe);
       if (exitTimerRef.current !== null) window.clearTimeout(exitTimerRef.current);
       window.removeEventListener("keydown", interrupt);
       window.removeEventListener("pointerdown", interrupt);
       window.removeEventListener("wheel", interrupt);
+      window.removeEventListener("touchstart", interrupt);
+      window.removeEventListener("resize", measureWordmarkTarget);
+      window.removeEventListener("orientationchange", measureWordmarkTarget);
       root.style.overflow = previousOverflowRef.current;
       activeIntroInstances -= 1;
       window.setTimeout(() => {
         if (activeIntroInstances === 0) root.dataset.larperIntro = "seen";
       }, 0);
     };
-  }, [dismiss]);
+  }, [dismiss, finish]);
 
   if (phase === "hidden") return null;
 
-  const [lead, secondary, tertiary] = signals;
-
   return (
     <div
+      ref={overlayRef}
       className={`${styles.overlay} ${phase === "exiting" ? styles.exiting : ""}`}
       aria-hidden="true"
     >
       <div className={styles.stage}>
-        <div className={styles.cobaltField} />
-        <div className={styles.redField} />
-        <div className={styles.halftone} />
-
-        <div className={styles.wordmark}>LARPer</div>
-        <p className={styles.promise}>Find it. Get the lore.</p>
-
-        {lead && (
-          <figure className={`${styles.signal} ${styles.signalLead}`}>
-            <Artwork media={lead.media} priority />
-            <figcaption>
-              <span>{lead.niche.name}</span>
-              <strong>{lead.topic.title}</strong>
-            </figcaption>
-          </figure>
-        )}
-
-        {secondary && (
-          <figure className={`${styles.signal} ${styles.signalSecondary}`}>
-            <Artwork media={secondary.media} />
-            <figcaption>{secondary.topic.type.replace("_", " ")}</figcaption>
-          </figure>
-        )}
-
-        {tertiary && (
-          <figure className={`${styles.signal} ${styles.signalTertiary}`}>
-            <Artwork media={tertiary.media} />
-            <figcaption>{tertiary.topic.freshnessLabel}</figcaption>
-          </figure>
-        )}
-
-        <div className={styles.liveStamp}>RN</div>
+        <div className={`${styles.curtain} ${styles.curtainTop}`} />
+        <div className={`${styles.curtain} ${styles.curtainBottom}`} />
+        <div className={styles.registrationBand} />
+        <div ref={wordmarkRef} className={styles.wordmark} data-intro-wordmark>
+          <span className={styles.wordmarkMeasure}>LARPer</span>
+          <span className={`${styles.wordmarkSlice} ${styles.sliceTop}`}>LARPer</span>
+          <span className={`${styles.wordmarkSlice} ${styles.sliceMiddle}`}>LARPer</span>
+          <span className={`${styles.wordmarkSlice} ${styles.sliceBottom}`}>LARPer</span>
+          <span className={styles.registrationSquare} />
+        </div>
       </div>
     </div>
   );

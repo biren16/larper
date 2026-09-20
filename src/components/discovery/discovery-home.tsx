@@ -43,7 +43,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
 
   return (
     <main id="main-content" className={styles.main}>
-      <DiscoveryIntro items={currentTopics.slice(0, 3)} />
+      <DiscoveryIntro />
       <header className={styles.intro}>
         <div className={styles.introCopy}>
           <p className={styles.kicker}>Find new shit to get obsessed with.</p>
