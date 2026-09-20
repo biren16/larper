@@ -24,15 +24,18 @@
 .action:hover svg { transform: translate(2px, -2px); }
 
 .lead { grid-template-columns: minmax(0, 1fr); }
-.lead .media { min-height: 14rem; }
-.lead .copy { background: var(--ink); color: var(--paper); padding: clamp(1.25rem, 2.5vw, 2.25rem); }
+.lead .media { min-height: 11rem; }
+.lead .media > div { min-height: 11rem; }
+.lead .copy { background: var(--feature-bg); color: var(--feature-text); padding: clamp(1.25rem, 2.5vw, 2.25rem); }
 .lead .meta, .lead .hook, .lead .signals { color: var(--feature-muted); }
-.lead .meta a { color: var(--paper); }
+.lead .meta a { color: var(--feature-text); }
 .lead h3 { font-size: clamp(2rem, 3.2vw, 3.6rem); line-height: 0.9; margin-top: 2.25rem; }
 
 .trend { min-height: 14rem; }
 .drop .media, .place .media { min-height: 12rem; }
 .drop { background: var(--surface-strong, var(--paper-deep)); }
+.drop .copy, .visual .copy { grid-row: 1; }
+.drop .media, .visual .media { grid-row: 2; }
 .meme { background: var(--cobalt); color: var(--cobalt-ink); }
 .meme .meta, .meme .meta a, .meme .signals { color: inherit; }
 .meme h3 { font-size: clamp(1.75rem, 3vw, 3.2rem); }
@@ -48,8 +51,13 @@
 .compact h3 { font-size: clamp(1.2rem, 1.7vw, 1.65rem); }
 .compact .signals span:not(:first-child) { display: none; }
 
+@media (min-width: 768px) and (max-width: 1100px) {
+  .footer { align-items: flex-start; flex-direction: column; gap: 0.5rem; }
+}
+
 @media (max-width: 767px) {
   .lead .media { min-height: 18rem; }
+  .lead .media > div { min-height: 18rem; }
   .lead .copy { min-height: 18rem; }
   .lead h3 { font-size: clamp(2.35rem, 12vw, 3.8rem); }
   .card { min-height: 0; }

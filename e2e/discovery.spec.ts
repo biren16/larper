@@ -1,4 +1,27 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
+
+async function contrastRatio(locator: Locator) {
+  return locator.evaluate((element) => {
+    const parse = (value: string) => value.match(/[\d.]+/g)!.slice(0, 3).map(Number);
+    const luminance = (rgb: number[]) => {
+      const channels = rgb.map((value) => {
+        const channel = value / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const styles = getComputedStyle(element);
+    let backgroundElement: Element | null = element;
+    let backgroundColor = styles.backgroundColor;
+    while (backgroundElement.parentElement && /rgba?\([^)]*,\s*0\)$/.test(backgroundColor)) {
+      backgroundElement = backgroundElement.parentElement;
+      backgroundColor = getComputedStyle(backgroundElement).backgroundColor;
+    }
+    const foreground = luminance(parse(styles.color));
+    const background = luminance(parse(backgroundColor));
+    return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
+  });
+}
 
 test("the opening explains the product and shows five useful signals", async ({ page, isMobile }) => {
   test.skip(isMobile, "desktop density check");
@@ -7,7 +30,7 @@ test("the opening explains the product and shows five useful signals", async ({ 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("What the internet is larping rn.");
   await expect(page.getByText(/Niche obsessions, drops, memes, debates and lore/).first()).toBeVisible();
 
-  const intersecting = await page.locator('section[aria-labelledby="larping-now"] article').evaluateAll((items) => (
+  const intersecting = await page.locator('section[aria-labelledby="larping-now"] article h3').evaluateAll((items) => (
     items.filter((item) => {
       const box = item.getBoundingClientRect();
       return box.top < window.innerHeight && box.bottom > 0;
@@ -59,22 +82,11 @@ test("light and dark modes keep contextual reading contrast", async ({ page, isM
   test.skip(isMobile, "desktop contrast check");
   for (const colorScheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme });
+    await page.goto("/");
+    const leadSignals = page.locator('section[aria-labelledby="larping-now"] article').first().locator('[aria-label$="source signals"]');
+    expect(await contrastRatio(leadSignals)).toBeGreaterThanOrEqual(4.5);
     await page.goto("/discover/the-silver-runner-resurgence");
-    const contrast = await page.locator("#beginner-context").evaluate((element) => {
-      const parse = (value: string) => value.match(/[\d.]+/g)!.slice(0, 3).map(Number);
-      const luminance = (rgb: number[]) => {
-        const channels = rgb.map((value) => {
-          const channel = value / 255;
-          return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
-        });
-        return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
-      };
-      const styles = getComputedStyle(element);
-      const foreground = luminance(parse(styles.color));
-      const background = luminance(parse(styles.backgroundColor));
-      return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
-    });
-    expect(contrast).toBeGreaterThanOrEqual(4.5);
+    expect(await contrastRatio(page.locator("#beginner-context"))).toBeGreaterThanOrEqual(4.5);
   }
 });
 
@@ -90,6 +102,35 @@ test("sticky lore keeps reading columns separate", async ({ page, isMobile }) =>
     return { left: box.left, right: box.right };
   }));
   expect(columns[0].right).toBeLessThanOrEqual(columns[1].left);
+});
+
+test("narrow desktop cards keep actions inside their edges", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop containment check");
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.goto("/");
+  const actions = page.locator('section[aria-labelledby="larping-now"] article').getByRole("link", { name: /Go deeper|WTF is this\?|Why do people care\?|Explain the lore/ });
+  const contained = await actions.evaluateAll((items) => items.every((item) => {
+    const action = item.getBoundingClientRect();
+    const card = item.closest("article")!.getBoundingClientRect();
+    return action.left >= card.left && action.right <= card.right + 0.5;
+  }));
+  expect(contained).toBe(true);
+});
+
+test("backward keyboard navigation raises the focused lore card", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop keyboard stack check");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const moreLore = page.getByRole("link", { name: "One more rabbit hole" }).first();
+  await moreLore.scrollIntoViewIfNeeded();
+  await moreLore.focus();
+  for (let index = 0; index < 5; index += 1) await page.keyboard.press("Shift+Tab");
+  const visibleAtFocusPoint = await page.locator(":focus").evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const top = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+    return Boolean(top && (element === top || element.contains(top) || top.contains(element)));
+  });
+  expect(visibleAtFocusPoint).toBe(true);
 });
 
 test("long topic titles reflow at 320px", async ({ page, isMobile }) => {

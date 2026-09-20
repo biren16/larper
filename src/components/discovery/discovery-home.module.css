@@ -30,7 +30,7 @@
 .nicheMedia { min-height: 100%; overflow: hidden; }
 .nicheMedia > div { min-height: 100%; }
 .nicheCopy { display: flex; flex-direction: column; min-width: 0; padding: 1rem; position: relative; }
-.nicheCopy > div { color: var(--muted); display: flex; font: 650 0.62rem/1 var(--font-sans); gap: 0.7rem; }
+.nicheCopy > div { color: var(--muted); display: flex; font: 650 0.62rem/1 var(--font-sans); gap: 0.7rem; padding-right: 3rem; }
 .nicheCopy h3 { font: 700 1.55rem/1 var(--font-sans); letter-spacing: -0.045em; margin-top: auto; }
 .nicheCopy p { color: var(--muted); font: 500 0.76rem/1.3 var(--font-sans); margin-top: 0.4rem; max-width: 24ch; }
 .roundLink { align-items: center; border: 1px solid var(--line); border-radius: 50%; display: flex; height: 2.75rem; justify-content: center; position: absolute; right: 0.8rem; top: 0.8rem; width: 2.75rem; }
@@ -58,6 +58,7 @@
 .loreStack > div { position: sticky; top: 6rem; }
 .loreStack > div:nth-child(2) { top: 7.25rem; }
 .loreStack > div:nth-child(3) { top: 8.5rem; }
+.loreStack > div:focus-within { z-index: 4; }
 .moreLore { align-items: center; border-bottom: 1px solid currentColor; display: flex; font: 700 0.82rem/1 var(--font-sans); gap: 0.45rem; grid-column: 2; justify-self: end; padding-bottom: 0.3rem; }
 @supports (animation-timeline: view()) {
   @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
