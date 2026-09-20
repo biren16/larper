@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Part 1 proves LARPer's core loop: see what niche communities are focused on, understand why it matters, learn the context, and move into adjacent rabbit holes.
+Part 1 proves larper's core loop: see what niche communities are focused on, understand why it matters, learn the context, and move into adjacent rabbit holes.
 
 The interface is deliberately source-agnostic. Seed fixtures behave like one repository adapter; a future ingestion-backed adapter can replace them without changing page components.
 
@@ -76,4 +76,3 @@ Reddit, YouTube, RSS, trend, or publication adapters may have different raw fiel
 ## Intentionally excluded
 
 Part 1 does not include live ingestion, scraping, AI chat, recommendations ML, authentication, cross-device preferences, community posts, profiles, comments, messaging, moderation, notifications, payments, or analytics.
-

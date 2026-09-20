@@ -21,7 +21,7 @@ function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;
 }
 
-export function ThemeToggle() {
+export function ThemeSelector() {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
@@ -32,10 +32,7 @@ export function ThemeToggle() {
     });
   }, []);
 
-  const nextTheme: Theme = theme === "light" ? "dark" : "light";
-  const label = `Switch to ${nextTheme} mode`;
-
-  function toggleTheme() {
+  function selectTheme(nextTheme: Theme) {
     setTheme(nextTheme);
     applyTheme(nextTheme);
     try {
@@ -46,8 +43,22 @@ export function ThemeToggle() {
   }
 
   return (
-    <button className={styles.toggle} type="button" onClick={toggleTheme} aria-label={label} title={label}>
-      <span aria-hidden="true" className={styles.icon}>{theme === "light" ? "◐" : "◑"}</span>
-    </button>
+    <fieldset className={styles.selector}>
+      <legend className={styles.legend}>Appearance</legend>
+      <div className={styles.options}>
+        {(["light", "dark"] as const).map((option) => (
+          <label className={styles.option} data-active={theme === option || undefined} key={option}>
+            <input
+              checked={theme === option}
+              name="larper-theme"
+              onChange={() => selectTheme(option)}
+              type="radio"
+              value={option}
+            />
+            <span>{option === "light" ? "Light" : "Dark"}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }

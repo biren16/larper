@@ -100,12 +100,60 @@ test("persists a newly followed niche inside Your Larps", async ({ page }) => {
 
 test("theme control switches modes and remembers an explicit choice", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Switch to dark mode" }).click();
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await page.getByRole("radio", { name: "Dark" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("button", { name: "Switch to light mode" })).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Dark" })).toBeChecked();
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+});
+
+test("site header opens a full-screen editorial menu", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop navbar composition check");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+
+  const header = page.getByRole("banner");
+  const metrics = await header.evaluate((element) => {
+    const styles = getComputedStyle(element);
+    return {
+      backdropFilter: styles.backdropFilter,
+      boxShadow: styles.boxShadow,
+      height: element.getBoundingClientRect().height,
+    };
+  });
+
+  await expect(header.getByRole("link", { name: "larper home" })).toBeVisible();
+  await expect(header.getByRole("navigation", { name: "Primary navigation" })).toHaveCount(0);
+  await expect(header.getByRole("button", { name: "Open menu" })).toBeVisible();
+  expect(metrics.backdropFilter).toBe("none");
+  expect(metrics.boxShadow).toBe("none");
+  expect(metrics.height).toBeLessThanOrEqual(72);
+
+  await header.getByRole("button", { name: "Open menu" }).click();
+  const menu = page.getByRole("dialog", { name: "Site menu" });
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole("link", { name: "Discovery" })).toBeVisible();
+  await expect(menu.getByRole("link", { name: "Your Larps" })).toBeVisible();
+  await expect(menu.getByRole("group", { name: "Appearance" })).toBeVisible();
+});
+
+test("site header keeps its menu trigger accessible at 320px", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop project owns the exact 320px navbar check");
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto("/");
+
+  const header = page.getByRole("banner");
+  const menuTarget = await page.getByRole("button", { name: "Open menu" }).evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return { width: box.width, height: box.height };
+  });
+
+  expect(await header.evaluate((element) => element.getBoundingClientRect().height)).toBeLessThanOrEqual(60);
+  expect(menuTarget.width).toBeGreaterThanOrEqual(44);
+  expect(menuTarget.height).toBeGreaterThanOrEqual(44);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });
 
 test("mobile rails work without horizontal page overflow", async ({ page, isMobile }) => {

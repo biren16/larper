@@ -4,13 +4,15 @@ import { describe, expect, it, vi } from "vitest";
 import { DISCOVERY_INTRO_STORAGE_KEY, DiscoveryIntro } from "./discovery-intro";
 
 describe("DiscoveryIntro", () => {
-  it("uses only the LARPer wordmark without topic imagery or supporting copy", async () => {
+  it("uses only the lowercase larper wordmark without topic imagery or supporting copy", async () => {
     window.sessionStorage.removeItem(DISCOVERY_INTRO_STORAGE_KEY);
     const { container } = render(<DiscoveryIntro />);
 
     expect(container.querySelector("img")).not.toBeInTheDocument();
     expect(screen.queryByText("Find it. Get the lore.")).not.toBeInTheDocument();
     expect(container.querySelector("[data-intro-wordmark]")).toBeInTheDocument();
+    expect(container).toHaveTextContent("larper");
+    expect(container).not.toHaveTextContent("LARPer");
 
     fireEvent.keyDown(window, { key: "Escape" });
     await waitFor(() => expect(container).toBeEmptyDOMElement(), { timeout: 600 });

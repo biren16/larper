@@ -16,9 +16,19 @@ test("the image-free intro resolves into the navbar wordmark", async ({ page }) 
 
     const introWordmark = page.locator("[data-intro-wordmark]");
     const overlay = introWordmark.locator("xpath=ancestor::div[@aria-hidden='true']");
+    const stage = introWordmark.locator("xpath=..");
     await expect(overlay.locator("img")).toHaveCount(0);
+    await expect(stage.locator(":scope > *")).toHaveCount(1);
+    expect(await introWordmark.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return Number.parseFloat(style.lineHeight) / Number.parseFloat(style.fontSize);
+    })).toBeGreaterThanOrEqual(0.85);
+    expect(await introWordmark.evaluate((element) => {
+      const stage = element.parentElement;
+      return stage ? getComputedStyle(stage, "::after").borderStyle : "missing";
+    })).toBe("none");
 
-    const navbarWordmark = page.getByRole("link", { name: "LARPer home" });
+    const navbarWordmark = page.getByRole("link", { name: "larper home" });
     await expect(introWordmark).toBeVisible();
     await page.waitForTimeout(2800);
 

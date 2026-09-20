@@ -33,7 +33,7 @@ describe("NicheSignalCard", () => {
     const item = { ...(await getItem("lead")), media: null };
     render(<NicheSignalCard item={item} layout="lead" />);
 
-    expect(screen.getByText("LARPer")).toBeInTheDocument();
+    expect(screen.getByText("larper")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: `Open ${item.topic.title}` })).toBeInTheDocument();
   });
 

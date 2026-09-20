@@ -5,7 +5,7 @@ export function SiteFooter() {
   return (
     <footer className={styles.footer}>
       <div>
-        <Link className={styles.mark} href="/">LARPer</Link>
+        <Link className={styles.mark} href="/">larper</Link>
         <p>Find new shit to get obsessed with.<br />Stay for the lore.</p>
       </div>
       <div className={styles.endMatter}>

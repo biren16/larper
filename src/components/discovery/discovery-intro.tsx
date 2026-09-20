@@ -81,7 +81,7 @@ export function DiscoveryIntro() {
     const measureWordmarkTarget = () => {
       const overlay = overlayRef.current;
       const wordmark = wordmarkRef.current;
-      const target = document.querySelector<HTMLElement>('a[aria-label="LARPer home"]');
+      const target = document.querySelector<HTMLElement>('a[aria-label="larper home"]');
 
       if (!overlay || !wordmark || !target || wordmark.offsetWidth === 0) return;
 
@@ -141,15 +141,9 @@ export function DiscoveryIntro() {
       aria-hidden="true"
     >
       <div className={styles.stage}>
-        <div className={`${styles.curtain} ${styles.curtainTop}`} />
-        <div className={`${styles.curtain} ${styles.curtainBottom}`} />
-        <div className={styles.registrationBand} />
         <div ref={wordmarkRef} className={styles.wordmark} data-intro-wordmark>
-          <span className={styles.wordmarkMeasure}>LARPer</span>
-          <span className={`${styles.wordmarkSlice} ${styles.sliceTop}`}>LARPer</span>
-          <span className={`${styles.wordmarkSlice} ${styles.sliceMiddle}`}>LARPer</span>
-          <span className={`${styles.wordmarkSlice} ${styles.sliceBottom}`}>LARPer</span>
-          <span className={styles.registrationSquare} />
+          <span className={styles.wordmarkMeasure}>larper</span>
+          <span className={styles.wordmarkText}>larper</span>
         </div>
       </div>
     </div>

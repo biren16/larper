@@ -1,4 +1,4 @@
-# LARPer Frontend V2 Redesign
+# larper Frontend V2 Redesign
 
 ## Goal
 

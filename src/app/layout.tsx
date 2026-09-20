@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/shell/site-footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "LARPer | Find your next obsession", template: "%s | LARPer" },
+  title: { default: "larper | Find your next obsession", template: "%s | larper" },
   description: "See what niche communities are obsessed with right now, then explore the context and lore behind it.",
 };
 

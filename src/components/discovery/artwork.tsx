@@ -3,7 +3,7 @@ import type { MediaAsset } from "@/domain/discovery/types";
 import styles from "./artwork.module.css";
 
 export function Artwork({ media, priority = false, className = "" }: { media: MediaAsset | null; priority?: boolean; className?: string }) {
-  if (!media) return <div className={`${styles.fallback} ${className}`} aria-hidden><span>LARPer</span></div>;
+  if (!media) return <div className={`${styles.fallback} ${className}`} aria-hidden><span>larper</span></div>;
 
   return (
     <div className={`${styles.frame} ${className}`}>

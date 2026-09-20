@@ -54,7 +54,7 @@ describe("DiscoveryCard", () => {
     const item = { ...(await topicOfType("TREND")), media: null };
     render(<DiscoveryCard item={item} kind="visual" />);
 
-    expect(screen.getByText("LARPer")).toBeInTheDocument();
+    expect(screen.getByText("larper")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: `Open ${item.topic.title}` })).toBeInTheDocument();
   });
 });

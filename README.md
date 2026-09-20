@@ -1,6 +1,6 @@
-# LARPer
+# larper
 
-LARPer is an India-first, globally aware culture radar for Gen Z: a public discovery product that shows what is moving across niche communities, the evidence behind it, and enough context to enter the conversation without pretending one viral post is a trend.
+larper is an India-first, globally aware culture radar for Gen Z: a public discovery product for finding what niche communities are currently obsessed with, seeing the evidence behind that movement, and understanding the lore without pretending one viral post is a trend.
 
 ## Product shape
 
@@ -52,3 +52,8 @@ npx playwright install chromium
 - `supabase/migrations`: schema, RLS, editorial transaction, processing, and schedule.
 - `supabase/functions/ingest`: the three-hour Edge ingestion entry point.
 - `docs/operations/live-culture-runbook.md`: deployment, editorial, incident, backup, and beta procedures.
+- `src/domain/discovery`: domain contracts, ranking, and page view-model services.
+- `src/components`: editorial discovery UI, preference state, and site shell.
+- `src/app`: Discovery, topic detail, and niche routes.
+- `public/media`: local generated editorial artwork used by the seed dataset.
+- `docs/architecture/discovery.md`: architecture and future ingestion seam.
