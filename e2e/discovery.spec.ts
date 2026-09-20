@@ -54,6 +54,29 @@ test("the opening is a tall ranked-culture collage that hands off to Larping RN"
   expect(layout[2].top).toBeLessThan(layout[3].top);
 });
 
+test("intro artwork reads as one connected image cluster", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop intro composition check");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await page.waitForTimeout(1750);
+
+  const cards = page.locator('div[aria-hidden="true"] figure');
+  await expect(cards).toHaveCount(3);
+  const [lead, upperSatellite, lowerSatellite] = await cards.evaluateAll((items) => items.map((item) => {
+    const box = item.getBoundingClientRect();
+    return { top: box.top, bottom: box.bottom, left: box.left, right: box.right };
+  }));
+
+  expect(upperSatellite.left).toBeLessThan(lead.right);
+  expect(upperSatellite.bottom).toBeGreaterThan(lead.top);
+  expect(lowerSatellite.right).toBeGreaterThan(lead.left + 20);
+  expect(lowerSatellite.top).toBeLessThan(lead.bottom);
+
+  const clusterLeft = Math.min(lead.left, upperSatellite.left, lowerSatellite.left);
+  const clusterRight = Math.max(lead.right, upperSatellite.right, lowerSatellite.right);
+  expect(clusterRight - clusterLeft).toBeLessThan(1440 * 0.55);
+});
+
 test("moves from a contextual action to its explanation and niche", async ({ page }) => {
   await page.goto("/");
   const action = page.getByRole("link", { name: "WTF is this?" }).first();
