@@ -45,7 +45,7 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
       phaseRef.current = "hidden";
       document.documentElement.dataset.larperIntro = "seen";
       setPhase("hidden");
-    }, 280);
+    }, 320);
   }, []);
 
   useLayoutEffect(() => {
@@ -70,7 +70,7 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
     rememberIntro();
     root.dataset.larperIntro = "playing";
 
-    const automaticExit = window.setTimeout(dismiss, 1520);
+    const automaticExit = window.setTimeout(dismiss, 2680);
     const interrupt = () => dismiss();
 
     window.addEventListener("keydown", interrupt);
