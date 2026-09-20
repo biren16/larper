@@ -37,23 +37,6 @@
   z-index: 20;
 }
 
-.skip {
-  background: color-mix(in srgb, var(--paper-bright) 92%, transparent);
-  border: 1px solid var(--ink);
-  border-radius: var(--radius-control);
-  color: var(--ink);
-  cursor: pointer;
-  font: 700 0.72rem/1 var(--font-sans);
-  min-height: 2.75rem;
-  padding: 0 1rem;
-  position: absolute;
-  right: clamp(1.5rem, 3vw, 3rem);
-  top: clamp(1.5rem, 3vw, 3rem);
-  z-index: 30;
-}
-
-.skip:active { transform: scale(0.97); }
-
 .cobaltField,
 .redField,
 .halftone {
@@ -93,36 +76,16 @@
 }
 
 .wordmark {
-  font: 760 clamp(7rem, 22vw, 24rem)/0.72 var(--font-sans);
-  left: 2vw;
+  color: var(--ink);
+  font: 760 clamp(7rem, 18vw, 19rem)/0.72 var(--font-sans);
+  left: 3vw;
   letter-spacing: -0.09em;
   position: absolute;
-  top: 50%;
-  transform: translate(-8%, -42%) rotate(-4deg);
+  text-shadow: 0.025em 0.025em 0 var(--paper);
+  top: 45%;
+  transform: translate(-4%, -50%) rotate(-3deg);
   white-space: nowrap;
-  z-index: 5;
-}
-
-.signalLabel {
-  font: 760 clamp(0.7rem, 1vw, 0.9rem)/1 var(--font-sans);
-  left: clamp(1.5rem, 4vw, 4.5rem);
-  letter-spacing: 0.08em;
-  position: absolute;
-  text-transform: uppercase;
-  top: clamp(1.75rem, 6vh, 4.5rem);
-  z-index: 8;
-}
-
-.signalLabel::before {
-  background: var(--acid);
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-  content: "";
-  display: inline-block;
-  height: 0.7rem;
-  margin-right: 0.55rem;
-  vertical-align: -0.08rem;
-  width: 0.7rem;
+  z-index: 10;
 }
 
 .promise {
@@ -172,12 +135,12 @@
 }
 
 .signalLead {
-  height: min(54vw, 68vh);
-  max-height: 43rem;
-  right: 9vw;
-  top: 13vh;
+  height: min(50vw, 64vh);
+  max-height: 40rem;
+  right: 4vw;
+  top: 17vh;
   transform: translate3d(130%, 8%, 0) rotate(9deg);
-  width: min(36vw, 34rem);
+  width: min(31vw, 30rem);
 }
 
 .signalSecondary {
@@ -235,13 +198,11 @@
   .redField { animation: redIn 720ms cubic-bezier(0.16, 1, 0.3, 1) 480ms both; }
   .halftone { animation: halftoneIn 680ms ease-out 720ms both; }
   .wordmark { animation: wordmarkIn 2.25s cubic-bezier(0.16, 1, 0.3, 1) 160ms both; }
-  .signalLabel { animation: copyIn 480ms ease-out 620ms both; }
   .promise { animation: copyIn 560ms ease-out 1.2s both; }
   .signalLead { animation: leadIn 1.35s cubic-bezier(0.16, 1, 0.3, 1) 620ms both; }
   .signalSecondary { animation: secondaryIn 1.05s cubic-bezier(0.16, 1, 0.3, 1) 1.02s both; }
   .signalTertiary { animation: tertiaryIn 1s cubic-bezier(0.16, 1, 0.3, 1) 1.35s both; }
   .liveStamp { animation: stampIn 620ms cubic-bezier(0.2, 1.35, 0.35, 1) 1.9s both; }
-  .skip { animation: copyIn 360ms ease-out 520ms both; }
 }
 
 @keyframes overlayFailsafe { to { pointer-events: none; visibility: hidden; } }
@@ -250,10 +211,10 @@
 @keyframes redIn { from { transform: rotate(-3deg) scaleY(0); } to { transform: rotate(-3deg) scaleY(1); } }
 @keyframes halftoneIn { from { opacity: 0; transform: translateY(-18%) rotate(-9deg); } to { opacity: 0.62; transform: rotate(-9deg); } }
 @keyframes wordmarkIn {
-  0% { opacity: 0; transform: translate(-18%, -42%) rotate(-9deg) scale(1.16); }
-  38% { opacity: 1; transform: translate(-8%, -42%) rotate(-4deg) scale(1); }
-  76% { transform: translate(-8%, -42%) rotate(-4deg) scale(1); }
-  100% { transform: translate(-13%, -42%) rotate(-5deg) scale(0.97); }
+  0% { opacity: 0; transform: translate(-16%, -50%) rotate(-8deg) scale(1.14); }
+  38% { opacity: 1; transform: translate(-4%, -50%) rotate(-3deg) scale(1); }
+  76% { transform: translate(-4%, -50%) rotate(-3deg) scale(1); }
+  100% { transform: translate(-7%, -50%) rotate(-4deg) scale(0.92); }
 }
 @keyframes copyIn { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: none; } }
 @keyframes leadIn { from { opacity: 0; transform: translate3d(130%, 8%, 0) rotate(9deg); } to { opacity: 1; transform: translate3d(0, 0, 0) rotate(-2deg); } }
@@ -263,17 +224,15 @@
 
 @media (max-width: 767px) {
   .stage::after { inset: 0.75rem; }
-  .wordmark { font-size: clamp(5rem, 25vw, 7.5rem); left: 8vw; top: 22%; }
-  .signalLabel { left: 1.25rem; top: 1.5rem; }
+  .wordmark { font-size: clamp(4.6rem, 24vw, 7rem); left: 6vw; top: 21%; }
   .promise { bottom: 2rem; left: 1.25rem; }
-  .signalLead { height: 40vh; max-height: 28rem; right: -8vw; top: 30vh; width: min(72vw, 25rem); }
+  .signalLead { height: 40vh; max-height: 28rem; right: -6vw; top: 34vh; width: min(70vw, 24rem); }
   .signalSecondary { height: 23vh; right: 49vw; top: 57vh; width: 46vw; }
   .signalTertiary { display: none; }
   .cobaltField { height: 54%; right: -20%; top: 25%; width: 92%; }
   .redField { height: 26%; width: 64%; }
   .halftone { height: 30%; left: 4%; top: 3%; width: 68%; }
   .liveStamp { bottom: 7vh; right: 6vw; }
-  .skip { right: 1.25rem; top: 1.25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

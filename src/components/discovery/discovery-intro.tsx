@@ -97,20 +97,13 @@ export function DiscoveryIntro({ items }: { items: TopicViewModel[] }) {
   return (
     <div
       className={`${styles.overlay} ${phase === "exiting" ? styles.exiting : ""}`}
-      role="dialog"
-      aria-modal="true"
-      aria-label="LARPer opening intro"
+      aria-hidden="true"
     >
-      <button className={styles.skip} type="button" onClick={dismiss}>
-        Skip intro
-      </button>
-
-      <div className={styles.stage} aria-hidden="true">
+      <div className={styles.stage}>
         <div className={styles.cobaltField} />
         <div className={styles.redField} />
         <div className={styles.halftone} />
 
-        <p className={styles.signalLabel}>Signal incoming</p>
         <div className={styles.wordmark}>LARPer</div>
         <p className={styles.promise}>Find it. Get the lore.</p>
 
