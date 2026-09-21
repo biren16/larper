@@ -32,7 +32,7 @@ export interface EditorialStore {
 }
 
 const REQUIRED_STORY_FIELDS: Array<keyof StoryDraft> = [
-  "nicheId", "slug", "title", "hook", "summary", "whyItMatters", "lore", "beginnerContext", "freshnessLabel", "evidenceSummary",
+  "nicheId", "slug", "title", "hook", "summary", "whyItMatters", "lore", "beginnerContext", "conversationLine", "freshnessLabel", "evidenceSummary",
 ];
 
 function validateSlug(slug: string) {

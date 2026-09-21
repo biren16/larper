@@ -41,6 +41,7 @@ export function createEditorialActions(dependencies: {
           whyItMatters: required(form, "whyItMatters"),
           lore: required(form, "lore"),
           beginnerContext: required(form, "beginnerContext"),
+          conversationLine: required(form, "conversationLine"),
           discoveryType,
           mode,
           regions: list(form, "regions"),

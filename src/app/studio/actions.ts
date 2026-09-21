@@ -26,7 +26,7 @@ export async function scheduleCandidateAction(form: FormData) {
     await runtime.service.scheduleStory(runtime.actor, String(form.get("candidateId") ?? ""), {
       nicheId: String(form.get("nicheId") ?? ""), slug: String(form.get("slug") ?? ""), title: String(form.get("title") ?? ""),
       hook: String(form.get("hook") ?? ""), summary: String(form.get("summary") ?? ""), whyItMatters: String(form.get("whyItMatters") ?? ""),
-      lore: String(form.get("lore") ?? ""), beginnerContext: String(form.get("beginnerContext") ?? ""), discoveryType, mode,
+      lore: String(form.get("lore") ?? ""), beginnerContext: String(form.get("beginnerContext") ?? ""), conversationLine: String(form.get("conversationLine") ?? ""), discoveryType, mode,
       regions: values("regions"), freshnessLabel: String(form.get("freshnessLabel") ?? ""), evidenceSummary: String(form.get("evidenceSummary") ?? ""), tags: values("tags"),
     }, scheduledFor, new Date().toISOString());
   } catch (error) {

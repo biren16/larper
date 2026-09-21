@@ -16,7 +16,7 @@ describe("editorial action factory", () => {
     Object.entries({
       candidateId: "cluster-1", nicheId: "books", slug: "f1-books", title: "F1 books", hook: "Hook", summary: "Summary",
       whyItMatters: "Why", lore: "Lore", beginnerContext: "Context", discoveryType: "TREND", mode: "current", regions: "india,global",
-      freshnessLabel: "Moving", evidenceSummary: "Two sources", tags: "books,f1",
+      conversationLine: "Mention the crossover, not just the headline.", freshnessLabel: "Moving", evidenceSummary: "Two sources", tags: "books,f1",
     }).forEach(([key, value]) => form.set(key, value));
 
     await expect(actions.publishStory(form)).resolves.toEqual({ ok: true, storyId: "story-1" });

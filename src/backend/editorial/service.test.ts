@@ -18,6 +18,7 @@ const draft: StoryDraft = {
   freshnessLabel: "Crossing feeds",
   evidenceSummary: "Three independent sources across books and racing.",
   tags: ["books", "f1"],
+  conversationLine: "The F1 romance wave is fandom crossover, not a random BookTok trend.",
 };
 
 function candidate(overrides: Partial<CandidateRecord> = {}): CandidateRecord {
@@ -80,6 +81,10 @@ describe("EditorialService", () => {
   it("blocks a factual story without a primary or publication source", async () => {
     store.current = candidate({ evidence: candidate().evidence.map((item) => ({ ...item, trustTier: "community" })) });
     await expect(service.publishStory(actor, "cluster-1", draft)).rejects.toThrow("credible source");
+  });
+
+  it("requires a conversation-ready line before publishing", async () => {
+    await expect(service.publishStory(actor, "cluster-1", { ...draft, conversationLine: "" })).rejects.toThrow("conversationLine is required");
   });
 
   it("auto-publishes only eligible evidence briefs", async () => {

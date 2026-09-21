@@ -50,6 +50,7 @@ export function StoryEditor({
           <label>Why people care<textarea name="whyItMatters" required rows={5} /></label>
           <label>The lore<textarea name="lore" required rows={7} /></label>
           <label>If you’re new<textarea name="beginnerContext" required rows={4} /></label>
+          <label>Say this in the group chat<textarea name="conversationLine" required rows={3} placeholder="The useful line a reader can repeat without faking expertise." /></label>
           <div className={styles.twoCol}>
             <label>Discovery type<select name="discoveryType" defaultValue="TREND"><option>TREND</option><option>MEME</option><option>DROP</option><option>LORE</option><option>DEBATE</option><option>COMEBACK</option><option>PRODUCT</option><option>EVENT</option><option>PERSON</option><option>AESTHETIC</option><option>DRAMA</option><option>RABBIT_HOLE</option></select></label>
             <label>Mode<select name="mode" defaultValue="current"><option value="current">Current</option><option value="deep-lore">Deep Lore</option></select></label>

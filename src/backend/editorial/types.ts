@@ -34,6 +34,7 @@ export interface StoryDraft {
   whyItMatters: string;
   lore: string;
   beginnerContext: string;
+  conversationLine: string;
   discoveryType: DiscoveryType;
   mode: TopicMode;
   regions: string[];

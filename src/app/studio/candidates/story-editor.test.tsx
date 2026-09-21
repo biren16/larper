@@ -21,6 +21,7 @@ describe("StoryEditor", () => {
     expect(screen.getByLabelText("Hook")).toBeRequired();
     expect(screen.getByLabelText("What happened?")).toBeRequired();
     expect(screen.getByLabelText("Why people care")).toBeRequired();
+    expect(screen.getByLabelText("Say this in the group chat")).toBeRequired();
     expect(screen.getByLabelText("The lore")).toBeRequired();
     expect(screen.getByLabelText("If you’re new")).toBeRequired();
     expect(screen.getByRole("button", { name: "Publish story" })).toBeInTheDocument();
