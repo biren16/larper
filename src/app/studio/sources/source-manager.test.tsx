@@ -8,6 +8,7 @@ const data: StudioSourcesData = {
     { id: "f1", name: "F1 newsroom", adapterType: "rss", watchlistBeat: "f1", active: true, healthy: true, lastPolledAt: "2026-09-21T08:00:00Z", failureCount: 0, trustTier: "publication", status: "live" },
     { id: "books", name: "Book channel", adapterType: "youtube", watchlistBeat: "books", active: false, healthy: false, lastPolledAt: null, failureCount: 0, trustTier: "primary", status: "paused" },
     { id: "music", name: "Music desk", adapterType: "rss", watchlistBeat: "music", active: true, healthy: false, lastPolledAt: "2026-09-21T07:00:00Z", failureCount: 2, trustTier: "publication", status: "attention" },
+    { id: "screen", name: "Screen desk", adapterType: "rss", watchlistBeat: "screen-culture", active: true, healthy: true, lastPolledAt: "2026-09-21T06:00:00Z", failureCount: 0, trustTier: "publication", status: "live" },
     { id: "tech", name: "Trends validation", adapterType: "trend", watchlistBeat: "tech-gaming", active: false, healthy: false, lastPolledAt: null, failureCount: 0, trustTier: "watchlist", status: "waiting" },
     { id: "manual", name: "Founder manual intake", adapterType: "manual", watchlistBeat: "internet-culture", active: true, healthy: true, lastPolledAt: null, failureCount: 0, trustTier: "watchlist", status: "live" },
   ],
@@ -18,7 +19,7 @@ describe("SourceManager", () => {
   it("groups watchlists by beat and explains all four operational states", () => {
     render(<SourceManager data={data} />);
 
-    for (const beat of ["F1", "Books", "Music", "Tech + gaming", "Internet culture"]) {
+    for (const beat of ["F1", "Books", "Music", "Screen culture", "Tech + gaming", "Internet culture"]) {
       expect(screen.getByRole("heading", { name: beat })).toBeInTheDocument();
     }
     expect(screen.getAllByText("Live").length).toBeGreaterThan(0);
@@ -45,5 +46,6 @@ describe("SourceManager", () => {
     expect(screen.getByRole("heading", { name: "Recent collection runs" })).toBeInTheDocument();
     expect(screen.getByText("7 added")).toBeInTheDocument();
     expect(screen.getByText("2 errors")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Screen culture" })).toHaveValue("screen-culture");
   });
 });

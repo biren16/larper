@@ -39,8 +39,8 @@ export async function scheduleCandidateAction(form: FormData) {
 
 export async function addManualSignalAction(form: FormData) {
   const runtime = await getEditorialRuntime();
-  const definition = await runtime.client.from("source_definitions").select("id").eq("adapter_type", "manual").eq("active", true).limit(1).maybeSingle();
-  if (definition.error || !definition.data) redirect("/studio?error=Create+an+active+manual+source+first");
+  const definition = await runtime.client.from("source_definitions").select("id").eq("adapter_type", "manual").limit(1).maybeSingle();
+  if (definition.error || !definition.data) redirect("/studio?error=Create+a+manual+source+first");
   form.set("sourceDefinitionId", definition.data.id);
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString() });
   const result = await actions.addManualSignal(form);
@@ -59,7 +59,7 @@ export async function createSourceAction(form: FormData) {
   const watchlistBeat = String(form.get("watchlistBeat") ?? "").trim();
   if (!name || !locator) redirect("/studio/sources?error=Source+name+and+locator+are+required");
   if (!new Set(["rss", "youtube"]).has(adapterType) || !new Set(["primary", "publication", "community", "watchlist"]).has(trustTier)) redirect("/studio/sources?error=Invalid+source+settings");
-  if (!new Set(["f1", "books", "music", "tech-gaming"]).has(watchlistBeat)) redirect("/studio/sources?error=Choose+a+valid+watchlist+beat");
+  if (!new Set(["f1", "books", "music", "tech-gaming", "screen-culture"]).has(watchlistBeat)) redirect("/studio/sources?error=Choose+a+valid+watchlist+beat");
   let config: Record<string, string>;
   if (adapterType === "rss") {
     if (!isPublicSourceUrl(locator)) redirect("/studio/sources?error=Enter+a+public+feed+URL");

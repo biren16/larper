@@ -11,9 +11,16 @@ vi.mock("@/backend/editorial/actions", () => ({ createEditorialActions }));
 describe("addManualSignalAction", () => {
   it("refreshes unclustered signals after saving a founder lead", async () => {
     const rpc = vi.fn(async () => ({ error: null }));
+    const query: Record<string, unknown> = {};
+    Object.assign(query, {
+      select: vi.fn(() => query),
+      eq: vi.fn(() => query),
+      limit: vi.fn(() => query),
+      maybeSingle: async () => ({ data: { id: "manual-source" }, error: null }),
+    });
     getEditorialRuntime.mockResolvedValue({
       actor: { id: "founder-1" }, service: {},
-      client: { from: () => ({ select: () => ({ eq: () => ({ eq: () => ({ limit: () => ({ maybeSingle: async () => ({ data: { id: "manual-source" }, error: null }) }) }) }) }) }), rpc },
+      client: { from: () => query, rpc },
     });
     createEditorialActions.mockReturnValue({ addManualSignal: async () => ({ ok: true, signalId: "signal-1" }) });
     const { addManualSignalAction } = await import("./actions");
@@ -21,6 +28,28 @@ describe("addManualSignalAction", () => {
 
     await expect(addManualSignalAction(form)).rejects.toThrow("redirect:/studio?notice=signal-added");
     expect(rpc).toHaveBeenCalledWith("process_unclustered_signals");
+  });
+
+  it("accepts the manual intake source even when scheduled polling is paused", async () => {
+    const rpc = vi.fn(async () => ({ error: null }));
+    const query: Record<string, unknown> = {};
+    const eq = vi.fn(() => query);
+    Object.assign(query, {
+      select: vi.fn(() => query),
+      eq,
+      limit: vi.fn(() => query),
+      maybeSingle: async () => ({ data: { id: "manual-source" }, error: null }),
+    });
+    getEditorialRuntime.mockResolvedValue({
+      actor: { id: "founder-1" }, service: {},
+      client: { from: () => query, rpc },
+    });
+    createEditorialActions.mockReturnValue({ addManualSignal: async () => ({ ok: true, signalId: "signal-1" }) });
+    const { addManualSignalAction } = await import("./actions");
+
+    await expect(addManualSignalAction(new FormData())).rejects.toThrow("redirect:/studio?notice=signal-added");
+    expect(eq).toHaveBeenCalledTimes(1);
+    expect(eq).toHaveBeenCalledWith("adapter_type", "manual");
   });
 });
 
@@ -37,6 +66,21 @@ describe("source actions", () => {
     form.set("locator", "https://example.com/feed.xml");
 
     await expect(createSourceAction(form)).rejects.toThrow("redirect:/studio/sources?notice=source-added");
+  });
+
+  it("accepts screen culture as a source beat", async () => {
+    const insert = vi.fn(async () => ({ error: null }));
+    getEditorialRuntime.mockResolvedValue({ client: { from: () => ({ insert }) } });
+    const { createSourceAction } = await import("./actions");
+    const form = new FormData();
+    form.set("name", "International screen desk");
+    form.set("adapterType", "rss");
+    form.set("trustTier", "publication");
+    form.set("watchlistBeat", "screen-culture");
+    form.set("locator", "https://example.com/screen.xml");
+
+    await expect(createSourceAction(form)).rejects.toThrow("redirect:/studio/sources?notice=source-added");
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ watchlist_beat: "screen-culture" }));
   });
 
   it("returns activation and pause notices to the Sources workspace", async () => {

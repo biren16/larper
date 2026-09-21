@@ -1,15 +1,16 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { XMLParser } from "npm:fast-xml-parser@5";
+import { suggestedNicheForWatchlistBeat } from "../../../src/backend/ingestion/source-url.ts";
 
 type Source = {
   id: string; name: string; adapter_type: "rss" | "youtube" | "manual" | "trend"; config: Record<string, unknown>;
-  trust_tier: string; locale: string; region: string; poll_minutes: number; last_polled_at: string | null;
+  trust_tier: string; locale: string; region: string; poll_minutes: number; last_polled_at: string | null; watchlist_beat: string | null;
 };
 type Signal = {
   source_definition_id: string; canonical_url: string; external_id: string | null; source_type: string;
   source_name: string; author: string | null; title: string; body: string | null; locale: string; region: string;
   published_at: string; observed_at: string; trust_tier: string; availability: "available"; metrics: Record<string, number>;
-  sensitive_flags: string[];
+  sensitive_flags: string[]; suggested_niche_id: string | null;
 };
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@", textNodeName: "#text", trimValues: true });
@@ -87,6 +88,7 @@ async function rssSignals(source: Source, observedAt: string): Promise<Signal[]>
       body: text(item.description ?? item.summary ?? item.content).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() || null,
       locale: source.locale, region: source.region, published_at: iso(item.pubDate ?? item.published ?? item.updated, observedAt),
       observed_at: observedAt, trust_tier: source.trust_tier, availability: "available" as const, metrics: {}, sensitive_flags: sensitiveFlags(`${title} ${text(item.description ?? item.summary ?? item.content)}`),
+      suggested_niche_id: suggestedNicheForWatchlistBeat(source.watchlist_beat) ?? null,
     }];
   });
 }
@@ -120,6 +122,7 @@ async function youtubeSignals(source: Source, observedAt: string, apiKey: string
       body: item.snippet?.description?.trim() || null, locale: source.locale, region: source.region,
       published_at: iso(item.snippet?.publishedAt, observedAt), observed_at: observedAt, trust_tier: source.trust_tier,
       availability: "available" as const, metrics: statistics.get(videoId) ?? {}, sensitive_flags: sensitiveFlags(`${title} ${item.snippet?.description ?? ""}`),
+      suggested_niche_id: suggestedNicheForWatchlistBeat(source.watchlist_beat) ?? null,
     }];
   });
 }

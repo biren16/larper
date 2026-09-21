@@ -99,6 +99,7 @@ function WatchlistSummary({ sources }: Pick<StudioDashboardData, "sources">) {
     ["Books", "books"],
     ["Music", "music"],
     ["Tech + gaming", "tech-gaming"],
+    ["Screen culture", "screen-culture"],
     ["Internet culture", "internet-culture"],
   ] as const;
   return (

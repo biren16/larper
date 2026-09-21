@@ -11,6 +11,7 @@ const data: StudioDashboardData = {
   sources: [
     { id: "source-1", name: "Culture Desk", adapterType: "rss", watchlistBeat: "books", active: true, healthy: true, lastPolledAt: "2026-09-20T09:00:00.000Z", failureCount: 0, trustTier: "publication", status: "live" },
     { id: "source-2", name: "Google Trends validation", adapterType: "trend", watchlistBeat: "tech-gaming", active: false, healthy: false, lastPolledAt: null, failureCount: 0, trustTier: "watchlist", status: "waiting" },
+    { id: "source-3", name: "Screen Daily", adapterType: "rss", watchlistBeat: "screen-culture", active: true, healthy: true, lastPolledAt: "2026-09-20T09:00:00.000Z", failureCount: 0, trustTier: "publication", status: "live" },
   ],
   runs: [{ id: "run-1", status: "succeeded", startedAt: "2026-09-20T09:00:00.000Z", insertedCount: 4, errorCount: 0 }],
   recentSignals: [{ id: "signal-1", title: "Grid reading lists are spreading", canonicalUrl: "https://example.com/signal", sourceName: "Culture Desk", sourceType: "rss", nicheName: "Books", region: "india", observedAt: "2026-09-20T10:15:00.000Z", availability: "available", clusterId: "cluster-1" }],
@@ -29,6 +30,7 @@ describe("StudioDashboard", () => {
     expect(screen.getByText("Grid reading lists are spreading")).toBeInTheDocument();
     expect(screen.getByText(/Culture Desk/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Manage sources" })).toHaveAttribute("href", "/studio/sources");
+    expect(screen.getByText("Screen culture")).toBeInTheDocument();
   });
 
   it("turns an empty queue into a direct capture action", async () => {

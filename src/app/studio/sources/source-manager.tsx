@@ -9,6 +9,7 @@ const beats = [
   { id: "books", label: "Books", description: "Reading communities, breakout titles, adaptations, and fandom crossovers." },
   { id: "music", label: "Music", description: "Releases, fan movements, tours, and sounds crossing into culture." },
   { id: "tech-gaming", label: "Tech + gaming", description: "Games, devices, creators, and internet-native product moments." },
+  { id: "screen-culture", label: "Screen culture", description: "Films, series, streaming releases, festivals, and the discourse around them." },
   { id: "internet-culture", label: "Internet culture", description: "Founder-led capture for memes, style, food, places, and hard-to-access platforms." },
 ] as const;
 
@@ -55,7 +56,7 @@ function SourceForm({ action }: { action?: (form: FormData) => void | Promise<vo
       <form action={action} aria-label="Add a source">
         <label>Source name<input name="name" required /></label>
         <div className={styles.formPair}>
-          <label>Beat<select name="watchlistBeat" defaultValue="f1"><option value="f1">F1</option><option value="books">Books</option><option value="music">Music</option><option value="tech-gaming">Tech + gaming</option></select></label>
+          <label>Beat<select name="watchlistBeat" defaultValue="f1"><option value="f1">F1</option><option value="books">Books</option><option value="music">Music</option><option value="tech-gaming">Tech + gaming</option><option value="screen-culture">Screen culture</option></select></label>
           <label>Adapter<select name="adapterType" defaultValue="rss"><option value="rss">RSS / Atom</option><option value="youtube">YouTube</option></select></label>
         </div>
         <label>Trust tier<select name="trustTier" defaultValue="publication"><option value="publication">Publication</option><option value="primary">Primary</option><option value="community">Community</option><option value="watchlist">Watchlist</option></select></label>
