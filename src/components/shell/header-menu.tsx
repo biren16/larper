@@ -7,12 +7,18 @@ import { type PointerEvent, type SyntheticEvent, useEffect, useRef, useState } f
 import { ThemeSelector } from "@/components/theme/theme-toggle";
 
 import { PrimaryNav } from "./primary-nav";
+import type { HeaderAccount } from "./header-types";
 import styles from "./header-menu.module.css";
 
 const MENU_ID = "site-menu";
 const CLOSE_DURATION_MS = 180;
 
-export function HeaderMenu() {
+type HeaderMenuProps = {
+  account?: HeaderAccount | null;
+  signOutAction?: () => Promise<void>;
+};
+
+export function HeaderMenu({ account, signOutAction }: HeaderMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -94,8 +100,19 @@ export function HeaderMenu() {
 
           <PrimaryNav onNavigate={closeMenu} />
 
-          <div className={styles.appearance} data-menu-content>
-            <ThemeSelector />
+          <div className={styles.menuFooter} data-menu-content>
+            <div className={styles.appearance}>
+              <ThemeSelector />
+            </div>
+            {account && (
+              <div className={styles.accountUtilities}>
+                <span className={styles.accountIdentity} title={account.label}>{account.label}</span>
+                <div className={styles.accountActions}>
+                  {account.canOpenStudio && <Link href="/studio" onClick={closeMenu}>Open Studio</Link>}
+                  {signOutAction && <form action={signOutAction}><button type="submit">Sign out</button></form>}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </dialog>

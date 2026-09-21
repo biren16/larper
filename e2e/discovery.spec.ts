@@ -117,10 +117,12 @@ test("site header opens a full-screen editorial menu", async ({ page, isMobile }
   const header = page.getByRole("banner");
   const metrics = await header.evaluate((element) => {
     const styles = getComputedStyle(element);
+    const inner = element.firstElementChild!;
     return {
       backdropFilter: styles.backdropFilter,
       boxShadow: styles.boxShadow,
       height: element.getBoundingClientRect().height,
+      gridColumns: getComputedStyle(inner).gridTemplateColumns.split(" ").map(Number.parseFloat),
     };
   });
 
@@ -130,6 +132,8 @@ test("site header opens a full-screen editorial menu", async ({ page, isMobile }
   expect(metrics.backdropFilter).toBe("none");
   expect(metrics.boxShadow).toBe("none");
   expect(metrics.height).toBeLessThanOrEqual(72);
+  expect(metrics.gridColumns).toHaveLength(3);
+  expect(Math.abs(metrics.gridColumns[0] - metrics.gridColumns[2])).toBeLessThanOrEqual(0.5);
 
   await header.getByRole("button", { name: "Open menu" }).click();
   const menu = page.getByRole("dialog", { name: "Site menu" });
@@ -149,10 +153,25 @@ test("site header keeps its menu trigger accessible at 320px", async ({ page, is
     const box = element.getBoundingClientRect();
     return { width: box.width, height: box.height };
   });
+  const headerItems = await header.evaluate((element) => {
+    const brand = element.querySelector('a[aria-label="larper home"]')!.getBoundingClientRect();
+    const signIn = [...element.querySelectorAll("a")].find((link) => link.textContent === "Sign in")!.getBoundingClientRect();
+    const menu = element.querySelector('button[aria-label="Open menu"]')!.getBoundingClientRect();
+    return {
+      brandRight: brand.right,
+      signInLeft: signIn.left,
+      signInHeight: signIn.height,
+      menuRight: menu.right,
+      headerRight: element.getBoundingClientRect().right,
+    };
+  });
 
   expect(await header.evaluate((element) => element.getBoundingClientRect().height)).toBeLessThanOrEqual(60);
   expect(menuTarget.width).toBeGreaterThanOrEqual(44);
   expect(menuTarget.height).toBeGreaterThanOrEqual(44);
+  expect(headerItems.signInHeight).toBeGreaterThanOrEqual(44);
+  expect(headerItems.brandRight).toBeLessThan(headerItems.signInLeft);
+  expect(headerItems.headerRight - headerItems.menuRight).toBeLessThanOrEqual(12);
   expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });
 

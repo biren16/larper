@@ -96,7 +96,20 @@
 .navLink:focus-visible::after,
 .navLink[data-active]::after { transform: scaleX(1); }
 .navLink[data-active] { font-weight: 760; }
-.appearance { align-self: end; justify-self: start; }
+.menuFooter {
+  align-items: end;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.appearance { justify-self: start; }
+.accountUtilities { display: grid; gap: 0.7rem; justify-items: end; min-width: 0; }
+.accountIdentity { color: var(--muted); font: 620 0.76rem/1 var(--font-sans); max-width: min(24rem, 42vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.accountActions { align-items: center; display: flex; gap: 1.25rem; }
+.accountActions form { margin: 0; }
+.accountActions a,
+.accountActions button { background: transparent; border: 0; color: var(--ink); cursor: pointer; font: 700 0.9rem/1 var(--font-sans); min-height: 2.75rem; padding: 0; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3rem; }
 
 @keyframes menuEnter {
   from { opacity: 0; transform: translateY(-0.75rem); }
@@ -114,6 +127,9 @@
   .menuGrid { grid-template-rows: 3.75rem 1fr auto; padding: 0 0.75rem 1.5rem; }
   .menuWordmark { font-size: 1.25rem; }
   .navLink { font-size: clamp(3rem, 17vw, 5rem); }
+  .menuFooter { align-items: start; gap: 1.4rem; grid-template-columns: 1fr; }
+  .accountUtilities { justify-items: start; }
+  .accountIdentity { max-width: calc(100vw - 1.5rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {

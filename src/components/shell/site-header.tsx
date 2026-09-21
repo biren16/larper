@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { HeaderMenu } from "./header-menu";
+import { HeaderChrome } from "./header-chrome";
+import type { HeaderAccount } from "./header-types";
 import styles from "./site-header.module.css";
 
 type SiteHeaderProps = {
-  account?: { label: string; canOpenStudio: boolean } | null;
+  account?: HeaderAccount | null;
   signOutAction?: () => Promise<void>;
 };
 
@@ -16,16 +17,9 @@ export function SiteHeader({ account, signOutAction }: SiteHeaderProps) {
         <Link className={styles.wordmark} href="/" aria-label="larper home">
           larper
         </Link>
-        <div className={styles.actions}>
-          {account === null && <Link className={styles.accountLink} href="/auth">Sign in</Link>}
-          {account && <>
-            {account.canOpenStudio && <Link className={styles.accountLink} href="/studio">Studio</Link>}
-            {signOutAction && <form action={signOutAction}><button className={styles.accountLink} type="submit" title={account.label}>Sign out</button></form>}
-          </>}
-          <Suspense fallback={<span aria-hidden className={styles.menuFallback} />}>
-            <HeaderMenu />
-          </Suspense>
-        </div>
+        <Suspense fallback={<><span aria-hidden className={styles.context} /><div className={styles.actions}><span aria-hidden className={styles.menuFallback} /></div></>}>
+          <HeaderChrome account={account} signOutAction={signOutAction} />
+        </Suspense>
       </div>
     </header>
   );

@@ -10,7 +10,7 @@
 .inner {
   align-items: center;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   margin: 0 auto;
   max-width: var(--content);
   min-height: 4.25rem;
@@ -25,8 +25,13 @@
 }
 
 .wordmark:hover { opacity: 0.62; }
-.actions { align-items: center; display: flex; gap: 0.35rem; justify-self: end; }
-.accountLink { background: transparent; border: 0; color: inherit; cursor: pointer; font: 680 0.7rem/1 var(--font-sans); min-height: 2.75rem; padding: 0.8rem 0.35rem; }
+.context { align-items: center; display: flex; justify-content: center; min-width: 0; }
+.contextLink { font: 680 0.75rem/1 var(--font-sans); letter-spacing: 0.01em; padding: 0.8rem 0; }
+.actions { align-items: center; display: flex; gap: 0.75rem; justify-self: end; }
+.signInLink { align-items: center; display: inline-flex; font: 680 0.72rem/1 var(--font-sans); min-height: 2.75rem; position: relative; }
+.signInLink::after { background: currentColor; bottom: 0.62rem; content: ""; height: 1px; left: 0; position: absolute; transform: scaleX(0); transform-origin: left; transition: transform 150ms ease; width: 100%; }
+.signInLink:hover::after,
+.signInLink:focus-visible::after { transform: scaleX(1); }
 .menuFallback { display: block; height: 3rem; width: 3rem; }
 
 @media (max-width: 600px) {
@@ -35,9 +40,12 @@
     padding: 0 0.5rem;
   }
   .wordmark { font-size: 1.25rem; }
+  .contextLink { font-size: 0.68rem; }
+  .actions { gap: 0.45rem; }
   .menuFallback { height: 2.75rem; width: 2.75rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .signInLink::after,
   .wordmark { transition: none; }
 }
