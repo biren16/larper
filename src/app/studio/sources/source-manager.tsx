@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PendingButton } from "../pending-button";
 import { StatusNotice } from "../status-notice";
 import type { StudioSource, StudioSourceStatus, StudioSourcesData } from "../studio-dashboard";
 import styles from "./sources.module.css";
@@ -38,7 +39,7 @@ function SourceRow({ source, toggleSourceAction }: { source: StudioSource; toggl
         <form action={toggleSourceAction}>
           <input type="hidden" name="sourceId" value={source.id} />
           <input type="hidden" name="active" value={source.active ? "false" : "true"} />
-          <button type="submit" aria-label={`${source.active ? "Pause" : "Activate"} ${source.name}`}>{source.active ? "Pause" : "Activate"}</button>
+          <PendingButton type="submit" pendingLabel={source.active ? "Pausing…" : "Activating…"} aria-label={`${source.active ? "Pause" : "Activate"} ${source.name}`}>{source.active ? "Pause" : "Activate"}</PendingButton>
         </form>
       )}
     </article>
@@ -64,7 +65,7 @@ function SourceForm({ action }: { action?: (form: FormData) => void | Promise<vo
           <label>Region<input name="region" defaultValue="india" required /></label>
         </div>
         <label className={styles.checkbox}><input name="allowlisted" type="checkbox" /> Allow for brief corroboration</label>
-        <button type="submit">Add paused source</button>
+        <PendingButton type="submit" pendingLabel="Adding source…">Add paused source</PendingButton>
       </form>
     </section>
   );

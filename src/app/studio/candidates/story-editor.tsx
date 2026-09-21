@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PendingButton } from "../pending-button";
 import styles from "./story-editor.module.css";
 import { StoryPreview } from "./story-preview";
 
@@ -21,9 +22,9 @@ function MoreActions({ candidate, transitionAction, mergeAction, splitAction }: 
     <details className={styles.moreActions} role="group" aria-label="More actions">
       <summary>More actions</summary>
       <p>These actions change the cluster or remove it from the editorial flow.</p>
-      {mergeAction && <form action={mergeAction}><input type="hidden" name="targetId" value={candidate.id} /><label>Duplicate cluster ID<input name="sourceId" required /></label><button type="submit">Merge into this cluster</button></form>}
-      {splitAction && <form action={splitAction}><input type="hidden" name="clusterId" value={candidate.id} /><label>Signal IDs to move<input name="signalIds" required placeholder="id-1,id-2" /></label><button type="submit">Split evidence</button></form>}
-      {transitionAction && <form action={transitionAction}><input type="hidden" name="candidateId" value={candidate.id} /><label>Review note<textarea name="notes" required rows={3} /></label><div className={styles.secondaryActions}><button type="submit" name="action" value="reject">Reject</button><button type="submit" name="action" value="expire">Expire</button><button type="submit" name="action" value="unpublish">Unpublish</button></div></form>}
+      {mergeAction && <form action={mergeAction}><input type="hidden" name="targetId" value={candidate.id} /><label>Duplicate cluster ID<input name="sourceId" required /></label><PendingButton type="submit" pendingLabel="Merging…">Merge into this cluster</PendingButton></form>}
+      {splitAction && <form action={splitAction}><input type="hidden" name="clusterId" value={candidate.id} /><label>Signal IDs to move<input name="signalIds" required placeholder="id-1,id-2" /></label><PendingButton type="submit" pendingLabel="Splitting…">Split evidence</PendingButton></form>}
+      {transitionAction && <form action={transitionAction}><input type="hidden" name="candidateId" value={candidate.id} /><label>Review note<textarea name="notes" required rows={3} /></label><div className={styles.secondaryActions}><PendingButton type="submit" name="action" value="reject" intentField="action" intentValue="reject" pendingLabel="Rejecting…">Reject</PendingButton><PendingButton type="submit" name="action" value="expire" intentField="action" intentValue="expire" pendingLabel="Expiring…">Expire</PendingButton><PendingButton type="submit" name="action" value="unpublish" intentField="action" intentValue="unpublish" pendingLabel="Unpublishing…">Unpublish</PendingButton></div></form>}
     </details>
   );
 }
@@ -104,9 +105,9 @@ export function StoryEditor({
           <div className={styles.actionBar} role="group" aria-label="Publication actions">
             {scheduleAction && <label>Schedule for (IST)<input name="scheduledFor" type="datetime-local" /></label>}
             <div>
-              <button type="submit">Publish story</button>
-              <button type="submit" name="format" value="brief" formNoValidate className={styles.secondary}>Publish brief</button>
-              {scheduleAction && <button type="submit" formAction={scheduleAction} className={styles.secondary}>Schedule</button>}
+              <PendingButton type="submit" name="intent" value="story" intentValue="story" pendingLabel="Publishing…">Publish story</PendingButton>
+              <PendingButton type="submit" name="format" value="brief" intentField="format" intentValue="brief" pendingLabel="Publishing brief…" formNoValidate className={styles.secondary}>Publish brief</PendingButton>
+              {scheduleAction && <PendingButton type="submit" name="intent" value="schedule" intentValue="schedule" pendingLabel="Scheduling…" formAction={scheduleAction} className={styles.secondary}>Schedule</PendingButton>}
             </div>
           </div>
         </form>

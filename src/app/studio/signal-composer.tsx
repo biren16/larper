@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { PendingButton } from "./pending-button";
 import styles from "./studio.module.css";
 
-function SubmitSignal() {
-  const { pending } = useFormStatus();
-  return <button type="submit" disabled={pending}>{pending ? "Adding signal…" : "Add to evidence inbox"}</button>;
+const OPEN_SIGNAL_COMPOSER = "larper:open-signal-composer";
+
+export function SignalComposerLink({ children }: { children: ReactNode }) {
+  return <a href="#signal-composer" onClick={(event) => {
+    event.preventDefault();
+    window.dispatchEvent(new CustomEvent(OPEN_SIGNAL_COMPOSER, { detail: { returnFocus: event.currentTarget } }));
+  }}>{children}</a>;
 }
 
 export function SignalComposer({
@@ -19,17 +23,35 @@ export function SignalComposer({
   const [open, setOpen] = useState(false);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
   const close = () => {
     setOpen(false);
-    window.setTimeout(() => launcherRef.current?.focus(), 0);
+    window.setTimeout(() => (returnFocusRef.current ?? launcherRef.current)?.focus(), 0);
   };
+
+  useEffect(() => {
+    const openFromLink = (event: Event) => {
+      returnFocusRef.current = (event as CustomEvent<{ returnFocus?: HTMLElement }>).detail?.returnFocus ?? null;
+      setOpen(true);
+    };
+    window.addEventListener(OPEN_SIGNAL_COMPOSER, openFromLink);
+    return () => window.removeEventListener(OPEN_SIGNAL_COMPOSER, openFromLink);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     urlRef.current?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
+      if (event.key !== "Tab" || !panelRef.current) return;
+      const focusable = Array.from(panelRef.current.querySelectorAll<HTMLElement>("button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]"));
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -43,12 +65,13 @@ export function SignalComposer({
         className={styles.mobileSignalButton}
         aria-controls="signal-composer"
         aria-expanded={open}
-        onClick={() => setOpen(true)}
+        onClick={() => { returnFocusRef.current = launcherRef.current; setOpen(true); }}
       >
         Add signal
       </button>
       {open && <button className={styles.composerScrim} type="button" aria-label="Dismiss add signal panel" onClick={close} />}
       <section
+        ref={panelRef}
         id="signal-composer"
         className={styles.composer}
         data-open={open}
@@ -72,7 +95,7 @@ export function SignalComposer({
           <label>Niche<select name="suggestedNicheId" defaultValue=""><option value="">Choose later</option>{niches.map((niche) => <option key={niche.id} value={niche.id}>{niche.name}</option>)}</select></label>
           <label>Observation<textarea name="observationNote" rows={3} placeholder="What makes this feel real, not just loud?" /></label>
           <label>Published at<input name="publishedAt" type="datetime-local" required /></label>
-          <SubmitSignal />
+          <PendingButton type="submit" pendingLabel="Adding signal…">Add to evidence inbox</PendingButton>
         </form>
       </section>
     </>

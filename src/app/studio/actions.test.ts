@@ -56,3 +56,22 @@ describe("source actions", () => {
     await expect(toggleSourceAction(pause)).rejects.toThrow("redirect:/studio/sources?notice=source-paused");
   });
 });
+
+describe("candidate action notices", () => {
+  it("confirms story and brief publication", async () => {
+    getEditorialRuntime.mockResolvedValue({ actor: { id: "founder-1" }, service: {} });
+    createEditorialActions.mockReturnValue({
+      publishStory: async () => ({ ok: true, storyId: "story-1" }),
+      publishBrief: async () => ({ ok: true, storyId: "story-1" }),
+    });
+    const { publishCandidateAction } = await import("./actions");
+    const story = new FormData();
+    story.set("candidateId", "cluster-1");
+    await expect(publishCandidateAction(story)).rejects.toThrow("redirect:/studio?notice=story-published");
+
+    const brief = new FormData();
+    brief.set("candidateId", "cluster-1");
+    brief.set("format", "brief");
+    await expect(publishCandidateAction(brief)).rejects.toThrow("redirect:/studio?notice=brief-published");
+  });
+});

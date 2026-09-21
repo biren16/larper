@@ -31,11 +31,24 @@ describe("StudioDashboard", () => {
     expect(screen.getByRole("link", { name: "Manage sources" })).toHaveAttribute("href", "/studio/sources");
   });
 
-  it("turns an empty queue into a direct capture action", () => {
+  it("turns an empty queue into a direct capture action", async () => {
+    const user = userEvent.setup();
     render(<StudioDashboard data={{ ...data, candidates: [] }} />);
 
     expect(screen.getByText("The desk is clear.")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Add first signal" })).toHaveAttribute("href", "#signal-composer");
+    const action = screen.getByRole("link", { name: "Add first signal" });
+    expect(action).toHaveAttribute("href", "#signal-composer");
+    await user.click(action);
+    expect(screen.getByRole("dialog", { name: "Add a signal" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Close signal composer" }));
+    expect(action).toHaveFocus();
+  });
+
+  it("always keeps the original public source link on captured evidence", () => {
+    render(<StudioDashboard data={data} />);
+
+    expect(screen.getByRole("link", { name: "Open captured source" })).toHaveAttribute("href", "https://example.com/signal");
+    expect(screen.getByRole("link", { name: "Open candidate" })).toHaveAttribute("href", "/studio/candidates/cluster-1");
   });
 });
 
@@ -54,6 +67,17 @@ describe("SignalComposer", () => {
     expect(launcher).toHaveFocus();
     expect(launcher).toHaveAttribute("aria-expanded", "false");
   });
+
+  it("traps keyboard focus while open", async () => {
+    const user = userEvent.setup();
+    render(<SignalComposer niches={data.niches ?? []} />);
+    await user.click(screen.getByRole("button", { name: "Add signal" }));
+
+    const submit = screen.getByRole("button", { name: "Add to evidence inbox" });
+    submit.focus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Close signal composer" })).toHaveFocus();
+  });
 });
 
 describe("StatusNotice", () => {
@@ -63,5 +87,8 @@ describe("StatusNotice", () => {
 
     rerender(<StatusNotice error="The source could not be reached" />);
     expect(screen.getByRole("alert")).toHaveTextContent("The source could not be reached");
+
+    rerender(<StatusNotice notice="story-published" />);
+    expect(screen.getByRole("status")).toHaveTextContent("Story published to discovery.");
   });
 });

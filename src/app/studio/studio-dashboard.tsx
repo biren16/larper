@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SignalComposer } from "./signal-composer";
+import { SignalComposer, SignalComposerLink } from "./signal-composer";
 import { StatusNotice } from "./status-notice";
 import styles from "./studio.module.css";
 
@@ -62,7 +62,7 @@ function ReviewQueue({ candidates }: Pick<StudioDashboardData, "candidates">) {
         {candidates.length === 0 && (
           <div className={styles.emptyState}>
             <div><strong>The desk is clear.</strong><p>Capture a public signal now, or return after the next collection run.</p></div>
-            <a href="#signal-composer">Add first signal</a>
+            <SignalComposerLink>Add first signal</SignalComposerLink>
           </div>
         )}
       </div>
@@ -82,7 +82,10 @@ function RecentEvidence({ signals }: { signals: StudioDashboardData["recentSigna
           <article className={styles.signalRow} key={signal.id}>
             <div><p className={styles.meta}>{signal.nicheName} / {signal.region}</p><h3>{signal.title}</h3><p>{signal.sourceName} · {signal.sourceType} · {time(signal.observedAt)}</p></div>
             <span data-availability={signal.availability}>{signal.availability}</span>
-            {signal.clusterId ? <Link href={`/studio/candidates/${signal.clusterId}`}>Open candidate</Link> : <a href={signal.canonicalUrl} target="_blank" rel="noreferrer">Open source</a>}
+            <div className={styles.signalLinks}>
+              <a href={signal.canonicalUrl} target="_blank" rel="noreferrer">Open captured source</a>
+              {signal.clusterId && <Link href={`/studio/candidates/${signal.clusterId}`}>Open candidate</Link>}
+            </div>
           </article>
         ))}
       </div> : <p className={styles.quietEmpty}>No captured evidence yet. Your next manual or scheduled signal will appear here.</p>}

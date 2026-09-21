@@ -9,9 +9,10 @@ import { isPublicSourceUrl } from "@/backend/ingestion/source-url";
 export async function publishCandidateAction(form: FormData) {
   const runtime = await getEditorialRuntime();
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString(), invalidatePublicContent: invalidatePublicDiscovery });
-  const result = form.get("format") === "brief" ? await actions.publishBrief(form) : await actions.publishStory(form);
+  const isBrief = form.get("format") === "brief";
+  const result = isBrief ? await actions.publishBrief(form) : await actions.publishStory(form);
   if (!result.ok) redirect(`/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}?error=${encodeURIComponent(result.error)}`);
-  redirect("/studio");
+  redirect(`/studio?notice=${isBrief ? "brief-published" : "story-published"}`);
 }
 
 export async function scheduleCandidateAction(form: FormData) {
@@ -33,7 +34,7 @@ export async function scheduleCandidateAction(form: FormData) {
     const message = error instanceof Error ? error.message : "Could not schedule story";
     redirect(`/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}?error=${encodeURIComponent(message)}`);
   }
-  redirect("/studio");
+  redirect("/studio?notice=story-scheduled");
 }
 
 export async function addManualSignalAction(form: FormData) {
@@ -89,7 +90,8 @@ export async function transitionCandidateAction(form: FormData) {
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString(), invalidatePublicContent: invalidatePublicDiscovery });
   const result = await actions.transition(form);
   if (!result.ok) redirect(`/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}?error=${encodeURIComponent(result.error)}`);
-  redirect("/studio");
+  const notice = form.get("action") === "reject" ? "candidate-rejected" : form.get("action") === "expire" ? "candidate-expired" : "story-unpublished";
+  redirect(`/studio?notice=${notice}`);
 }
 
 export async function mergeCandidateAction(form: FormData) {
@@ -97,7 +99,7 @@ export async function mergeCandidateAction(form: FormData) {
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString() });
   const result = await actions.merge(form);
   if (!result.ok) redirect(`/studio/candidates/${encodeURIComponent(String(form.get("targetId") ?? ""))}?error=${encodeURIComponent(result.error)}`);
-  redirect("/studio");
+  redirect("/studio?notice=clusters-merged");
 }
 
 export async function splitCandidateAction(form: FormData) {
@@ -105,5 +107,5 @@ export async function splitCandidateAction(form: FormData) {
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString() });
   const result = await actions.split(form);
   if (!result.ok) redirect(`/studio/candidates/${encodeURIComponent(String(form.get("clusterId") ?? ""))}?error=${encodeURIComponent(result.error)}`);
-  redirect("/studio");
+  redirect("/studio?notice=cluster-split");
 }
