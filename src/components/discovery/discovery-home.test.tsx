@@ -15,8 +15,8 @@ describe("DiscoveryHome", () => {
       </FollowedNichesProvider>,
     );
 
-    expect(screen.getByRole("heading", { level: 1, name: "Wanna larp bout smth ? Find a niche rn." })).toBeInTheDocument();
-    expect(screen.getByText(/niche obsessions, drops, memes, debates and lore/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Wanna larp bout smth? Find a niche rn." })).toBeInTheDocument();
+    expect(screen.getByText("Niche obsessions, drops, memes, debates and lore. With enough context to get why people care.")).toBeInTheDocument();
     const hero = screen.getByLabelText("Current ranked culture signals");
     const heroSignals = within(hero).getAllByRole("link");
     expect(heroSignals).toHaveLength(3);
