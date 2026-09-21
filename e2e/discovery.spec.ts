@@ -23,7 +23,7 @@ async function contrastRatio(locator: Locator) {
   });
 }
 
-test("the opening is a tall ranked-culture collage that hands off to Larping RN", async ({ page, isMobile }) => {
+test("the opening is a tall ranked-culture collage that hands off to Internet RN", async ({ page, isMobile }) => {
   test.skip(isMobile, "desktop hero composition check");
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
@@ -36,7 +36,7 @@ test("the opening is a tall ranked-culture collage that hands off to Larping RN"
   expect(heroBox).not.toBeNull();
   expect(heroBox!.height).toBeGreaterThanOrEqual(600);
   await expect(hero.getByRole("link", { name: /Hero signal:/ })).toHaveCount(3);
-  const chapterTop = await page.getByRole("heading", { name: "Larping RN", exact: true }).evaluate((element) => element.getBoundingClientRect().top);
+  const chapterTop = await page.getByRole("heading", { name: "Internet RN", exact: true }).evaluate((element) => element.getBoundingClientRect().top);
   expect(chapterTop).toBeLessThan(900);
 
   const section = page.locator('section[aria-labelledby="larping-now"]').filter({ visible: true }).first();

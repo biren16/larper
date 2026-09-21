@@ -9,7 +9,7 @@ export function SiteFooter() {
         <p>Find new shit to get obsessed with.<br />Stay for the lore.</p>
       </div>
       <div className={styles.endMatter}>
-        <Link href="/#larping-now">Larping RN</Link>
+        <Link href="/#larping-now">Internet RN</Link>
         <Link href="/#your-larps">Your Larps</Link>
         <p className={styles.note}>Evidence-led culture signals. Checked, timestamped, and built for context.</p>
       </div>

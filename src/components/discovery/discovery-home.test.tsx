@@ -26,7 +26,7 @@ describe("DiscoveryHome", () => {
         `/discover/${item.topic.slug}`,
       );
     });
-    const nowHeading = screen.getByRole("heading", { name: "Larping RN" });
+    const nowHeading = screen.getByRole("heading", { name: "Internet RN" });
     const nowSection = nowHeading.closest("section");
     expect(nowSection).not.toBeNull();
     const nowStories = within(nowSection!).getAllByRole("article");

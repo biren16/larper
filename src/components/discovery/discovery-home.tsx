@@ -69,7 +69,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
       </header>
 
       <section className={styles.now} aria-labelledby="larping-now">
-        <div className={styles.chapterHeading}><div><span className={styles.liveMark}>Active signals</span><h2 id="larping-now">Larping RN</h2></div><p>The drops, memes and micro-drama moving fastest through niche communities.</p></div>
+        <div className={styles.chapterHeading}><div><span className={styles.liveMark}>Active signals</span><h2 id="larping-now">Internet RN</h2></div><p>The drops, memes and micro-drama moving fastest through niche communities.</p></div>
         <div className={styles.currentScene}>
           <div className={styles.leadStage}><HomeSignalCard item={currentTopics[0]} layout="lead" /></div>
           <div className={styles.spotlightStack}>{currentTopics.slice(1, 5).map((item) => <HomeSignalCard key={item.topic.id} item={item} layout="spotlight" />)}</div>
