@@ -6,7 +6,7 @@
 
 ## Goal
 
-Make LARPer a credible, current culture radar without pretending that unsupported social-platform data is live. The system should surface movement across selected Gen Z beats, preserve evidence, and require the founder to make every publishing decision.
+Make LARPer a credible, current Gen Z culture digest without pretending that unsupported social-platform data is live. The system should surface movement across five selected beats, preserve evidence, and help a reader understand both why a topic matters and what they can say about it in a real conversation.
 
 ## Product boundaries
 
@@ -20,7 +20,7 @@ Make LARPer a credible, current culture radar without pretending that unsupporte
 
 ### Automated watchlists
 
-The initial automated beats are F1, books, music, and gaming/tech. Each beat has a small allowlisted watchlist of official YouTube channels, YouTube searches, and approved RSS/Atom feeds.
+The five initial beats are F1, books, music, tech/gaming, and internet culture (memes and style). F1, books, music, and tech/gaming each have a small allowlisted watchlist of official YouTube channels, YouTube searches, and approved RSS/Atom feeds. Internet culture begins founder-led; no automated Reddit, TikTok, Instagram, X, or GitHub Trending collection is part of this release. Food/places is deferred until beta evidence shows that it deserves a dedicated beat.
 
 The scheduled ingestion job runs every three hours. It stores immutable raw signals and engagement snapshots, then uses the existing duplicate detection, clustering, and scoring path to create candidates.
 
@@ -33,7 +33,7 @@ Each automated source remains explicitly visible in Studio with one of four stat
 
 ### Founder pulse inbox
 
-Memes, style, and food/places begin as founder-submitted public links from Instagram, TikTok, Reddit, X, or any other accessible public page. The intake captures:
+Memes and style begin as founder-submitted public links from Instagram, TikTok, Reddit, X, or any other accessible public page. The intake captures:
 
 - Platform, canonical URL, and source name.
 - A concise observation/title supplied by the founder.
@@ -64,6 +64,25 @@ The candidate queue exposes the source links, source/platform, observed time, av
 - **Ready for review**
 - **Blocked: sensitive**
 
+### Editorial stages
+
+The internal queue uses plain-language editorial stages alongside the durable database lifecycle:
+
+- **Watching:** a newly captured lead, including a single-source lead.
+- **Rising:** a lead with meaningful movement or additional evidence, but not yet ready to publish.
+- **Confirmed:** two independent available source definitions, plus a credible source for factual claims; eligible for founder review and publication.
+
+Heat and confidence may remain internal ordering signals, but they are not editorial verdicts and are not presented as a public claim.
+
+### Published story format
+
+Every published story uses a required four-part structure:
+
+1. **What is happening** — a concise, factual opening.
+2. **Why it matters / the drama** — the context a newcomer is missing.
+3. **Say this in the group chat** — a concise conversation-ready line that gives the reader social fluency without fabricating a take.
+4. **Sources** — evidence links presented as receipts.
+
 ## Scoring and presentation
 
 Automated and manual inputs share the existing heat, recency, novelty, India relevance, crossover, and source-diversity concepts. Manual inputs may add topic confidence only when they are corroborated; a large visible metric never overrules the two-source rule.
@@ -80,11 +99,14 @@ Studio gains a clear founder-pulse form alongside source management:
 - Region and observed time with useful defaults.
 - Clear acknowledgement that the link is a lead, not publication-ready proof.
 
+The form must be usable on a phone in under a minute. A founder-only Telegram bot is a later convenience option, not a prerequisite for beta; if added, it writes the same raw-signal record through an authenticated webhook and never bypasses evidence rules.
+
 Automated source management is organised by watchlist beat so the founder can add, pause, or diagnose sources without editing environment variables or database rows.
 
 ## Non-goals for this release
 
 - External editor accounts or contributor submissions.
+- A Telegram bot before the mobile Studio capture flow proves insufficient.
 - Automatic publishing.
 - Generic Instagram, TikTok, Reddit, or X scraping.
 - Claims of real-time Google search interest without approved API access.
@@ -97,4 +119,3 @@ Automated source management is organised by watchlist beat so the founder can ad
 - A single viral source cannot pass publishing validation.
 - The founder can tell why a source or topic is ready, blocked, stale, or failing.
 - Disabled Google Trends validation remains visibly disabled until official credentials/access exist.
-

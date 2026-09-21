@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const migration = readFileSync("supabase/migrations/202609200001_live_culture.sql", "utf8");
@@ -6,6 +6,8 @@ const evidenceMigration = readFileSync("supabase/migrations/202609200002_public_
 const editorialMigration = readFileSync("supabase/migrations/202609200003_editorial_publication.sql", "utf8");
 const profileProtectionMigration = readFileSync("supabase/migrations/202609200006_profile_role_protection.sql", "utf8");
 const schedulingMigration = readFileSync("supabase/migrations/202609200007_story_scheduling.sql", "utf8");
+const narrowRadarMigrationPath = "supabase/migrations/202609210004_narrow_culture_radar.sql";
+const narrowRadarMigration = existsSync(narrowRadarMigrationPath) ? readFileSync(narrowRadarMigrationPath, "utf8") : "";
 
 describe("live culture database migration", () => {
   it.each([
@@ -60,5 +62,13 @@ describe("live culture database migration", () => {
     expect(schedulingMigration).toMatch(/publish_due_stories/i);
     expect(schedulingMigration).toMatch(/scheduled_publish/i);
     expect(schedulingMigration).toMatch(/\*\/5 \* \* \* \*/);
+  });
+
+  it("adds founder culture-radar fields without weakening publishing gates", () => {
+    expect(narrowRadarMigration).toMatch(/watchlist_beat/i);
+    expect(narrowRadarMigration).toMatch(/suggested_niche_id/i);
+    expect(narrowRadarMigration).toMatch(/editorial_stage/i);
+    expect(narrowRadarMigration).toMatch(/conversation_line/i);
+    expect(narrowRadarMigration).toMatch(/'trend'/i);
   });
 });

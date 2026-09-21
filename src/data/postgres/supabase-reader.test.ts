@@ -6,7 +6,7 @@ describe("Supabase discovery row mapping", () => {
     expect(mapStoryRow({
       id: "story-1", cluster_id: "cluster-1", niche_id: "books", slug: "romantasy-racing",
       title: "Romantasy found the paddock", hook: "Fast cars, slower burns.", summary: "A summary",
-      why_it_matters: "Why it matters", lore: "The lore", beginner_context: "Start here",
+      why_it_matters: "Why it matters", lore: "The lore", beginner_context: "Start here", conversation_line: "Mention the crossover, not just the headline.",
       discovery_type: "TREND", mode: "current", publication_format: "story", lifecycle: "published_story",
       regions: ["IN", "global"], freshness_label: "Checked 20m ago", confidence: 88,
       evidence_summary: "Three independent signals are accelerating.",
