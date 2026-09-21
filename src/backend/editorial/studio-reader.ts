@@ -14,7 +14,7 @@ export class StudioReader {
     const [clusters, niches, sources, failures, runs, links] = await Promise.all([
       this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, state, editorial_stage, last_checked_at, sensitive_flags").in("state", ["detected", "reviewing"]).order("heat", { ascending: false }).limit(50),
       this.client.from("niches").select("id, name"),
-      this.client.from("source_definitions").select("id, name, adapter_type, active, last_polled_at").order("name"),
+      this.client.from("source_definitions").select("id, name, adapter_type, watchlist_beat, active, last_polled_at").order("name"),
       this.client.from("source_failures").select("source_definition_id").is("resolved_at", null),
       this.client.from("ingestion_runs").select("id, status, started_at, inserted_count, error_count").order("started_at", { ascending: false }).limit(20),
       this.client.from("cluster_signals").select("cluster_id"),
@@ -33,7 +33,7 @@ export class StudioReader {
         sourceCount: signalCounts.get(row.id) ?? 0, lastCheckedAt: row.last_checked_at, sensitiveFlags: row.sensitive_flags,
       })),
       sources: (sources.data ?? []).map((row) => ({
-        id: row.id, name: row.name, adapterType: row.adapter_type, active: row.active,
+        id: row.id, name: row.name, adapterType: row.adapter_type, watchlistBeat: row.watchlist_beat, active: row.active,
         healthy: row.active && (failureCounts.get(row.id) ?? 0) === 0, lastPolledAt: row.last_polled_at,
         failureCount: failureCounts.get(row.id) ?? 0,
       })),

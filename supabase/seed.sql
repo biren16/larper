@@ -17,10 +17,12 @@ values ('internet-culture', 'meme', 'en'), ('internet-culture', 'brainrot', 'en'
   ('screen-culture', 'anime', 'en'), ('gaming-tech', 'gaming', 'en'), ('food-places', 'cafe', 'en')
 on conflict do nothing;
 
-insert into public.source_definitions(name, adapter_type, config, trust_tier, locale, region, poll_minutes, allowlisted, active)
+insert into public.source_definitions(name, adapter_type, config, trust_tier, locale, region, poll_minutes, allowlisted, active, watchlist_beat)
 values
-  ('Founder manual intake', 'manual', '{}'::jsonb, 'watchlist', 'en-IN', 'india', 180, true, true),
-  ('Approved India culture RSS template', 'rss', '{"url":"REPLACE_WITH_APPROVED_PUBLIC_FEED"}'::jsonb, 'publication', 'en-IN', 'india', 180, true, false),
-  ('Approved global culture RSS template', 'rss', '{"url":"REPLACE_WITH_APPROVED_PUBLIC_FEED"}'::jsonb, 'publication', 'en', 'global', 180, true, false),
-  ('Approved YouTube channel template', 'youtube', '{"channelId":"REPLACE_WITH_APPROVED_CHANNEL_ID"}'::jsonb, 'primary', 'en', 'global', 180, true, false)
+  ('Founder manual intake', 'manual', '{}'::jsonb, 'watchlist', 'en-IN', 'india', 180, true, true, 'internet-culture'),
+  ('F1 RSS template', 'rss', '{"url":"REPLACE_WITH_APPROVED_PUBLIC_FEED"}'::jsonb, 'publication', 'en', 'global', 180, true, false, 'f1'),
+  ('Books YouTube template', 'youtube', '{"query":"REPLACE_WITH_APPROVED_BOOKS_QUERY"}'::jsonb, 'watchlist', 'en', 'global', 180, false, false, 'books'),
+  ('Music YouTube template', 'youtube', '{"query":"REPLACE_WITH_APPROVED_MUSIC_QUERY"}'::jsonb, 'watchlist', 'en', 'global', 180, false, false, 'music'),
+  ('Tech and gaming RSS template', 'rss', '{"url":"REPLACE_WITH_APPROVED_PUBLIC_FEED"}'::jsonb, 'publication', 'en', 'global', 180, true, false, 'tech-gaming'),
+  ('Google Trends validation — waiting for official API access', 'trend', '{}'::jsonb, 'watchlist', 'en', 'global', 180, false, false, null)
 on conflict do nothing;

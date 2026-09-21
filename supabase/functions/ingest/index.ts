@@ -2,7 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { XMLParser } from "npm:fast-xml-parser@5";
 
 type Source = {
-  id: string; name: string; adapter_type: "rss" | "youtube" | "manual"; config: Record<string, unknown>;
+  id: string; name: string; adapter_type: "rss" | "youtube" | "manual" | "trend"; config: Record<string, unknown>;
   trust_tier: string; locale: string; region: string; poll_minutes: number; last_polled_at: string | null;
 };
 type Signal = {
@@ -136,7 +136,7 @@ Deno.serve(async (request) => {
   const begun = await database.from("ingestion_runs").insert({ trigger: "supabase_cron", status: "running", started_at: startedAt }).select("id").single();
   if (begun.error) return response({ status: "failed", error: "Could not start ingestion run" }, 500);
   const runId = begun.data.id;
-  const sourceResult = await database.from("source_definitions").select("*").eq("active", true).neq("adapter_type", "manual");
+  const sourceResult = await database.from("source_definitions").select("*").eq("active", true).in("adapter_type", ["rss", "youtube"]);
   if (sourceResult.error) return response({ status: "failed", error: "Could not load source registry" }, 500);
   const now = Date.now();
   const due = (sourceResult.data as Source[]).filter((source) => !source.last_polled_at || now - Date.parse(source.last_polled_at) >= source.poll_minutes * 60_000);

@@ -55,8 +55,10 @@ export async function createSourceAction(form: FormData) {
   const trustTier = String(form.get("trustTier") ?? "");
   const locator = String(form.get("locator") ?? "").trim();
   const name = String(form.get("name") ?? "").trim();
+  const watchlistBeat = String(form.get("watchlistBeat") ?? "").trim();
   if (!name || !locator) redirect("/studio?error=Source+name+and+locator+are+required");
   if (!new Set(["rss", "youtube"]).has(adapterType) || !new Set(["primary", "publication", "community", "watchlist"]).has(trustTier)) redirect("/studio?error=Invalid+source+settings");
+  if (!new Set(["f1", "books", "music", "tech-gaming"]).has(watchlistBeat)) redirect("/studio?error=Choose+a+valid+watchlist+beat");
   let config: Record<string, string>;
   if (adapterType === "rss") {
     if (!isPublicSourceUrl(locator)) redirect("/studio?error=Enter+a+public+feed+URL");
@@ -67,7 +69,7 @@ export async function createSourceAction(form: FormData) {
   const result = await runtime.client.from("source_definitions").insert({
     name, adapter_type: adapterType, trust_tier: trustTier,
     config, locale: String(form.get("locale") ?? "en-IN").trim(), region: String(form.get("region") ?? "india").trim(),
-    poll_minutes: 180, allowlisted: form.get("allowlisted") === "on", active: false,
+    poll_minutes: 180, allowlisted: form.get("allowlisted") === "on", active: false, watchlist_beat: watchlistBeat,
   });
   if (result.error) redirect(`/studio?error=${encodeURIComponent(result.error.message)}`);
   redirect("/studio");

@@ -4,7 +4,7 @@ import styles from "./studio.module.css";
 export interface StudioDashboardData {
   niches?: Array<{ id: string; name: string }>;
   candidates: Array<{ id: string; title: string; nicheName: string; heat: number; confidence: number; state: string; sourceCount: number; lastCheckedAt: string; sensitiveFlags: string[] }>;
-  sources: Array<{ id: string; name: string; adapterType: string; active: boolean; healthy: boolean; lastPolledAt: string | null; failureCount: number }>;
+  sources: Array<{ id: string; name: string; adapterType: string; watchlistBeat?: string | null; active: boolean; healthy: boolean; lastPolledAt: string | null; failureCount: number }>;
   runs: Array<{ id: string; status: string; startedAt: string; insertedCount: number; errorCount: number }>;
 }
 
@@ -48,14 +48,14 @@ export function StudioDashboard({ data, manualSignalAction, createSourceAction, 
           <div className={styles.sourceList}>{data.sources.map((source) => (
             <article key={source.id} className={styles.sourceRow}>
               <span className={styles.health} data-healthy={source.healthy} aria-label={source.healthy ? "Healthy" : "Needs attention"} />
-              <div><strong>{source.name}</strong><small>{source.adapterType} · polled {time(source.lastPolledAt)}</small>{source.adapterType === "trend" && <small>Waiting for official API access</small>}</div>
+              <div><strong>{source.name}</strong><small>{source.watchlistBeat ?? source.adapterType} · {source.adapterType} · polled {time(source.lastPolledAt)}</small>{source.adapterType === "trend" && <small>Waiting for official API access</small>}</div>
               <span>{source.failureCount} failures</span>
               {toggleSourceAction && <form action={toggleSourceAction}><input type="hidden" name="sourceId" value={source.id} /><input type="hidden" name="active" value={source.active ? "false" : "true"} /><button type="submit">{source.active ? "Pause" : "Activate"}</button></form>}
             </article>
           ))}</div>
           {createSourceAction && <form className={styles.manualForm} action={createSourceAction} aria-label="Add a source definition">
             <label>Source name<input name="name" required /></label>
-            <div><label>Adapter<select name="adapterType"><option value="rss">RSS / Atom</option><option value="youtube">YouTube</option></select></label><label>Trust<select name="trustTier"><option value="publication">Publication</option><option value="primary">Primary</option><option value="community">Community</option><option value="watchlist">Watchlist</option></select></label></div>
+            <div><label>Beat<select name="watchlistBeat" defaultValue="f1"><option value="f1">F1</option><option value="books">Books</option><option value="music">Music</option><option value="tech-gaming">Tech + gaming</option></select></label><label>Adapter<select name="adapterType"><option value="rss">RSS / Atom</option><option value="youtube">YouTube</option></select></label><label>Trust<select name="trustTier"><option value="publication">Publication</option><option value="primary">Primary</option><option value="community">Community</option><option value="watchlist">Watchlist</option></select></label></div>
             <label>Public feed URL, channel ID, or search query<input name="locator" required /></label>
             <div><label>Locale<input name="locale" defaultValue="en-IN" required /></label><label>Region<input name="region" defaultValue="india" required /></label></div>
             <label><input name="allowlisted" type="checkbox" /> Allow for brief corroboration</label>
