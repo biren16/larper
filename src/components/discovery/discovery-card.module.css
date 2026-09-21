@@ -15,11 +15,11 @@
 .meta { align-items: center; color: var(--muted); display: flex; flex-wrap: wrap; font: 650 0.68rem/1.2 var(--font-sans); gap: 0.55rem; }
 .meta > * + * { border-left: 1px solid currentColor; padding-left: 0.55rem; }
 .meta a { color: var(--ink); }
-.card h3 { font: 650 clamp(1.35rem, 2.2vw, 2.2rem)/0.98 var(--font-sans); letter-spacing: -0.045em; margin: 0.85rem 0 0.7rem; text-wrap: balance; }
+.card h3 { font: 650 clamp(1.35rem, 2.2vw, 2.2rem)/1 var(--font-sans); letter-spacing: -0.03em; margin: 0.85rem 0 0.7rem; text-wrap: balance; }
 .hook { color: var(--muted); font: 470 0.88rem/1.42 var(--font-sans); max-width: 42ch; }
 .footer { align-items: flex-end; display: flex; gap: 1rem; justify-content: space-between; margin-top: auto; padding-top: 1.25rem; }
 .signals { color: var(--muted); display: flex; flex-wrap: wrap; font: 620 0.64rem/1.25 var(--font-sans); gap: 0.35rem 0.7rem; }
-.action { align-items: center; display: inline-flex; flex: none; font: 700 0.72rem/1 var(--font-sans); gap: 0.35rem; min-height: 2.75rem; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.action { align-items: center; display: inline-flex; flex: none; font: 650 0.72rem/1 var(--font-sans); gap: 0.35rem; min-height: 2.75rem; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .action svg { height: 0.9rem; transition: transform 160ms ease; width: 0.9rem; }
 .action:hover svg { transform: translate(2px, -2px); }
 
@@ -48,7 +48,7 @@
 .visual .hook { display: none; }
 .place .media { clip-path: polygon(0 0, 100% 0, 97% 100%, 0 96%); }
 .lore { background: var(--surface, var(--paper-bright)); }
-.lore h3 { font-family: var(--font-serif); font-size: clamp(1.8rem, 3vw, 3rem); font-weight: 560; letter-spacing: -0.04em; }
+.lore h3 { font-family: var(--font-serif); font-size: clamp(1.8rem, 3vw, 3rem); font-weight: 400; letter-spacing: -0.025em; }
 .compact { min-height: 11rem; }
 .compact h3 { font-size: clamp(1.2rem, 1.7vw, 1.65rem); }
 .compact .signals span:not(:first-child) { display: none; }

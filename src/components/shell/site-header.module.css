@@ -18,17 +18,17 @@
 }
 
 .wordmark {
-  font: 820 1.8rem/0.9 var(--font-sans);
+  font: 700 1.8rem/0.95 var(--font-sans);
   justify-self: start;
-  letter-spacing: -0.085em;
+  letter-spacing: -0.055em;
   transition: opacity 150ms ease;
 }
 
 .wordmark:hover { opacity: 0.62; }
 .context { align-items: center; display: flex; justify-content: center; min-width: 0; }
-.contextLink { font: 680 0.75rem/1 var(--font-sans); letter-spacing: 0.01em; padding: 0.8rem 0; }
+.contextLink { font: 600 0.75rem/1 var(--font-sans); letter-spacing: 0.01em; padding: 0.8rem 0; }
 .actions { align-items: center; display: flex; gap: 0.75rem; justify-self: end; }
-.signInLink { align-items: center; display: inline-flex; font: 680 0.72rem/1 var(--font-sans); min-height: 2.75rem; position: relative; }
+.signInLink { align-items: center; display: inline-flex; font: 600 0.72rem/1 var(--font-sans); min-height: 2.75rem; position: relative; }
 .signInLink::after { background: currentColor; bottom: 0.62rem; content: ""; height: 1px; left: 0; position: absolute; transform: scaleX(0); transform-origin: left; transition: transform 150ms ease; width: 100%; }
 .signInLink:hover::after,
 .signInLink:focus-visible::after { transform: scaleX(1); }

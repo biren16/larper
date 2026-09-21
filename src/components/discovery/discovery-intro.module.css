@@ -22,9 +22,9 @@
 }
 
 .wordmark {
-  font: 820 clamp(7.5rem, 19vw, 19rem)/0.9 var(--font-sans);
+  font: 700 clamp(7.5rem, 19vw, 19rem)/0.94 var(--font-sans);
   left: 0;
-  letter-spacing: -0.085em;
+  letter-spacing: -0.055em;
   position: absolute;
   top: 0;
   transform: translate(calc(50vw - 50%), calc(50dvh - 50%));
@@ -80,14 +80,14 @@
   }
   48% {
     clip-path: inset(-0.14em -0.04em -0.18em);
-    font-weight: 680;
+    font-weight: 600;
     letter-spacing: 0.015em;
     opacity: 1;
   }
   72%, 100% {
     clip-path: inset(-0.14em -0.04em -0.18em);
-    font-weight: 820;
-    letter-spacing: -0.085em;
+    font-weight: 700;
+    letter-spacing: -0.055em;
     opacity: 1;
   }
 }
