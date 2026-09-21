@@ -4,8 +4,29 @@ import styles from "./studio.module.css";
 export interface StudioDashboardData {
   niches?: Array<{ id: string; name: string }>;
   candidates: Array<{ id: string; title: string; nicheName: string; heat: number; confidence: number; state: string; sourceCount: number; lastCheckedAt: string; sensitiveFlags: string[] }>;
-  sources: Array<{ id: string; name: string; adapterType: string; watchlistBeat?: string | null; active: boolean; healthy: boolean; lastPolledAt: string | null; failureCount: number }>;
+  sources: StudioSource[];
   runs: Array<{ id: string; status: string; startedAt: string; insertedCount: number; errorCount: number }>;
+  recentSignals: Array<{ id: string; title: string; canonicalUrl: string; sourceName: string; sourceType: string; nicheName: string; region: string; observedAt: string; availability: string; clusterId: string | null }>;
+}
+
+export type StudioSourceStatus = "live" | "paused" | "attention" | "waiting";
+
+export interface StudioSource {
+  id: string;
+  name: string;
+  adapterType: string;
+  watchlistBeat?: string | null;
+  active: boolean;
+  healthy: boolean;
+  lastPolledAt: string | null;
+  failureCount: number;
+  trustTier: string;
+  status: StudioSourceStatus;
+}
+
+export interface StudioSourcesData {
+  sources: StudioSource[];
+  runs: StudioDashboardData["runs"];
 }
 
 const time = (value: string | null) => value

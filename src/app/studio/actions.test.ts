@@ -19,7 +19,40 @@ describe("addManualSignalAction", () => {
     const { addManualSignalAction } = await import("./actions");
     const form = new FormData();
 
-    await expect(addManualSignalAction(form)).rejects.toThrow("redirect:/studio");
+    await expect(addManualSignalAction(form)).rejects.toThrow("redirect:/studio?notice=signal-added");
     expect(rpc).toHaveBeenCalledWith("process_unclustered_signals");
+  });
+});
+
+describe("source actions", () => {
+  it("returns a source-added notice after creating a paused source", async () => {
+    const insert = vi.fn(async () => ({ error: null }));
+    getEditorialRuntime.mockResolvedValue({ client: { from: () => ({ insert }) } });
+    const { createSourceAction } = await import("./actions");
+    const form = new FormData();
+    form.set("name", "Books desk");
+    form.set("adapterType", "rss");
+    form.set("trustTier", "publication");
+    form.set("watchlistBeat", "books");
+    form.set("locator", "https://example.com/feed.xml");
+
+    await expect(createSourceAction(form)).rejects.toThrow("redirect:/studio/sources?notice=source-added");
+  });
+
+  it("returns activation and pause notices to the Sources workspace", async () => {
+    const eq = vi.fn(async () => ({ error: null }));
+    const update = vi.fn(() => ({ eq }));
+    getEditorialRuntime.mockResolvedValue({ client: { from: () => ({ update }) } });
+    const { toggleSourceAction } = await import("./actions");
+
+    const activate = new FormData();
+    activate.set("sourceId", "source-1");
+    activate.set("active", "true");
+    await expect(toggleSourceAction(activate)).rejects.toThrow("redirect:/studio/sources?notice=source-activated");
+
+    const pause = new FormData();
+    pause.set("sourceId", "source-1");
+    pause.set("active", "false");
+    await expect(toggleSourceAction(pause)).rejects.toThrow("redirect:/studio/sources?notice=source-paused");
   });
 });

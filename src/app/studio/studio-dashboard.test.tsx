@@ -7,10 +7,11 @@ describe("StudioDashboard", () => {
     render(<StudioDashboard data={{
       candidates: [{ id: "cluster-1", title: "F1 books cross feeds", nicheName: "Books", heat: 84, confidence: 88, state: "reviewing", sourceCount: 3, lastCheckedAt: "2026-09-20T10:00:00.000Z", sensitiveFlags: [] }],
       sources: [
-        { id: "source-1", name: "Culture Desk", adapterType: "rss", active: true, healthy: true, lastPolledAt: "2026-09-20T09:00:00.000Z", failureCount: 0 },
-        { id: "source-2", name: "Google Trends validation", adapterType: "trend", active: false, healthy: true, lastPolledAt: null, failureCount: 0 },
+        { id: "source-1", name: "Culture Desk", adapterType: "rss", active: true, healthy: true, lastPolledAt: "2026-09-20T09:00:00.000Z", failureCount: 0, trustTier: "publication", status: "live" },
+        { id: "source-2", name: "Google Trends validation", adapterType: "trend", active: false, healthy: false, lastPolledAt: null, failureCount: 0, trustTier: "watchlist", status: "waiting" },
       ],
       runs: [{ id: "run-1", status: "succeeded", startedAt: "2026-09-20T09:00:00.000Z", insertedCount: 4, errorCount: 0 }],
+      recentSignals: [],
     }} />);
 
     expect(screen.getByRole("heading", { name: "Signal desk" })).toBeInTheDocument();
