@@ -59,7 +59,11 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
       <header className={styles.intro}>
         <div className={styles.introCopy}>
           <p className={styles.kicker}>Find new shit to get obsessed with.</p>
-          <h1>Wanna larp bout smth? Find a niche rn.</h1>
+          <h1 aria-label="wanna larp? find a niche get the lore rn">
+            wanna larp?<br />
+            find a niche<br />
+            get the lore rn
+          </h1>
           <p className={styles.dek}>Niche obsessions, drops, memes, debates and lore. With enough context to get why people care.</p>
           <a className={styles.nowLink} href="#larping-now">See what&apos;s peaking <ArrowDown aria-hidden /></a>
         </div>
