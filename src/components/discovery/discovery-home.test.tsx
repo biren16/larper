@@ -52,7 +52,8 @@ describe("DiscoveryHome", () => {
 
     expect(screen.getByRole("heading", { name: "The radar is recalibrating." })).toBeInTheDocument();
     expect(screen.getByText(/no verified stories are ready yet/i)).toBeInTheDocument();
-    expect(container.querySelector("[data-empty-radar-visual]")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByText("Verified edition")).not.toBeInTheDocument();
+    expect(container.querySelector("[data-empty-radar-visual]")).not.toBeInTheDocument();
     expect(screen.queryByText(/fictional|demo trends/i)).not.toBeInTheDocument();
   });
 });

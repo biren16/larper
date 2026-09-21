@@ -46,14 +46,9 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
       <main id="main-content" className={styles.main}>
         <section className={styles.emptyRadar} aria-labelledby="empty-radar-heading">
           <div className={styles.emptyCopy}>
-            <span>Verified edition</span>
             <h1 id="empty-radar-heading">The radar is recalibrating.</h1>
             <p>No verified stories are ready yet. We’ll publish when independent evidence clears the bar—not just because a post is loud.</p>
             {home.verifiedAt && <small>Latest verified check: {new Date(home.verifiedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</small>}
-          </div>
-          <div className={styles.emptyVisual} data-empty-radar-visual aria-hidden="true">
-            <span className={styles.scanOrbit}><span className={styles.scanCore} /></span>
-            <span className={styles.scanTarget} />
           </div>
         </section>
       </main>
