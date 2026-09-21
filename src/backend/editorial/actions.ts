@@ -114,6 +114,13 @@ export function createEditorialActions(dependencies: {
           locale: String(form.get("locale") ?? "en-IN"),
           author: String(form.get("author") ?? "") || undefined,
           body: String(form.get("body") ?? "") || undefined,
+          platform: String(form.get("platform") ?? "web") as import("@/backend/ingestion/manual").ManualPlatform,
+          suggestedNicheId: String(form.get("suggestedNicheId") ?? "") || undefined,
+          observationNote: String(form.get("observationNote") ?? "") || undefined,
+          visibleMetrics: {
+            views: String(form.get("visibleViews") ?? ""), likes: String(form.get("visibleLikes") ?? ""),
+            comments: String(form.get("visibleComments") ?? ""), shares: String(form.get("visibleShares") ?? ""),
+          },
         }, required(form, "sourceDefinitionId"), dependencies.now());
         return { ok: true as const, signalId };
       } catch (error) {

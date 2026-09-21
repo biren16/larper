@@ -44,6 +44,8 @@ export async function addManualSignalAction(form: FormData) {
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString() });
   const result = await actions.addManualSignal(form);
   if (!result.ok) redirect(`/studio?error=${encodeURIComponent(result.error)}`);
+  const processed = await runtime.client.rpc("process_unclustered_signals");
+  if (processed.error) redirect("/studio?error=Signal+saved%2C+but+could+not+refresh+the+queue");
   redirect("/studio");
 }
 

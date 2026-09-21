@@ -24,6 +24,7 @@ export interface NormalizedSignal {
   body?: string;
   locale: string;
   region: string;
+  suggestedNicheId?: string;
   publishedAt: string;
   observedAt: string;
   trustTier: SourceTrustTier;

@@ -91,7 +91,7 @@ export class PostgresEditorialStore implements EditorialStore {
     const result = await this.client.from("raw_signals").upsert({
       source_definition_id: signal.sourceDefinitionId, canonical_url: signal.canonicalUrl, external_id: signal.externalId ?? null,
       source_type: signal.sourceType, source_name: signal.sourceName, author: signal.author ?? null, title: signal.title,
-      body: signal.body ?? null, locale: signal.locale, region: signal.region, published_at: signal.publishedAt,
+      body: signal.body ?? null, locale: signal.locale, region: signal.region, suggested_niche_id: signal.suggestedNicheId ?? null, published_at: signal.publishedAt,
       observed_at: signal.observedAt, trust_tier: signal.trustTier, availability: signal.availability,
       metrics: signal.metrics, sensitive_flags: signal.sensitiveFlags,
     }, { onConflict: "source_definition_id,canonical_url" }).select("id").single();

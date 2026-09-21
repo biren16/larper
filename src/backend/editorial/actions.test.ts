@@ -35,4 +35,17 @@ describe("editorial action factory", () => {
     await expect(actions.publishStory(new FormData())).resolves.toEqual({ ok: false, error: "candidateId is required" });
     expect(publishStory).not.toHaveBeenCalled();
   });
+
+  it("passes structured founder pulse details to the editorial service", async () => {
+    const addManualSignal = vi.fn(async () => "signal-1");
+    const actions = createEditorialActions({
+      getActor: async () => ({ id: "editor-1", email: "founder@example.com", role: "founder" as const }),
+      now: () => "2026-09-21T10:00:00.000Z", service: { addManualSignal } as never,
+    });
+    const form = new FormData();
+    Object.entries({ url: "https://www.instagram.com/reel/a/", title: "F1 edit", sourceName: "Founder", publishedAt: "2026-09-21T09:00", region: "india", sourceDefinitionId: "manual-1", platform: "instagram", suggestedNicheId: "f1", observationNote: "Crossing feeds", visibleLikes: "1200" }).forEach(([key, value]) => form.set(key, value));
+
+    await expect(actions.addManualSignal(form)).resolves.toEqual({ ok: true, signalId: "signal-1" });
+    expect(addManualSignal).toHaveBeenCalledWith(expect.objectContaining({ id: "editor-1" }), expect.objectContaining({ platform: "instagram", suggestedNicheId: "f1", observationNote: "Crossing feeds", visibleMetrics: expect.objectContaining({ likes: "1200" }) }), "manual-1", "2026-09-21T10:00:00.000Z");
+  });
 });
