@@ -1,37 +1,60 @@
-.main { margin: 0 auto; max-width: var(--content); padding: clamp(2rem, 5vw, 5rem) var(--gutter) 6rem; }
-.header { align-items: end; border-bottom: 2px solid var(--ink); display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr) minmax(17rem, 26rem); padding-bottom: 2rem; }
-.header h1 { font-family: var(--font-serif); font-size: clamp(3rem, 8vw, 7rem); font-weight: 500; letter-spacing: -.06em; line-height: .86; }
-.header > div > p:last-child { color: var(--muted); font-size: 1.05rem; margin-top: 1rem; }
-.eyebrow, .sectionHeading p { font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.runStatus { background: var(--feature-bg); color: var(--feature-text); display: grid; gap: .45rem; padding: 1.25rem; }
-.runStatus span, .runStatus small { color: var(--feature-muted); }
-.runStatus[data-status="failed"] { background: var(--signal-red); color: var(--red-ink); }
-.queue { padding: 3rem 0; }
-.sectionHeading { align-items: end; display: flex; justify-content: space-between; margin-bottom: 1rem; }
-.sectionHeading h2 { font-size: clamp(1.8rem, 4vw, 3.5rem); line-height: 1; }
-.sectionHeading > span { color: var(--muted); }
-.candidateGrid { display: grid; gap: 1px; grid-template-columns: repeat(3, 1fr); background: var(--line); border: 1px solid var(--line); }
-.candidate { background: var(--surface); min-height: 18rem; padding: 1.15rem; position: relative; }
-.candidate h3 { font-family: var(--font-serif); font-size: clamp(1.6rem, 2.7vw, 2.55rem); font-weight: 520; line-height: 1; margin: 1.25rem 0; }
-.metrics { display: flex; flex-wrap: wrap; gap: .4rem; }
-.metrics > * { border: 1px solid var(--line); font-size: .72rem; padding: .25rem .4rem; }
+.main { margin: 0 auto; max-width: 74rem; padding: clamp(1.5rem, 4vw, 4rem) var(--gutter) 6rem; }
+.header { align-items: end; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; padding-bottom: 1.4rem; }
+.eyebrow { color: var(--muted); font-size: .72rem; font-weight: 750; letter-spacing: .09em; margin: 0; text-transform: uppercase; }
+.header h1 { font-family: var(--font-serif); font-size: clamp(3.25rem, 8vw, 6.5rem); font-weight: 500; letter-spacing: -.07em; line-height: .82; margin: .75rem 0 0; }
+.header > div > p:last-child { color: var(--muted); font-size: 1rem; margin: 1.1rem 0 0; max-width: 28rem; }
+.today { align-items: end; display: grid; gap: .3rem; justify-items: end; }
+.today span { color: var(--muted); font-size: .75rem; }
+.today strong { font-size: .9rem; }
+.statusStrip { border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 0; }
+.statusStrip p { border-right: 1px solid var(--line); color: var(--muted); font-size: .78rem; margin: 0; padding: .85rem 1.1rem .85rem 0; }
+.statusStrip p + p { padding-left: 1.1rem; }
+.statusStrip strong { color: var(--ink); }
+.statusStrip .runNote { border-right: 0; color: var(--ink); margin-left: auto; padding-right: 0; }
+.runNote[data-status="failed"] { color: var(--signal-red); }
+.inbox { align-items: start; display: grid; gap: clamp(1.5rem, 4vw, 5rem); grid-template-columns: minmax(13rem, .65fr) minmax(0, 1.35fr); padding: clamp(2.5rem, 7vw, 5rem) 0; }
+.inboxIntro { position: sticky; top: 2rem; }
+.inboxIntro h2, .sectionHeading h2 { font-family: var(--font-serif); font-size: clamp(2.4rem, 5vw, 4.2rem); font-weight: 500; letter-spacing: -.055em; line-height: .9; margin: .75rem 0 1rem; }
+.inboxIntro > p:last-child { color: var(--muted); font-size: 1rem; line-height: 1.45; margin: 0; max-width: 19rem; }
+.manualForm { background: var(--feature-bg); color: var(--feature-text); display: grid; gap: 1rem; padding: clamp(1.1rem, 3vw, 2rem); }
+.manualForm label { display: grid; font-size: .77rem; font-weight: 700; gap: .4rem; }
+.manualForm input, .manualForm select, .manualForm textarea { background: transparent; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--feature-text) 32%, transparent); border-radius: 0; color: var(--feature-text); font: inherit; min-height: 2.5rem; padding: .45rem 0; }
+.manualForm input::placeholder, .manualForm textarea::placeholder { color: color-mix(in srgb, var(--feature-text) 50%, transparent); }
+.manualForm select option { background: var(--feature-bg); color: var(--feature-text); }
+.manualForm textarea { line-height: 1.4; resize: vertical; }
+.signalTopRow, .signalMeta, .submitRow { display: grid; gap: 1rem; }
+.signalTopRow { grid-template-columns: 9rem 1fr; }
+.signalMeta { grid-template-columns: 1.4fr .8fr .7fr; }
+.submitRow { align-items: end; grid-template-columns: 1fr auto; }
+.manualForm button, .sourceRow button { border: 0; cursor: pointer; font-weight: 800; min-height: 2.75rem; padding: .7rem 1rem; }
+.manualForm button { background: var(--feature-text); color: var(--feature-bg); }
+.queue, .sources { border-top: 1px solid var(--line); padding: clamp(2.5rem, 6vw, 4.5rem) 0; }
+.sectionHeading { align-items: end; display: flex; gap: 1rem; justify-content: space-between; margin-bottom: 1.4rem; }
+.sectionHeading h2 { margin-bottom: 0; }
+.sectionHeading > span { color: var(--muted); font-size: .8rem; padding-bottom: .25rem; text-align: right; }
+.candidateList, .sourceList { border-top: 1px solid var(--ink); }
+.candidate { align-items: center; border-bottom: 1px solid var(--line); display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr) auto auto; padding: 1.25rem 0; }
+.candidate h3 { font-family: var(--font-serif); font-size: clamp(1.45rem, 2.6vw, 2.25rem); font-weight: 520; letter-spacing: -.035em; line-height: .95; margin: .38rem 0; }
+.niche, .checked { color: var(--muted); font-size: .73rem; margin: 0; text-transform: uppercase; }
+.checked { text-transform: none; }
+.metrics { display: flex; flex-wrap: wrap; gap: .3rem; justify-content: flex-end; max-width: 12rem; }
+.metrics > * { border: 1px solid var(--line); font-size: .7rem; padding: .24rem .38rem; white-space: nowrap; }
 .metrics strong { background: var(--acid); border-color: var(--acid); color: var(--acid-ink); }
-.niche, .checked { color: var(--muted); font-size: .78rem; margin-top: .9rem; text-transform: uppercase; }
-.warning { background: color-mix(in srgb, var(--signal-red) 18%, transparent); border-left: 3px solid var(--signal-red); font-size: .85rem; padding: .6rem; }
-.reviewLink { bottom: 1rem; font-weight: 800; position: absolute; text-decoration: underline; text-underline-offset: .2rem; }
-.empty { background: var(--surface); grid-column: 1 / -1; padding: 3rem; }
-.lowerGrid { border-top: 2px solid var(--ink); display: grid; gap: 3rem; grid-template-columns: 1.15fr .85fr; padding-top: 3rem; }
-.sourceList { border: 1px solid var(--line); }
-.sourceRow { align-items: center; border-bottom: 1px solid var(--line); display: grid; gap: .8rem; grid-template-columns: auto 1fr auto; padding: .9rem; }
-.sourceRow:last-child { border-bottom: 0; }
+.reviewLink { font-size: .8rem; font-weight: 800; text-decoration: underline; text-underline-offset: .22rem; white-space: nowrap; }
+.warning { color: var(--signal-red); font-size: .8rem; margin: .55rem 0 0; }
+.empty { color: var(--muted); margin: 0; padding: 2rem 0; }
+.sources { padding-bottom: 0; }
+.sourceRow { align-items: center; border-bottom: 1px solid var(--line); display: grid; gap: .8rem; grid-template-columns: auto minmax(0, 1fr) auto auto; padding: .9rem 0; }
 .sourceRow div { display: grid; gap: .15rem; }
-.sourceRow small, .sourceRow > span:last-child { color: var(--muted); font-size: .75rem; }
-.health { background: var(--signal-red); border-radius: 50%; height: .65rem; width: .65rem; }
+.sourceRow small, .sourceRow > span:last-of-type { color: var(--muted); font-size: .73rem; }
+.health { background: var(--signal-red); border-radius: 50%; height: .58rem; width: .58rem; }
 .health[data-healthy="true"] { background: #4f9f45; }
-.manualForm { background: var(--surface); border: 1px solid var(--line); display: grid; gap: .9rem; padding: 1rem; }
-.manualForm label { display: grid; font-size: .78rem; font-weight: 700; gap: .35rem; }
-.manualForm input, .manualForm select { background: var(--paper-bright); border: 1px solid var(--line); color: var(--ink); min-height: 2.75rem; padding: .65rem; }
-.manualForm > div { display: grid; gap: .75rem; grid-template-columns: 1fr 1fr; }
-.manualForm button { background: var(--ink); border: 0; color: var(--paper); cursor: pointer; font-weight: 800; min-height: 2.9rem; padding: .7rem 1rem; }
-@media (max-width: 800px) { .header, .lowerGrid { grid-template-columns: 1fr; } .candidateGrid { grid-template-columns: 1fr; } .candidate { min-height: 15rem; } }
-@media (max-width: 480px) { .manualForm > div { grid-template-columns: 1fr; } .sourceRow { grid-template-columns: auto 1fr; } .sourceRow > span:last-child { grid-column: 2; } }
+.sourceRow form { margin: 0; }
+.sourceRow button { background: transparent; border: 1px solid var(--ink); color: var(--ink); min-height: auto; padding: .4rem .6rem; }
+.sources .manualForm { background: var(--surface); color: var(--ink); margin-top: 1.25rem; }
+.sources .manualForm input, .sources .manualForm select, .sources .manualForm textarea { border-bottom-color: var(--line); color: var(--ink); }
+.sources .manualForm select option { background: var(--surface); color: var(--ink); }
+.sources .manualForm > div { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); }
+.sources .manualForm button { background: var(--ink); color: var(--paper); justify-self: start; }
+@media (max-width: 760px) { .header { align-items: start; flex-direction: column; gap: 1.75rem; } .today { justify-items: start; } .statusStrip { display: grid; grid-template-columns: 1fr 1fr; } .statusStrip p, .statusStrip p + p { border-bottom: 1px solid var(--line); border-right: 0; margin: 0; padding: .75rem 0; } .statusStrip .runNote { grid-column: 1 / -1; margin: 0; } .inbox { grid-template-columns: 1fr; } .inboxIntro { position: static; } .candidate { align-items: start; grid-template-columns: 1fr auto; } .metrics { grid-column: 1; justify-content: flex-start; } .reviewLink { grid-column: 2; grid-row: 1 / span 2; } .sourceRow { grid-template-columns: auto minmax(0, 1fr) auto; } .sourceRow > span:last-of-type { display: none; } }
+@media (max-width: 520px) { .signalTopRow, .signalMeta, .submitRow, .sources .manualForm > div { grid-template-columns: 1fr; } .manualForm button { width: 100%; } .candidate { display: block; } .metrics { justify-content: flex-start; margin-top: .9rem; max-width: none; } .reviewLink { display: inline-block; margin-top: .9rem; } .sectionHeading { align-items: start; flex-direction: column; } .sectionHeading > span { text-align: left; } .sourceRow { grid-template-columns: auto 1fr; } .sourceRow form { grid-column: 2; } }
