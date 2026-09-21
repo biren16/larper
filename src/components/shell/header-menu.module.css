@@ -56,7 +56,7 @@
 }
 
 .menuWordmark {
-  font: 700 1.8rem/0.95 var(--font-sans);
+  font: 700 1.8rem/0.95 var(--font-shell);
   justify-self: start;
   letter-spacing: -0.055em;
 }
@@ -71,7 +71,7 @@
 .navLink {
   border-bottom: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
   display: block;
-  font: 600 clamp(3.5rem, 8vw, 7.5rem)/0.98 var(--font-sans);
+  font: 600 clamp(3.5rem, 8vw, 7.5rem)/0.98 var(--font-shell);
   letter-spacing: -0.04em;
   padding: 0.16em 0;
   position: relative;
@@ -105,11 +105,11 @@
 
 .appearance { justify-self: start; }
 .accountUtilities { display: grid; gap: 0.7rem; justify-items: end; min-width: 0; }
-.accountIdentity { color: var(--muted); font: 620 0.76rem/1 var(--font-sans); max-width: min(24rem, 42vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.accountIdentity { color: var(--muted); font: 620 0.76rem/1 var(--font-shell); max-width: min(24rem, 42vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .accountActions { align-items: center; display: flex; gap: 1.25rem; }
 .accountActions form { margin: 0; }
 .accountActions a,
-.accountActions button { background: transparent; border: 0; color: var(--ink); cursor: pointer; font: 650 0.9rem/1 var(--font-sans); min-height: 2.75rem; padding: 0; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3rem; }
+.accountActions button { background: transparent; border: 0; color: var(--ink); cursor: pointer; font: 650 0.9rem/1 var(--font-shell); min-height: 2.75rem; padding: 0; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3rem; }
 
 @keyframes menuEnter {
   from { opacity: 0; transform: translateY(-0.75rem); }

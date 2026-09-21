@@ -1,20 +1,20 @@
 .main { margin: 0 auto; max-width: 88rem; padding: clamp(1.25rem, 3vw, 2.5rem) var(--gutter) 7rem; }
 .breadcrumb { align-items: center; color: var(--muted); display: flex; font-size: .72rem; gap: .45rem; margin-bottom: 1rem; }
-.breadcrumb a { color: var(--cobalt); font-weight: 760; text-decoration: underline; text-underline-offset: .2rem; }
+.breadcrumb a { color: var(--cobalt); font-weight: 650; text-decoration: underline; text-underline-offset: .2rem; }
 .header { align-items: end; border-bottom: 1px solid var(--ink); display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr) auto; padding-bottom: 1.2rem; }
-.header p { color: var(--muted); font-size: .72rem; font-weight: 760; margin: 0; text-transform: capitalize; }
+.header p { color: var(--muted); font-size: .72rem; font-weight: 600; margin: 0; text-transform: capitalize; }
 .header h1 { font-family: var(--font-serif); font-size: clamp(2.25rem, 5vw, 4rem); font-weight: 400; letter-spacing: -.03em; line-height: .98; margin: .4rem 0 0; max-width: 18ch; }
 .header dl { display: grid; grid-template-columns: repeat(4, auto); margin: 0; }
 .header dl div { border-left: 1px solid var(--line); min-width: 5.5rem; padding-left: .65rem; }
 .header dt { color: var(--muted); font-size: .62rem; }
-.header dd { font-size: .9rem; font-weight: 780; margin: .22rem 0 0; }
+.header dd { font-size: .9rem; font-weight: 650; margin: .22rem 0 0; }
 .alert { align-items: center; border-bottom: 1px solid var(--line); color: var(--signal-red); display: flex; font-size: .8rem; gap: .8rem; min-height: 3rem; padding: .65rem 0; }
 .alert strong { background: var(--signal-red); color: #fff; padding: .22rem .42rem; }
 .workspace { align-items: start; display: grid; gap: clamp(2rem, 4vw, 4.5rem); grid-template-columns: minmax(0, 1.65fr) minmax(19rem, .72fr); padding-top: clamp(2rem, 4vw, 3.5rem); }
 .editor { display: grid; gap: clamp(2.25rem, 5vw, 4rem); min-width: 0; }
 .editor fieldset { border: 0; border-top: 1px solid var(--ink); display: grid; gap: 1rem; margin: 0; min-width: 0; padding: 1rem 0 0; }
-.editor legend { font-size: clamp(1.55rem, 2.8vw, 2.35rem); font-weight: 720; letter-spacing: -.045em; line-height: .95; padding: 0 1rem 0 0; }
-.editor label, .moreActions label, .actionBar label { display: grid; font-size: .72rem; font-weight: 740; gap: .32rem; }
+.editor legend { font-size: clamp(1.55rem, 2.8vw, 2.35rem); font-weight: 680; letter-spacing: -.03em; line-height: 1; padding: 0 1rem 0 0; }
+.editor label, .moreActions label, .actionBar label { display: grid; font-size: .72rem; font-weight: 600; gap: .32rem; }
 .editor input, .editor textarea, .editor select, .moreActions input, .moreActions textarea {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -30,7 +30,7 @@
 .actionBar { background: var(--paper); border-top: 1px solid var(--ink); bottom: 0; display: flex; gap: 1rem; justify-content: space-between; padding: .8rem 0; position: sticky; z-index: 5; }
 .actionBar > label { min-width: 13rem; }
 .actionBar > div { align-items: end; display: flex; flex-wrap: wrap; gap: .55rem; justify-content: flex-end; }
-.actionBar button, .moreActions button { background: var(--acid); border: 1px solid var(--ink); color: var(--acid-ink); cursor: pointer; font: inherit; font-size: .76rem; font-weight: 820; min-height: 3rem; padding: .68rem 1rem; }
+.actionBar button, .moreActions button { background: var(--acid); border: 1px solid var(--ink); color: var(--acid-ink); cursor: pointer; font: inherit; font-size: .76rem; font-weight: 650; min-height: 3rem; padding: .68rem 1rem; }
 .actionBar .secondary { background: var(--surface); color: var(--ink); }
 .evidence { border-left: 1px solid var(--line); padding-left: 1.25rem; }
 .evidenceSticky { position: sticky; top: 1.25rem; }
@@ -44,11 +44,11 @@
 .evidence article span { border: 1px solid var(--line); font-size: .62rem; padding: .2rem .32rem; text-transform: capitalize; }
 .evidence h3 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 400; letter-spacing: -.02em; margin: .65rem 0 .2rem; }
 .evidence article p, .revisions p { color: var(--muted); font-size: .72rem; margin: 0 0 .65rem; }
-.evidence article a { color: var(--cobalt); font-size: .73rem; font-weight: 770; text-decoration: underline; text-underline-offset: .2rem; }
+.evidence article a { color: var(--cobalt); font-size: .73rem; font-weight: 650; text-decoration: underline; text-underline-offset: .2rem; }
 .revisions { border-top: 1px solid var(--ink); margin-top: 2rem; padding-top: 1rem; }
 .revisions h2 { margin-bottom: .7rem; }
 .moreActions { border-top: 1px solid var(--ink); margin-top: 2rem; padding-top: .8rem; }
-.moreActions summary { cursor: pointer; font-size: .84rem; font-weight: 800; min-height: 2.75rem; padding: .6rem 0; }
+.moreActions summary { cursor: pointer; font-size: .84rem; font-weight: 650; min-height: 2.75rem; padding: .6rem 0; }
 .moreActions > p { color: var(--muted); font-size: .72rem; line-height: 1.4; }
 .moreActions form { border-top: 1px solid var(--line); display: grid; gap: .7rem; padding: .9rem 0; }
 .moreActions button { background: transparent; color: var(--ink); justify-self: start; min-height: 2.75rem; }

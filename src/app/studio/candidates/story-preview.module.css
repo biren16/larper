@@ -2,6 +2,6 @@
 .trigger { background: transparent !important; color: var(--ink) !important; text-decoration: underline; text-underline-offset: 4px; }
 .preview section { background: var(--paper); border: 1px solid var(--line); margin-top: 1rem; padding: clamp(1rem, 3vw, 2.5rem); }
 .preview section > p:first-child { font: 650 0.65rem/1 var(--font-sans); letter-spacing: 0.1em; text-transform: uppercase; }
-.preview h2 { font: 700 clamp(2rem, 4vw, 4rem)/0.94 var(--font-sans); letter-spacing: -0.04em; margin: 0.8rem 0; }
+.preview h2 { font: 680 clamp(2rem, 4vw, 4rem)/0.98 var(--font-sans); letter-spacing: -0.03em; margin: 0.8rem 0; }
 .preview h3 { font: 650 1rem/1.2 var(--font-sans); margin-top: 1.4rem; }
 .preview section p { color: var(--muted); line-height: 1.5; }

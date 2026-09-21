@@ -15,16 +15,16 @@
 .kicker {
   color: var(--muted);
   font-size: .72rem;
-  font-weight: 760;
+  font-weight: 600;
   letter-spacing: .045em;
   margin: 0;
 }
 
 .header h1 {
   font-size: clamp(2.8rem, 6vw, 4rem);
-  font-weight: 720;
-  letter-spacing: -.055em;
-  line-height: .9;
+  font-weight: 700;
+  letter-spacing: -.038em;
+  line-height: .94;
   margin: .4rem 0 0;
 }
 
@@ -54,7 +54,7 @@
 .successNotice strong { background: var(--acid); color: var(--acid-ink); padding: .2rem .4rem; }
 .errorNotice strong { background: var(--signal-red); color: #fff; padding: .2rem .4rem; }
 .pipelineNotice { color: var(--signal-red); }
-.pipelineNotice a { color: var(--cobalt); font-weight: 760; margin-left: auto; }
+.pipelineNotice a { color: var(--cobalt); font-weight: 650; margin-left: auto; }
 
 .deskGrid {
   align-items: start;
@@ -79,9 +79,9 @@
 .sectionHeading h2,
 .watchlist h2 {
   font-size: clamp(1.75rem, 3vw, 2.65rem);
-  font-weight: 720;
-  letter-spacing: -.045em;
-  line-height: .95;
+  font-weight: 680;
+  letter-spacing: -.03em;
+  line-height: 1;
   margin: .35rem 0 0;
 }
 
@@ -121,7 +121,7 @@
 .metrics { display: flex; gap: .25rem; margin: 0; }
 .metrics div { border-left: 1px solid var(--line); min-width: 3.7rem; padding-left: .55rem; }
 .metrics dt { color: var(--muted); font-size: .62rem; }
-.metrics dd { font-size: 1.05rem; font-weight: 780; margin: .12rem 0 0; }
+.metrics dd { font-size: 1.05rem; font-weight: 650; margin: .12rem 0 0; }
 
 .reviewLink,
 .signalLinks a,
@@ -129,7 +129,7 @@
 .emptyState > a {
   color: var(--cobalt);
   font-size: .78rem;
-  font-weight: 780;
+  font-weight: 650;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: .24rem;
@@ -169,12 +169,12 @@
   top: 1.25rem;
 }
 .composerHeader { align-items: start; display: flex; justify-content: space-between; }
-.composerHeader h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); letter-spacing: -.05em; margin: .35rem 0 0; }
+.composerHeader h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); letter-spacing: -.03em; line-height: 1; margin: .35rem 0 0; }
 .composerIntro { color: color-mix(in srgb, var(--feature-text) 68%, transparent); font-size: .8rem; line-height: 1.45; margin: .75rem 0 1.5rem; max-width: 34rem; }
 .closeComposer { display: none; }
 
 .signalForm { display: grid; gap: .9rem; }
-.signalForm label { display: grid; font-size: .72rem; font-weight: 720; gap: .28rem; }
+.signalForm label { display: grid; font-size: .72rem; font-weight: 600; gap: .28rem; }
 .signalForm input,
 .signalForm select,
 .signalForm textarea {
@@ -196,7 +196,7 @@
   border: 1px solid var(--acid);
   color: var(--acid-ink);
   cursor: pointer;
-  font-weight: 820;
+  font-weight: 650;
   min-height: 3rem;
   padding: .7rem 1rem;
 }
@@ -266,7 +266,7 @@
     color: var(--acid-ink);
     display: block;
     font: inherit;
-    font-weight: 820;
+    font-weight: 650;
     left: var(--gutter);
     min-height: 3.25rem;
     position: fixed;

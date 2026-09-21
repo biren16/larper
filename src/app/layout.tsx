@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Sans, Instrument_Serif } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif, Schibsted_Grotesk } from "next/font/google";
 import Script from "next/script";
 import { Suspense, type ReactNode } from "react";
 import { FollowedNichesProvider } from "@/components/preferences/followed-niches-provider";
@@ -21,6 +21,12 @@ const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
 });
 
+const schibstedGrotesk = Schibsted_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-schibsted-grotesk",
+});
+
 export const metadata: Metadata = {
   title: { default: "larper | Find your next obsession", template: "%s | larper" },
   description: "See what niche communities are obsessed with right now, then explore the context and lore behind it.",
@@ -32,7 +38,7 @@ const introStateScript = `(function(){try{if(sessionStorage.getItem("larper:intr
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html className={`${instrumentSans.variable} ${instrumentSerif.variable}`} lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html className={`${instrumentSans.variable} ${instrumentSerif.variable} ${schibstedGrotesk.variable}`} lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <a className="skipLink" href="#main-content">Skip to content</a>
         <FollowedNichesProvider>

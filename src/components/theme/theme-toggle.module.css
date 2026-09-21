@@ -6,7 +6,7 @@
 
 .legend {
   color: var(--muted);
-  font: 620 0.76rem/1 var(--font-sans);
+  font: 620 0.76rem/1 var(--font-shell);
   letter-spacing: 0.025em;
   margin-bottom: 0.8rem;
 }
@@ -20,7 +20,7 @@
 .option {
   color: var(--muted);
   cursor: pointer;
-  font: 650 1rem/1 var(--font-sans);
+  font: 650 1rem/1 var(--font-shell);
   padding: 0.35rem 0;
   position: relative;
   transition: color 180ms ease;

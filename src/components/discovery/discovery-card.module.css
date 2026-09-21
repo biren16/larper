@@ -15,8 +15,8 @@
 .meta { align-items: center; color: var(--muted); display: flex; flex-wrap: wrap; font: 650 0.68rem/1.2 var(--font-sans); gap: 0.55rem; }
 .meta > * + * { border-left: 1px solid currentColor; padding-left: 0.55rem; }
 .meta a { color: var(--ink); }
-.card h3 { font: 650 clamp(1.35rem, 2.2vw, 2.2rem)/1 var(--font-sans); letter-spacing: -0.03em; margin: 0.85rem 0 0.7rem; text-wrap: balance; }
-.hook { color: var(--muted); font: 470 0.88rem/1.42 var(--font-sans); max-width: 42ch; }
+.card h3 { font: 650 clamp(1.35rem, 2.2vw, 2.2rem)/1.04 var(--font-sans); letter-spacing: -0.022em; margin: 0.85rem 0 0.7rem; text-wrap: balance; }
+.hook { color: var(--muted); font: 450 0.9rem/1.5 var(--font-sans); max-width: 42ch; }
 .footer { align-items: flex-end; display: flex; gap: 1rem; justify-content: space-between; margin-top: auto; padding-top: 1.25rem; }
 .signals { color: var(--muted); display: flex; flex-wrap: wrap; font: 620 0.64rem/1.25 var(--font-sans); gap: 0.35rem 0.7rem; }
 .action { align-items: center; display: inline-flex; flex: none; font: 650 0.72rem/1 var(--font-sans); gap: 0.35rem; min-height: 2.75rem; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
@@ -29,7 +29,7 @@
 .lead .copy { background-color: rgb(15 16 15 / 0.9); background-image: linear-gradient(to top, rgb(15 16 15 / 0.98), rgb(15 16 15 / 0.6)); bottom: 0; color: var(--feature-text); left: 0; padding: 1.15rem 1.35rem; position: absolute; right: 0; }
 .lead .meta, .lead .hook, .lead .signals { color: var(--feature-muted); }
 .lead .meta a { color: var(--feature-text); }
-.lead h3 { font-size: clamp(2rem, 3vw, 3.15rem); line-height: 0.9; margin: 0.85rem 0 0.45rem; max-width: 17ch; }
+.lead h3 { font-size: clamp(2rem, 3vw, 3.15rem); line-height: 0.96; margin: 0.85rem 0 0.45rem; max-width: 17ch; }
 .lead .hook { display: -webkit-box; font-size: 0.8rem; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; }
 .lead .footer { padding-top: 0.65rem; }
 

@@ -8,8 +8,8 @@
 .intro::before { background: radial-gradient(circle, color-mix(in srgb, var(--ink) 22%, transparent) 0 1px, transparent 1.35px); background-size: 8px 8px; content: ""; height: 28%; left: 43%; opacity: 0.45; position: absolute; top: 4%; transform: rotate(-8deg); width: 27%; }
 .introCopy { grid-column: 1 / span 6; position: relative; z-index: 8; }
 .kicker { font: 650 0.82rem/1.2 var(--font-sans); margin-bottom: clamp(1.25rem, 2vw, 2rem); }
-.intro h1 { font: 700 clamp(4.7rem, 7.3vw, 7rem)/0.87 var(--font-sans); letter-spacing: -0.055em; max-width: 9.5ch; text-wrap: balance; }
-.dek { color: var(--muted); font: 560 clamp(1rem, 1.25vw, 1.18rem)/1.35 var(--font-sans); margin-top: 1.5rem; max-width: 40ch; }
+.intro h1 { font: 700 clamp(4.7rem, 7.3vw, 7rem)/0.91 var(--font-sans); letter-spacing: -0.042em; max-width: 9.5ch; text-wrap: balance; }
+.dek { color: var(--muted); font: 500 clamp(1rem, 1.25vw, 1.18rem)/1.48 var(--font-sans); margin-top: 1.5rem; max-width: 40ch; }
 .nowLink { align-items: center; border-bottom: 1px solid currentColor; display: inline-flex; font: 650 0.78rem/1 var(--font-sans); gap: 0.5rem; margin-top: 2rem; min-height: 2.75rem; }
 .nowLink svg { height: 1rem; width: 1rem; }
 .heroCollage { align-self: stretch; grid-column: 7 / -1; min-height: 34rem; position: relative; }
@@ -29,7 +29,7 @@
 .now { background: var(--surface); max-width: none; padding-left: max(var(--gutter), calc((100vw - var(--content)) / 2 + var(--gutter))); padding-right: max(var(--gutter), calc((100vw - var(--content)) / 2 + var(--gutter))); }
 .chapterHeading { align-items: end; display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr) minmax(14rem, 23rem); margin-bottom: clamp(2rem, 4vw, 4rem); }
 .chapterHeading > div > span, .stickyHeading > span, .loreIntro > span { color: var(--muted); display: block; font: 650 0.68rem/1 var(--font-sans); margin-bottom: 0.55rem; }
-.chapterHeading h2, .stickyHeading h2, .loreIntro h2 { font: 700 clamp(3rem, 5.6vw, 6.4rem)/0.9 var(--font-sans); letter-spacing: -0.05em; }
+.chapterHeading h2, .stickyHeading h2, .loreIntro h2 { font: 700 clamp(3rem, 5.6vw, 6.4rem)/0.94 var(--font-sans); letter-spacing: -0.038em; }
 .chapterHeading > p, .stickyHeading p, .loreIntro p { color: var(--muted); font: 500 0.95rem/1.45 var(--font-sans); max-width: 40ch; }
 .liveMark { align-items: center; display: flex !important; gap: 0.45rem; }
 .liveMark::before { background: var(--acid); border: 1px solid var(--ink); border-radius: 50%; content: ""; height: 0.65rem; width: 0.65rem; }
@@ -42,8 +42,8 @@
 .signalCopy { display: flex; flex-direction: column; min-width: 0; padding: clamp(1rem, 1.7vw, 1.5rem); }
 .signalMeta { color: var(--muted); display: flex; flex-wrap: wrap; font: 650 0.64rem/1.2 var(--font-sans); gap: 0.45rem 0.8rem; }
 .signalMeta a { color: var(--ink); }
-.signalCard h3 { font: 650 clamp(1.6rem, 2.8vw, 3.1rem)/0.96 var(--font-sans); letter-spacing: -0.035em; margin: 0.8rem 0; text-wrap: balance; }
-.signalCard p { color: var(--muted); font: 480 0.86rem/1.42 var(--font-sans); max-width: 45ch; }
+.signalCard h3 { font: 650 clamp(1.6rem, 2.8vw, 3.1rem)/1.01 var(--font-sans); letter-spacing: -0.024em; margin: 0.8rem 0; text-wrap: balance; }
+.signalCard p { color: var(--muted); font: 450 0.88rem/1.5 var(--font-sans); max-width: 45ch; }
 .signalAction { align-items: center; display: inline-flex; font: 650 0.72rem/1 var(--font-sans); gap: 0.35rem; margin-top: auto; min-height: 2.75rem; text-decoration: underline; text-underline-offset: 4px; }
 .signalAction svg { height: 0.9rem; width: 0.9rem; }
 .lead { min-height: calc(100svh - 8rem); }
@@ -68,7 +68,7 @@
 .nicheMedia > div { min-height: 100%; }
 .nicheCopy { display: flex; flex-direction: column; padding: 1.35rem; position: relative; }
 .nicheCopy > div { color: var(--muted); display: flex; font: 650 0.64rem/1 var(--font-sans); gap: 0.8rem; }
-.nicheCopy h3 { font: 700 clamp(2rem, 3vw, 3.4rem)/0.94 var(--font-sans); letter-spacing: -0.04em; margin-top: auto; }
+.nicheCopy h3 { font: 680 clamp(2rem, 3vw, 3.4rem)/0.98 var(--font-sans); letter-spacing: -0.028em; margin-top: auto; }
 .nicheCopy p { color: var(--muted); font: 500 0.8rem/1.35 var(--font-sans); margin-top: 0.55rem; max-width: 28ch; }
 .roundLink { align-items: center; border: 1px solid var(--line); border-radius: 50%; display: flex; height: 2.75rem; justify-content: center; position: absolute; right: 1rem; top: 1rem; width: 2.75rem; }
 .roundLink:hover { background: var(--acid); border-color: var(--acid); color: var(--acid-ink); }
@@ -82,7 +82,7 @@
 .curiosityMedia > div { min-height: 100%; }
 .curiosityCopy { align-items: flex-start; display: flex; flex-direction: column; padding: 1.3rem; }
 .curiosityCopy > span { color: var(--muted); font: 650 0.64rem/1 var(--font-sans); }
-.curiosityCopy h3 { font: 700 clamp(2rem, 3.2vw, 3.8rem)/0.94 var(--font-sans); letter-spacing: -0.04em; margin: 0.7rem 0; }
+.curiosityCopy h3 { font: 680 clamp(2rem, 3.2vw, 3.8rem)/0.98 var(--font-sans); letter-spacing: -0.028em; margin: 0.7rem 0; }
 .curiosityCopy p { color: var(--muted); font: 500 0.84rem/1.4 var(--font-sans); margin-bottom: 1.25rem; max-width: 34ch; }
 .curiosityCopy button { margin-top: auto; }
 .curiositySupport { grid-column: span 1; grid-template-columns: 0.9fr 1.1fr; min-height: 15rem; }

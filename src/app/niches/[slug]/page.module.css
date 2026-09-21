@@ -26,9 +26,9 @@
 .heroCopy { grid-column: 1 / span 5; position: relative; z-index: 2; }
 .eyebrow { color: var(--muted); font: 650 0.66rem/1 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; }
 .hero h1 {
-  font: 700 clamp(4rem, 8.5vw, 8.7rem)/0.88 var(--font-sans);
+  font: 700 clamp(4rem, 8.5vw, 8.7rem)/0.92 var(--font-sans);
   hyphens: none;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.038em;
   margin: clamp(3rem, 9vh, 7rem) 0 1.5rem;
   max-width: 9ch;
   overflow-wrap: normal;
@@ -70,7 +70,7 @@
 .chapterHeading > p,
 .loreIntro > p { color: var(--muted); font: 650 0.66rem/1 var(--font-sans); letter-spacing: 0.05em; text-transform: uppercase; }
 .chapterHeading h2,
-.loreIntro h2 { font: 700 clamp(3.3rem, 7vw, 7rem)/0.92 var(--font-sans); grid-column: 1; letter-spacing: -0.045em; text-wrap: balance; }
+.loreIntro h2 { font: 680 clamp(3.3rem, 7vw, 7rem)/0.96 var(--font-sans); grid-column: 1; letter-spacing: -0.034em; text-wrap: balance; }
 .chapterHeading > span,
 .loreIntro > span { color: var(--muted); font: 450 0.9rem/1.5 var(--font-sans); grid-column: 2; grid-row: 2; max-width: 42ch; }
 
@@ -101,7 +101,7 @@
 .relatedRail > a:hover .relatedArt > div { transform: scale(1.018); }
 .relatedCopy { display: grid; grid-template-columns: 1fr auto; padding: clamp(1.2rem, 2.5vw, 2rem); }
 .relatedCopy small { color: var(--muted); font: 600 0.62rem/1 var(--font-sans); grid-column: 1 / -1; margin-bottom: 2rem; text-transform: uppercase; }
-.relatedCopy strong { font: 650 clamp(2rem, 3.6vw, 3.7rem)/0.94 var(--font-sans); letter-spacing: -0.035em; }
+.relatedCopy strong { font: 650 clamp(2rem, 3.6vw, 3.7rem)/0.99 var(--font-sans); letter-spacing: -0.026em; }
 .relatedCopy em { align-items: center; align-self: end; display: inline-flex; font: 600 0.7rem/1 var(--font-sans); font-style: normal; gap: 0.4rem; min-height: 2.75rem; }
 .relatedCopy svg { height: 1rem; width: 1rem; }
 
