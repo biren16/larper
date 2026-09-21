@@ -7,7 +7,6 @@ import { rankCurrentTopics } from "@/domain/discovery/ranking";
 import { useFollowedNiches } from "@/components/preferences/followed-niches-provider";
 import { FollowButton } from "@/components/preferences/follow-button";
 import { Artwork } from "./artwork";
-import { DiscoveryIntro } from "./discovery-intro";
 import { buildSignalCue, getCuriosityAction } from "./topic-presentation";
 import styles from "./discovery-home.module.css";
 
@@ -57,7 +56,6 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
 
   return (
     <main id="main-content" className={styles.main}>
-      <DiscoveryIntro />
       <header className={styles.intro}>
         <div className={styles.introCopy}>
           <p className={styles.kicker}>Find new shit to get obsessed with.</p>
