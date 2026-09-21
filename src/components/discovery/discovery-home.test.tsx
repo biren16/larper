@@ -44,7 +44,7 @@ describe("DiscoveryHome", () => {
   });
 
   it("renders an honest verified-edition state when no publishable signals exist", () => {
-    render(
+    const { container } = render(
       <FollowedNichesProvider knownNicheIds={[]}>
         <DiscoveryHome home={{ niches: [], followedNiches: [], recommendedNiches: [], currentTopics: [], deepLore: [], verifiedAt: null }} />
       </FollowedNichesProvider>,
@@ -52,6 +52,7 @@ describe("DiscoveryHome", () => {
 
     expect(screen.getByRole("heading", { name: "The radar is recalibrating." })).toBeInTheDocument();
     expect(screen.getByText(/no verified stories are ready yet/i)).toBeInTheDocument();
+    expect(container.querySelector("[data-empty-radar-visual]")).toHaveAttribute("aria-hidden", "true");
     expect(screen.queryByText(/fictional|demo trends/i)).not.toBeInTheDocument();
   });
 });

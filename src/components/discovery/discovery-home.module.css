@@ -1,9 +1,22 @@
 .main { overflow: clip; }
-.emptyRadar { align-items: flex-start; display: flex; flex-direction: column; justify-content: center; min-height: calc(100dvh - 9rem); padding: clamp(4rem, 10vw, 9rem) var(--gutter); }
-.emptyRadar > span { font: 650 0.72rem/1 var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; }
-.emptyRadar h1 { font-family: var(--font-serif); font-size: clamp(3.5rem, 9vw, 8.5rem); font-weight: 400; letter-spacing: -0.035em; line-height: 0.94; margin: 1rem 0 1.5rem; max-width: 9ch; }
-.emptyRadar p { font: 500 clamp(1rem, 1.6vw, 1.3rem)/1.5 var(--font-sans); max-width: 44rem; }
-.emptyRadar small { margin-top: 1.5rem; opacity: 0.68; }
+.emptyRadar { align-items: center; display: grid; gap: clamp(3rem, 7vw, 9rem); grid-template-columns: minmax(0, 0.92fr) minmax(20rem, 1.08fr); margin: 0 auto; max-width: var(--content); min-height: calc(100dvh - 9rem); overflow: hidden; padding: clamp(4rem, 8vw, 7rem) var(--gutter); }
+.emptyCopy { min-width: 0; position: relative; z-index: 1; }
+.emptyCopy > span { align-items: center; display: flex; font: 650 0.7rem/1 var(--font-sans); gap: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.emptyCopy > span::before { background: var(--acid); border: 1px solid var(--ink); border-radius: 50%; content: ""; height: 0.62rem; width: 0.62rem; }
+.emptyRadar h1 { font: 700 clamp(3.75rem, 6.7vw, 7rem)/0.92 var(--font-sans); letter-spacing: -0.042em; margin: 1.1rem 0 1.5rem; max-width: 10ch; text-wrap: balance; }
+.emptyRadar p { color: var(--muted); font: 450 clamp(1rem, 1.25vw, 1.18rem)/1.55 var(--font-sans); max-width: 39rem; }
+.emptyRadar small { color: var(--muted); display: block; font: 500 0.74rem/1.4 var(--font-sans); margin-top: 1.5rem; }
+.emptyVisual { aspect-ratio: 1; border: 1px solid var(--line); border-radius: 50%; justify-self: end; max-width: 38rem; position: relative; width: 100%; }
+.emptyVisual::before, .emptyVisual::after { content: ""; position: absolute; }
+.emptyVisual::before { border-block: 1px solid var(--line); inset: calc(50% - 0.5px) 0 auto; }
+.emptyVisual::after { border-inline: 1px solid var(--line); inset: 0 auto 0 calc(50% - 0.5px); }
+.scanOrbit { border: 1px solid var(--line); border-radius: 50%; display: grid; inset: 16%; place-items: center; position: absolute; }
+.scanOrbit::before, .scanOrbit::after { border: 1px solid var(--line); border-radius: 50%; content: ""; position: absolute; }
+.scanOrbit::before { inset: 22%; }
+.scanOrbit::after { border-color: color-mix(in srgb, var(--cobalt) 72%, var(--line)); inset: 39%; }
+.scanCore { background: var(--cobalt); border: 0.45rem solid var(--paper); border-radius: 50%; box-shadow: 0 0 0 1px var(--cobalt); height: 1.4rem; width: 1.4rem; z-index: 1; }
+.scanTarget { background: var(--acid); border: 1px solid var(--ink); border-radius: 50%; height: 1rem; position: absolute; right: 13%; top: 27%; width: 1rem; }
+.scanTarget::after { border: 1px solid var(--ink); border-radius: 50%; content: ""; inset: -0.55rem; position: absolute; }
 .intro { align-items: center; display: grid; gap: clamp(2rem, 4vw, 5rem); grid-template-columns: repeat(12, minmax(0, 1fr)); margin: 0 auto; max-width: var(--content); min-height: calc(100svh - 4.5rem); padding: clamp(2rem, 4vw, 4rem) var(--gutter); position: relative; }
 .intro::before { background: radial-gradient(circle, color-mix(in srgb, var(--ink) 22%, transparent) 0 1px, transparent 1.35px); background-size: 8px 8px; content: ""; height: 28%; left: 43%; opacity: 0.45; position: absolute; top: 4%; transform: rotate(-8deg); width: 27%; }
 .introCopy { grid-column: 1 / span 6; position: relative; z-index: 8; }
@@ -138,6 +151,9 @@
   .curiosity:nth-child(1) { grid-row: auto; }
 }
 @media (max-width: 767px) {
+  .emptyRadar { align-items: start; gap: 3.5rem; grid-template-columns: minmax(0, 1fr); padding-block: 4rem; }
+  .emptyRadar h1 { font-size: clamp(3.25rem, 15vw, 4.5rem); max-width: 8ch; }
+  .emptyVisual { justify-self: start; max-width: 22rem; width: min(92vw, 100%); }
   .intro { display: flex; flex-direction: column; gap: 2rem; min-height: calc(100dvh - 4.5rem); padding-block: 2.5rem; }
   .intro::before { left: auto; right: -8%; top: 5%; width: 58%; }
   .intro h1 { font-size: clamp(3.45rem, 15.5vw, 5rem); max-width: 8ch; }
