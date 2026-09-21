@@ -1,12 +1,15 @@
 import { notFound, redirect } from "next/navigation";
 import { getEditorialRuntime } from "@/backend/editorial/runtime";
 import { StudioDashboard } from "./studio-dashboard";
-import { addManualSignalAction, createSourceAction, toggleSourceAction } from "./actions";
+import { addManualSignalAction } from "./actions";
 
-export default async function StudioPage() {
+export default async function StudioPage({ searchParams }: { searchParams: Promise<{ notice?: string | string[]; error?: string | string[] }> }) {
   const runtime = await authorizedRuntime();
-  return <StudioDashboard data={await runtime.reader.dashboard()} manualSignalAction={addManualSignalAction} createSourceAction={createSourceAction} toggleSourceAction={toggleSourceAction} />;
+  const query = await searchParams;
+  return <StudioDashboard data={await runtime.reader.dashboard()} manualSignalAction={addManualSignalAction} notice={first(query.notice)} error={first(query.error)} />;
 }
+
+function first(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
 
 async function authorizedRuntime() {
   try {
