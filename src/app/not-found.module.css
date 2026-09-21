@@ -1,5 +1,4 @@
 .main { margin: 0 auto; max-width: var(--content); min-height: 70dvh; padding: clamp(5rem, 12vw, 11rem) var(--gutter); }
 .main p { font: 650 0.82rem/1 var(--font-sans); }
-.main h1 { font: 540 clamp(4rem, 10vw, 9rem)/0.88 var(--font-serif); letter-spacing: -0.06em; margin: 3rem 0; max-width: 8ch; }
+.main h1 { font: 400 clamp(4rem, 10vw, 9rem)/0.94 var(--font-serif); letter-spacing: -0.035em; margin: 3rem 0; max-width: 8ch; }
 .main a { border-bottom: 1px solid var(--ink); font-weight: 650; padding-bottom: 0.3rem; }
-

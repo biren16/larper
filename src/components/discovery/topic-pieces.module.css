@@ -6,20 +6,20 @@
 .leadCopy { align-items: flex-start; background: var(--feature-bg); color: var(--feature-text); display: flex; flex-direction: column; justify-content: space-between; padding: clamp(1.5rem, 3vw, 3rem); }
 .leadCopy .meta, .leadCopy .meta a { color: var(--feature-muted); }
 .leadCopy .meta > * + * { border-color: var(--feature-line); }
-.leadCopy h3 { font: 560 clamp(2.4rem, 5vw, 5.8rem)/0.88 var(--font-serif); letter-spacing: -0.055em; margin: 2rem 0 1rem; max-width: 9ch; }
+.leadCopy h3 { font: 400 clamp(2.4rem, 5vw, 5.8rem)/0.94 var(--font-serif); letter-spacing: -0.035em; margin: 2rem 0 1rem; max-width: 9ch; }
 .leadCopy p { color: var(--feature-muted); font: 450 1rem/1.55 var(--font-sans); max-width: 35ch; }
 .signalLine { border-top: 1px solid var(--feature-line); display: flex; font: 600 0.75rem/1 var(--font-sans); gap: 1rem; margin-top: 2rem; padding-top: 1rem; text-transform: lowercase; width: 100%; }
 .row { align-items: center; border-bottom: 1px solid var(--line); display: grid; gap: 1.2rem; grid-template-columns: 2.25rem minmax(0, 1fr) 2.75rem; padding: 1.25rem 0; }
 .rowWithoutRank { grid-template-columns: minmax(0, 1fr) 2.75rem; }
 .rank { color: var(--muted); font: 500 0.75rem/1 var(--font-sans); }
-.rowCopy h3 { font: 560 clamp(1.35rem, 2vw, 2rem)/1.05 var(--font-serif); letter-spacing: -0.025em; margin: 0.55rem 0 0.45rem; }
+.rowCopy h3 { font: 400 clamp(1.35rem, 2vw, 2rem)/1.08 var(--font-serif); letter-spacing: -0.015em; margin: 0.55rem 0 0.45rem; }
 .rowCopy p { color: var(--muted); font: 440 0.9rem/1.45 var(--font-sans); max-width: 62ch; }
 .arrow { align-items: center; border: 1px solid var(--line); border-radius: 50%; display: flex; height: 2.75rem; justify-content: center; width: 2.75rem; }
 .arrow:hover { background: var(--acid); border-color: var(--acid); color: var(--acid-ink); }
 .arrow svg { height: 1.1rem; width: 1.1rem; }
 .lore { display: grid; gap: 1rem; grid-template-rows: 15rem auto; }
 .loreImage { min-height: 15rem; }
-.lore h3 { font: 560 1.65rem/1.05 var(--font-serif); letter-spacing: -0.025em; margin: 0.65rem 0 0.5rem; }
+.lore h3 { font: 400 1.65rem/1.08 var(--font-serif); letter-spacing: -0.015em; margin: 0.65rem 0 0.5rem; }
 .lore p { color: var(--muted); font: 440 0.9rem/1.5 var(--font-sans); }
 
 @media (max-width: 767px) {

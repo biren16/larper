@@ -4,27 +4,27 @@
 .backRow svg { height: 1rem; width: 1rem; }
 .hero { border: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr); min-height: 32rem; }
 .titleBlock { align-items: flex-start; background: var(--surface); display: flex; flex-direction: column; min-width: 0; padding: clamp(1.4rem, 3.5vw, 3.5rem); }
-.nicheLink { border-bottom: 1px solid currentColor; font: 700 0.78rem/1 var(--font-sans); padding-bottom: 0.25rem; }
-.titleBlock h1 { font: 650 clamp(3.1rem, 6.4vw, 6.8rem)/0.86 var(--font-sans); letter-spacing: -0.065em; margin: auto 0 1.25rem; max-width: 9ch; overflow-wrap: anywhere; text-wrap: balance; }
+.nicheLink { border-bottom: 1px solid currentColor; font: 650 0.78rem/1 var(--font-sans); padding-bottom: 0.25rem; }
+.titleBlock h1 { font: 700 clamp(3.1rem, 6.4vw, 6.8rem)/0.9 var(--font-sans); letter-spacing: -0.05em; margin: auto 0 1.25rem; max-width: 9ch; overflow-wrap: anywhere; text-wrap: balance; }
 .titleBlock > p { color: var(--muted); font: 470 1rem/1.48 var(--font-sans); max-width: 42ch; }
-.signals { border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; font: 680 0.68rem/1 var(--font-sans); gap: 0.55rem 1rem; margin-top: 1.6rem; padding-top: 0.9rem; width: 100%; }
+.signals { border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; font: 600 0.68rem/1 var(--font-sans); gap: 0.55rem 1rem; margin-top: 1.6rem; padding-top: 0.9rem; width: 100%; }
 .signals span:first-child { background: var(--acid); color: var(--acid-ink); padding: 0.35rem 0.5rem; }
 .heroArt { min-height: 32rem; }
 .story { display: grid; grid-template-columns: 1fr 1fr; margin: clamp(3.5rem, 7vw, 7rem) auto; max-width: 74rem; scroll-margin-top: 6rem; }
 .story section, .story aside { border-top: 1px solid var(--line); min-height: 16rem; padding: 1.4rem clamp(1rem, 3vw, 3rem) 2.5rem 0; scroll-margin-top: 6rem; }
 .story section:nth-child(even), .story aside { border-left: 1px solid var(--line); padding-left: clamp(1rem, 3vw, 3rem); }
-.story h2 { font: 620 clamp(1.9rem, 3.1vw, 3rem)/0.95 var(--font-sans); letter-spacing: -0.045em; margin-bottom: 1.5rem; }
+.story h2 { font: 650 clamp(1.9rem, 3.1vw, 3rem)/0.98 var(--font-sans); letter-spacing: -0.03em; margin-bottom: 1.5rem; }
 .story p { color: var(--muted); font: 450 clamp(1rem, 1.25vw, 1.12rem)/1.65 var(--font-sans); max-width: 48ch; }
-.loreSection p { color: var(--ink); font: 470 clamp(1.3rem, 1.8vw, 1.7rem)/1.5 var(--font-serif); }
+.loreSection p { color: var(--ink); font: 400 clamp(1.3rem, 1.8vw, 1.7rem)/1.55 var(--font-serif); }
 .story aside { background: var(--acid); color: var(--acid-ink); }
 .story aside p { color: var(--acid-ink); }
 .sources, .related { border-top: 1px solid var(--line); padding: clamp(3rem, 6vw, 5.5rem) 0; }
-.sources > h2, .related > h2 { font: 650 clamp(2.4rem, 4.5vw, 4.6rem)/0.9 var(--font-sans); letter-spacing: -0.055em; }
+.sources > h2, .related > h2 { font: 700 clamp(2.4rem, 4.5vw, 4.6rem)/0.94 var(--font-sans); letter-spacing: -0.04em; }
 .sourceNote { color: var(--muted); font: 450 0.85rem/1.5 var(--font-sans); margin: 0.8rem 0 2rem; max-width: 55ch; }
 .sourceGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .sourceGrid article, .sourceGrid a { border: 1px solid var(--line); border-right: 0; min-height: 11rem; padding: 1.15rem; position: relative; }
 .sourceGrid > :last-child { border-right: 1px solid var(--line); }
-.sourceGrid span { color: var(--muted); font: 680 0.66rem/1 var(--font-sans); }
+.sourceGrid span { color: var(--muted); font: 600 0.66rem/1 var(--font-sans); }
 .sourceGrid h3 { font: 620 1.15rem/1.05 var(--font-sans); margin: 2rem 0 0.45rem; }
 .sourceGrid p { color: var(--muted); font: 440 0.8rem/1.45 var(--font-sans); }
 .sourceGrid svg { height: 1rem; position: absolute; right: 1.1rem; top: 1.1rem; width: 1rem; }

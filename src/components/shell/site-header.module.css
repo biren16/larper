@@ -18,15 +18,15 @@
 }
 
 .wordmark {
-  font: 820 1.8rem/0.9 var(--font-sans);
+  font: 700 1.8rem/0.95 var(--font-sans);
   justify-self: start;
-  letter-spacing: -0.085em;
+  letter-spacing: -0.055em;
   transition: opacity 150ms ease;
 }
 
 .wordmark:hover { opacity: 0.62; }
 .actions { align-items: center; display: flex; gap: 0.35rem; justify-self: end; }
-.accountLink { background: transparent; border: 0; color: inherit; cursor: pointer; font: 680 0.7rem/1 var(--font-sans); min-height: 2.75rem; padding: 0.8rem 0.35rem; }
+.accountLink { background: transparent; border: 0; color: inherit; cursor: pointer; font: 600 0.7rem/1 var(--font-sans); min-height: 2.75rem; padding: 0.8rem 0.35rem; }
 .menuFallback { display: block; height: 3rem; width: 3rem; }
 
 @media (max-width: 600px) {

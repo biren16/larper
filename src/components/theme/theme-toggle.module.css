@@ -20,7 +20,7 @@
 .option {
   color: var(--muted);
   cursor: pointer;
-  font: 680 1rem/1 var(--font-sans);
+  font: 650 1rem/1 var(--font-sans);
   padding: 0.35rem 0;
   position: relative;
   transition: color 180ms ease;
