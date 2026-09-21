@@ -8,6 +8,12 @@ import { SaveButton } from "./save-button";
 export async function SavedStoryControl({ storyId, returnPath }: { storyId: string; returnPath: string }) {
   const [user, client] = await Promise.all([getCurrentAccountUser(), createServerSupabaseClient()]);
   if (!user || !client) return <Link href={`/auth?next=${encodeURIComponent(returnPath)}`}>Sign in to save</Link>;
-  const saved = await new AccountService(new SupabaseAccountStore(client)).isSaved(user, storyId);
+  let saved: boolean;
+  try {
+    saved = await new AccountService(new SupabaseAccountStore(client)).isSaved(user, storyId);
+  } catch (error) {
+    console.error("Load saved story state failed", error);
+    return null;
+  }
   return <SaveButton storyId={storyId} initialSaved={saved} />;
 }
