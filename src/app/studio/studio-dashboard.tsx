@@ -2,6 +2,7 @@ import Link from "next/link";
 import styles from "./studio.module.css";
 
 export interface StudioDashboardData {
+  niches?: Array<{ id: string; name: string }>;
   candidates: Array<{ id: string; title: string; nicheName: string; heat: number; confidence: number; state: string; sourceCount: number; lastCheckedAt: string; sensitiveFlags: string[] }>;
   sources: Array<{ id: string; name: string; adapterType: string; active: boolean; healthy: boolean; lastPolledAt: string | null; failureCount: number }>;
   runs: Array<{ id: string; status: string; startedAt: string; insertedCount: number; errorCount: number }>;
@@ -65,9 +66,11 @@ export function StudioDashboard({ data, manualSignalAction, createSourceAction, 
         <section aria-labelledby="manual-heading">
           <div className={styles.sectionHeading}><div><p>Hard-to-access platforms</p><h2 id="manual-heading">Add signal</h2></div></div>
           <form className={styles.manualForm} aria-label="Add a manual signal" action={manualSignalAction}>
+            <label>Platform<select name="platform" defaultValue="instagram"><option value="instagram">Instagram</option><option value="tiktok">TikTok</option><option value="reddit">Reddit</option><option value="x">X</option><option value="youtube">YouTube</option><option value="web">Web</option></select></label>
             <label>Public URL<input name="url" type="url" required placeholder="https://…" /></label>
             <label>What is moving?<input name="title" required maxLength={180} /></label>
-            <div><label>Source name<input name="sourceName" required /></label><label>Region<select name="region" defaultValue="india"><option value="india">India</option><option value="global">Global</option></select></label></div>
+            <div><label>Source name<input name="sourceName" required /></label><label>Niche<select name="suggestedNicheId" defaultValue=""><option value="">Choose later</option>{data.niches?.map((niche) => <option key={niche.id} value={niche.id}>{niche.name}</option>)}</select></label><label>Region<select name="region" defaultValue="india"><option value="india">India</option><option value="global">Global</option></select></label></div>
+            <label>Why does it feel like it is moving?<textarea name="observationNote" rows={3} /></label>
             <label>Published at<input name="publishedAt" type="datetime-local" required /></label>
             <button type="submit">Add to evidence inbox</button>
           </form>

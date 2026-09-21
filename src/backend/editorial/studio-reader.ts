@@ -12,7 +12,7 @@ export class StudioReader {
 
   async dashboard(): Promise<StudioDashboardData> {
     const [clusters, niches, sources, failures, runs, links] = await Promise.all([
-      this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, state, last_checked_at, sensitive_flags").in("state", ["detected", "reviewing"]).order("heat", { ascending: false }).limit(50),
+      this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, state, editorial_stage, last_checked_at, sensitive_flags").in("state", ["detected", "reviewing"]).order("heat", { ascending: false }).limit(50),
       this.client.from("niches").select("id, name"),
       this.client.from("source_definitions").select("id, name, adapter_type, active, last_polled_at").order("name"),
       this.client.from("source_failures").select("source_definition_id").is("resolved_at", null),
@@ -26,9 +26,10 @@ export class StudioReader {
     const signalCounts = new Map<string, number>();
     (links.data ?? []).forEach((row) => signalCounts.set(row.cluster_id, (signalCounts.get(row.cluster_id) ?? 0) + 1));
     return {
+      niches: (niches.data ?? []).map((row) => ({ id: row.id, name: row.name })),
       candidates: (clusters.data ?? []).map((row) => ({
         id: row.id, title: row.title, nicheName: row.niche_id ? nicheNames.get(row.niche_id) ?? "Unassigned" : "Unassigned",
-        heat: Number(row.heat), confidence: Number(row.confidence), state: row.state,
+        heat: Number(row.heat), confidence: Number(row.confidence), state: row.editorial_stage,
         sourceCount: signalCounts.get(row.id) ?? 0, lastCheckedAt: row.last_checked_at, sensitiveFlags: row.sensitive_flags,
       })),
       sources: (sources.data ?? []).map((row) => ({

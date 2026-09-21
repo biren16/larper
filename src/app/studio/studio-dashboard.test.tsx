@@ -16,5 +16,7 @@ describe("StudioDashboard", () => {
     expect(screen.getByText("Culture Desk")).toBeInTheDocument();
     expect(screen.getByText("Last run succeeded")).toBeInTheDocument();
     expect(screen.getByRole("form", { name: "Add a manual signal" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Platform")).toBeInTheDocument();
+    expect(screen.getByLabelText("Niche")).toBeInTheDocument();
   });
 });
