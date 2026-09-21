@@ -3,7 +3,7 @@
 .breadcrumb a { color: var(--cobalt); font-weight: 650; text-decoration: underline; text-underline-offset: .2rem; }
 .header { align-items: end; border-bottom: 1px solid var(--ink); display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr) auto; padding-bottom: 1.2rem; }
 .header p { color: var(--muted); font-size: .72rem; font-weight: 600; margin: 0; text-transform: capitalize; }
-.header h1 { font-family: var(--font-serif); font-size: clamp(2.25rem, 5vw, 4rem); font-weight: 400; letter-spacing: -.03em; line-height: .98; margin: .4rem 0 0; max-width: 18ch; }
+.header h1 { font-size: clamp(2.25rem, 5vw, 4rem); font-weight: 700; letter-spacing: -.038em; line-height: .94; margin: .4rem 0 0; max-width: 18ch; }
 .header dl { display: grid; grid-template-columns: repeat(4, auto); margin: 0; }
 .header dl div { border-left: 1px solid var(--line); min-width: 5.5rem; padding-left: .65rem; }
 .header dt { color: var(--muted); font-size: .62rem; }
@@ -42,7 +42,7 @@
 .evidence article { border-bottom: 1px solid var(--line); padding: .9rem 0; }
 .evidence article div { display: flex; gap: .35rem; }
 .evidence article span { border: 1px solid var(--line); font-size: .62rem; padding: .2rem .32rem; text-transform: capitalize; }
-.evidence h3 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 400; letter-spacing: -.02em; margin: .65rem 0 .2rem; }
+.evidence h3 { font-size: 1.2rem; font-weight: 650; letter-spacing: -.02em; margin: .65rem 0 .2rem; }
 .evidence article p, .revisions p { color: var(--muted); font-size: .72rem; margin: 0 0 .65rem; }
 .evidence article a { color: var(--cobalt); font-size: .73rem; font-weight: 650; text-decoration: underline; text-underline-offset: .2rem; }
 .revisions { border-top: 1px solid var(--ink); margin-top: 2rem; padding-top: 1rem; }

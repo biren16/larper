@@ -99,10 +99,9 @@
 
 .candidateCopy h3,
 .signalRow h3 {
-  font-family: var(--font-serif);
   font-size: clamp(1.35rem, 2.35vw, 2rem);
-  font-weight: 400;
-  letter-spacing: -.02em;
+  font-weight: 680;
+  letter-spacing: -.03em;
   line-height: 1;
   margin: .35rem 0;
 }
@@ -144,7 +143,7 @@
   min-height: 9rem;
   padding: 1.5rem;
 }
-.emptyState strong { font-family: var(--font-serif); font-size: 1.55rem; font-weight: 400; }
+.emptyState strong { font-size: 1.55rem; font-weight: 650; }
 .emptyState p, .quietEmpty { color: var(--muted); font-size: .85rem; margin: .35rem 0 0; }
 .quietEmpty { border-top: 1px solid var(--ink); padding: 1.5rem 0; }
 

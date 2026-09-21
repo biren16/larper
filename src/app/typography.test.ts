@@ -37,12 +37,6 @@ describe("global typography", () => {
     }
   });
 
-  it("keeps Studio editorial headings on Instrument Serif's supported regular weight", () => {
-    const storyEditor = read("./studio/candidates/story-editor.module.css");
-
-    expect(storyEditor).toMatch(/\.evidence h3 \{[^}]*font-weight: 400;/);
-  });
-
   it("removes the superseded Fontsource packages", () => {
     const packageJson = JSON.parse(read("../../package.json")) as { dependencies: Record<string, string> };
 
