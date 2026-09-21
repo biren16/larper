@@ -48,7 +48,7 @@ export function StudioDashboard({ data, manualSignalAction, createSourceAction, 
           <div className={styles.sourceList}>{data.sources.map((source) => (
             <article key={source.id} className={styles.sourceRow}>
               <span className={styles.health} data-healthy={source.healthy} aria-label={source.healthy ? "Healthy" : "Needs attention"} />
-              <div><strong>{source.name}</strong><small>{source.adapterType} · polled {time(source.lastPolledAt)}</small></div>
+              <div><strong>{source.name}</strong><small>{source.adapterType} · polled {time(source.lastPolledAt)}</small>{source.adapterType === "trend" && <small>Waiting for official API access</small>}</div>
               <span>{source.failureCount} failures</span>
               {toggleSourceAction && <form action={toggleSourceAction}><input type="hidden" name="sourceId" value={source.id} /><input type="hidden" name="active" value={source.active ? "false" : "true"} /><button type="submit">{source.active ? "Pause" : "Activate"}</button></form>}
             </article>
@@ -64,7 +64,7 @@ export function StudioDashboard({ data, manualSignalAction, createSourceAction, 
         </section>
 
         <section aria-labelledby="manual-heading">
-          <div className={styles.sectionHeading}><div><p>Hard-to-access platforms</p><h2 id="manual-heading">Add signal</h2></div></div>
+          <div className={styles.sectionHeading}><div><p>Internet culture · hard-to-access platforms</p><h2 id="manual-heading">Add signal</h2></div></div>
           <form className={styles.manualForm} aria-label="Add a manual signal" action={manualSignalAction}>
             <label>Platform<select name="platform" defaultValue="instagram"><option value="instagram">Instagram</option><option value="tiktok">TikTok</option><option value="reddit">Reddit</option><option value="x">X</option><option value="youtube">YouTube</option><option value="web">Web</option></select></label>
             <label>Public URL<input name="url" type="url" required placeholder="https://…" /></label>
