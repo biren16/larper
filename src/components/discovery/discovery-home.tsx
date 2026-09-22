@@ -69,7 +69,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
       </header>
 
       <section className={styles.now} aria-labelledby="larping-now">
-        <div className={styles.chapterHeading}><div><span className={styles.liveMark}>Active signals</span><h2 id="larping-now">Internet RN</h2></div><p>The drops, memes and micro-drama moving fastest through niche communities.</p></div>
+        <div className={styles.chapterHeading}><div><h2 id="larping-now">Internet RN</h2></div><p>The drops, memes and micro-drama moving fastest through niche communities.</p></div>
         <div className={styles.currentScene}>
           <div className={styles.leadStage}><HomeSignalCard item={currentTopics[0]} layout="lead" /></div>
           <div className={styles.spotlightStack}>{currentTopics.slice(1, 5).map((item) => <HomeSignalCard key={item.topic.id} item={item} layout="spotlight" />)}</div>
@@ -78,7 +78,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
       </section>
 
       <section className={styles.yours} aria-labelledby="your-larps">
-        <div className={styles.stickyHeading}><span>Your active worlds</span><h2 id="your-larps">Your Larps</h2><p>The niche tabs you never really close.</p></div>
+        <div className={styles.stickyHeading}><span>Your active worlds</span><h2 id="your-larps">Your Niches</h2><p>The tabs you never really close.</p></div>
         <div className={styles.nicheRail}>{followed.map((niche) => {
           const latest = currentTopics.find((item) => item.niche.id === niche.id) ?? home.deepLore.find((item) => item.niche.id === niche.id);
           const cue = latest ? buildSignalCue(latest.topic, latest.sources) : null;

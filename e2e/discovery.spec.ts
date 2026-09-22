@@ -88,13 +88,13 @@ test("moves from a contextual action to its explanation and niche", async ({ pag
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("F1");
 });
 
-test("persists a newly followed niche inside Your Larps", async ({ page }) => {
+test("persists a newly followed niche inside Your Niches", async ({ page }) => {
   await page.goto("/");
   const button = page.getByRole("button", { name: "Start larping in Mechanical Keyboards" });
   await button.scrollIntoViewIfNeeded();
   await button.click();
   await page.reload();
-  const yourLarps = page.locator("section").filter({ has: page.getByRole("heading", { name: "Your Larps" }) });
+  const yourLarps = page.locator("section").filter({ has: page.getByRole("heading", { name: "Your Niches" }) });
   await expect(yourLarps.getByRole("heading", { name: "Mechanical Keyboards" })).toBeVisible();
 });
 
@@ -209,7 +209,7 @@ test("narrow signal rails keep compact stories readable without stretching them"
   expect(metrics.lineClamp).toBe("none");
 });
 
-test("Your Larps keeps its title and metadata inside a 320px card", async ({ page, isMobile }) => {
+test("Your Niches keeps its title and metadata inside a 320px card", async ({ page, isMobile }) => {
   test.skip(isMobile, "desktop project owns the exact 320px viewport");
   await page.setViewportSize({ width: 320, height: 720 });
   await page.goto("/");

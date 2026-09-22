@@ -29,6 +29,7 @@ describe("DiscoveryHome", () => {
     const nowHeading = screen.getByRole("heading", { name: "Internet RN" });
     const nowSection = nowHeading.closest("section");
     expect(nowSection).not.toBeNull();
+    expect(within(nowSection!).queryByText("Active signals")).not.toBeInTheDocument();
     const nowStories = within(nowSection!).getAllByRole("article");
     expect(nowStories).toHaveLength(7);
     expect(within(nowStories[0]).getByRole("heading", { name: currentTopicsTitle(home, 0) })).toBeInTheDocument();
@@ -37,7 +38,8 @@ describe("DiscoveryHome", () => {
       expect(within(story).getByText(`${home.currentTopics[index + 1].sourceCount} signals`)).toBeInTheDocument();
     });
     expect(within(nowSection!).getAllByRole("link", { name: /go deeper|wtf is this|why do people care/i }).length).toBeGreaterThan(3);
-    expect(screen.getByRole("heading", { name: "Your Larps" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your Niches" })).toBeInTheDocument();
+    expect(screen.getByText("The tabs you never really close.")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Go larp something new" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Missed the origin story?" })).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: /silver runners are back in rotation/i }).length).toBeGreaterThan(0);
