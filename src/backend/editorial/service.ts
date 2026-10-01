@@ -171,8 +171,6 @@ export class EditorialService {
   async addManualSignal(actor: EditorialActor | null, input: ManualSignalInput, sourceDefinitionId: string, observedAt: string) {
     assertEditorialAccess(actor, this.allowlistedEmails);
     const signal = normalizeManualSignal(input, sourceDefinitionId, observedAt);
-    const id = await this.store.addManualSignal(signal);
-    await this.store.recordReview({ candidateId: id, reviewerId: actor.id, action: "manual_signal", notes: signal.canonicalUrl });
-    return id;
+    return this.store.addManualSignal(signal);
   }
 }

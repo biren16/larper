@@ -138,4 +138,18 @@ describe("EditorialService", () => {
     expect(store.splits).toEqual([["cluster-1", ["signal-b"]]]);
     expect(store.manuals).toHaveLength(1);
   });
+
+  it("does not write a cluster review event before a manual signal has been clustered", async () => {
+    await service.addManualSignal(actor, {
+      url: "https://www.youtube.com/watch?v=signal-1",
+      title: "A new music release",
+      sourceName: "Official artist channel",
+      publishedAt: "2026-09-20T08:00:00.000Z",
+      region: "global",
+      suggestedNicheId: "music",
+    }, "manual-source", "2026-09-20T10:00:00.000Z");
+
+    expect(store.manuals).toHaveLength(1);
+    expect(store.reviews).toEqual([]);
+  });
 });
