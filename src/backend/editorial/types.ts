@@ -40,6 +40,7 @@ export interface StoryDraft {
   regions: string[];
   freshnessLabel: string;
   evidenceSummary: string;
+  independentSourcesConfirmed: boolean;
   tags: string[];
 }
 
@@ -50,5 +51,6 @@ export interface BriefDraft {
   regions: string[];
   freshnessLabel: string;
   evidenceSummary: string;
+  independentSourcesConfirmed: boolean;
   tags: string[];
 }

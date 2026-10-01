@@ -28,7 +28,7 @@ export async function scheduleCandidateAction(form: FormData) {
       nicheId: String(form.get("nicheId") ?? ""), slug: String(form.get("slug") ?? ""), title: String(form.get("title") ?? ""),
       hook: String(form.get("hook") ?? ""), summary: String(form.get("summary") ?? ""), whyItMatters: String(form.get("whyItMatters") ?? ""),
       lore: String(form.get("lore") ?? ""), beginnerContext: String(form.get("beginnerContext") ?? ""), conversationLine: String(form.get("conversationLine") ?? ""), discoveryType, mode,
-      regions: values("regions"), freshnessLabel: String(form.get("freshnessLabel") ?? ""), evidenceSummary: String(form.get("evidenceSummary") ?? ""), tags: values("tags"),
+      regions: values("regions"), freshnessLabel: String(form.get("freshnessLabel") ?? ""), evidenceSummary: String(form.get("evidenceSummary") ?? ""), independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on", tags: values("tags"),
     }, scheduledFor, new Date().toISOString());
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not schedule story";

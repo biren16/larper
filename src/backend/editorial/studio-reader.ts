@@ -71,7 +71,12 @@ export class StudioReader {
     failureCounts: Map<string, number>,
   ): StudioSource {
     const failureCount = failureCounts.get(row.id) ?? 0;
-    const status = row.adapter_type === "trend" ? "waiting" : !row.active ? "paused" : failureCount > 0 ? "attention" : "live";
+    const status = row.adapter_type === "trend" ? "waiting"
+      : !row.active ? "paused"
+      : row.adapter_type === "manual" ? "manual"
+      : failureCount > 0 ? "attention"
+      : !row.last_polled_at ? "pending"
+      : "live";
     return {
       id: row.id,
       name: row.name,

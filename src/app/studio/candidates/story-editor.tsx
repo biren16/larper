@@ -98,6 +98,7 @@ export function StoryEditor({
           <fieldset>
             <legend>Evidence summary</legend>
             <label>What the sources establish<textarea name="evidenceSummary" required rows={4} /></label>
+            <label className={styles.independenceCheck}><input name="independentSourcesConfirmed" type="checkbox" required />I checked at least two independent original sources, not two copies of one report.</label>
           </fieldset>
 
           <StoryPreview />
@@ -114,7 +115,7 @@ export function StoryEditor({
 
         <aside className={styles.evidence} aria-labelledby="evidence-heading">
           <div className={styles.evidenceSticky}>
-            <header><h2 id="evidence-heading">Evidence</h2><span>{candidate.evidence.length} independent signals</span></header>
+            <header><h2 id="evidence-heading">Evidence</h2><span>{candidate.evidence.length} signals</span></header>
             <p>Open every source behind a factual claim before publishing.</p>
             <div className={styles.evidenceList}>{candidate.evidence.map((item) => <article key={item.id}>
               <div><span>{item.trustTier}</span><span data-availability={item.availability}>{item.availability}</span></div>

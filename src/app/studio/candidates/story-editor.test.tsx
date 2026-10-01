@@ -31,7 +31,9 @@ describe("StoryEditor", () => {
 
     expect(screen.getByRole("group", { name: "Classification" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Evidence summary" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: /independent original sources/i })).toBeRequired();
     expect(screen.getAllByRole("link", { name: /Open source/ })).toHaveLength(2);
+    expect(screen.getByText("2 signals", { selector: "span" })).toBeInTheDocument();
   });
 
   it("keeps publication controls stable and separates destructive cluster actions", () => {
@@ -53,6 +55,6 @@ describe("StoryEditor", () => {
 
     expect(screen.getByRole("alert")).toHaveTextContent("Mandatory review");
     expect(screen.getByText("minors")).toBeInTheDocument();
-    expect(screen.getByText("2 signals")).toBeInTheDocument();
+    expect(screen.getByText("2 signals", { selector: "span" })).toBeInTheDocument();
   });
 });

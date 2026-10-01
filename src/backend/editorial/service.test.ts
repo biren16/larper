@@ -19,6 +19,7 @@ const draft: StoryDraft = {
   evidenceSummary: "Three independent sources across books and racing.",
   tags: ["books", "f1"],
   conversationLine: "The F1 romance wave is fandom crossover, not a random BookTok trend.",
+  independentSourcesConfirmed: true,
 };
 
 function candidate(overrides: Partial<CandidateRecord> = {}): CandidateRecord {
@@ -70,7 +71,7 @@ describe("EditorialService", () => {
   it("publishes a reviewed story with credible independent evidence and a revision", async () => {
     await expect(service.publishStory(actor, "cluster-1", draft)).resolves.toEqual({ storyId: "story-1", revision: 1 });
     expect(store.publications[0]).toMatchObject({ lifecycle: "published_story", publicationFormat: "story", reviewerId: "editor-1" });
-    expect(store.reviews[0]).toMatchObject({ action: "publish_story", reviewerId: "editor-1" });
+    expect(store.reviews[0]).toMatchObject({ action: "publish_story", reviewerId: "editor-1", notes: "Editor confirmed independent original sources" });
   });
 
   it("blocks a story with fewer than two independent available sources", async () => {
@@ -87,19 +88,33 @@ describe("EditorialService", () => {
     await expect(service.publishStory(actor, "cluster-1", { ...draft, conversationLine: "" })).rejects.toThrow("conversationLine is required");
   });
 
+  it("requires the founder to confirm distinct original reporting before publication or scheduling", async () => {
+    await expect(service.publishStory(actor, "cluster-1", { ...draft, independentSourcesConfirmed: false }))
+      .rejects.toThrow("Confirm that the sources have independent origins");
+    await expect(service.scheduleStory(actor, "cluster-1", { ...draft, independentSourcesConfirmed: false }, "2026-09-21T10:00:00Z", "2026-09-20T10:00:00Z"))
+      .rejects.toThrow("Confirm that the sources have independent origins");
+    expect(store.publications).toHaveLength(0);
+    expect(store.schedules).toHaveLength(0);
+  });
+
   it("auto-publishes only eligible evidence briefs", async () => {
-    await service.publishBrief(actor, "cluster-1", { nicheId: "books", slug: "f1-books-brief", title: "F1 books are crossing feeds", regions: ["india", "global"], freshnessLabel: "Moving now", evidenceSummary: "Two allowlisted signals", tags: ["books", "f1"] });
+    await service.publishBrief(actor, "cluster-1", { nicheId: "books", slug: "f1-books-brief", title: "F1 books are crossing feeds", regions: ["india", "global"], freshnessLabel: "Moving now", evidenceSummary: "Two allowlisted signals", tags: ["books", "f1"], independentSourcesConfirmed: true });
     expect(store.publications[0]).toMatchObject({ lifecycle: "published_brief", publicationFormat: "brief" });
 
     store.current = candidate({ sensitiveFlags: ["minors"], heat: 100, confidence: 100 });
-    await expect(service.publishBrief(actor, "cluster-1", { nicheId: "books", slug: "blocked", title: "Blocked", regions: ["india"], freshnessLabel: "Moving", evidenceSummary: "Evidence", tags: [] }))
+    await expect(service.publishBrief(actor, "cluster-1", { nicheId: "books", slug: "blocked", title: "Blocked", regions: ["india"], freshnessLabel: "Moving", evidenceSummary: "Evidence", tags: [], independentSourcesConfirmed: true }))
       .rejects.toThrow("sensitive:minors");
+  });
+
+  it("does not publish a brief without a human independence check", async () => {
+    await expect(service.publishBrief(actor, "cluster-1", { nicheId: "books", slug: "f1-books-brief", title: "F1 books", regions: ["india"], freshnessLabel: "Moving", evidenceSummary: "Evidence", tags: [], independentSourcesConfirmed: false }))
+      .rejects.toThrow("Confirm that the sources have independent origins");
   });
 
   it("schedules a reviewed story for a future publication time", async () => {
     await service.scheduleStory(actor, "cluster-1", draft, "2026-09-21T10:00:00.000Z", "2026-09-20T10:00:00.000Z");
     expect(store.schedules).toEqual([{ candidateId: "cluster-1", scheduledFor: "2026-09-21T10:00:00.000Z" }]);
-    expect(store.reviews.at(-1)).toMatchObject({ action: "schedule_story" });
+    expect(store.reviews.at(-1)).toMatchObject({ action: "schedule_story", notes: expect.stringContaining("Editor confirmed independent original sources") });
   });
 
   it("records reject, expire, and unpublish transitions", async () => {

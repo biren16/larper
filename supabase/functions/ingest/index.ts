@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { XMLParser } from "npm:fast-xml-parser@5";
 import { suggestedNicheForWatchlistBeat } from "../../../src/backend/ingestion/source-url.ts";
+import { persistObservation } from "../../../src/backend/ingestion/store-observation.ts";
 
 type Source = {
   id: string; name: string; adapter_type: "rss" | "youtube" | "manual" | "trend"; config: Record<string, unknown>;
@@ -150,13 +151,23 @@ Deno.serve(async (request) => {
       const signals = source.adapter_type === "rss" ? await rssSignals(source, observedAt) : await youtubeSignals(source, observedAt, Deno.env.get("YOUTUBE_API_KEY") ?? "");
       const unique = new Map(signals.map((signal) => [`${signal.source_definition_id}:${signal.canonical_url}`, signal]));
       for (const signal of unique.values()) {
-        const existing = await database.from("raw_signals").select("id").eq("source_definition_id", signal.source_definition_id).eq("canonical_url", signal.canonical_url).maybeSingle();
-        if (existing.error) throw existing.error;
-        const stored = await database.from("raw_signals").upsert(signal, { onConflict: "source_definition_id,canonical_url" }).select("id").single();
-        if (stored.error) throw stored.error;
-        if (!existing.data) insertedCount += 1;
-        const snapshot = await database.from("signal_snapshots").upsert({ raw_signal_id: stored.data.id, metrics: signal.metrics, captured_at: observedAt }, { onConflict: "raw_signal_id,captured_at" });
-        if (snapshot.error) throw snapshot.error;
+        const inserted = await persistObservation({
+          find: async (item) => {
+            const result = await database.from("raw_signals").select("id, observed_at").eq("source_definition_id", item.source_definition_id).eq("canonical_url", item.canonical_url).maybeSingle();
+            if (result.error) throw result.error;
+            return result.data;
+          },
+          upsert: async (item) => {
+            const result = await database.from("raw_signals").upsert(item, { onConflict: "source_definition_id,canonical_url" }).select("id").single();
+            if (result.error) throw result.error;
+            return result.data;
+          },
+          appendSnapshot: async (id, metrics, capturedAt) => {
+            const result = await database.from("signal_snapshots").upsert({ raw_signal_id: id, metrics, captured_at: capturedAt }, { onConflict: "raw_signal_id,captured_at" });
+            if (result.error) throw result.error;
+          },
+        }, signal, observedAt);
+        if (inserted) insertedCount += 1;
       }
       await database.from("source_definitions").update({ last_polled_at: observedAt, updated_at: observedAt }).eq("id", source.id);
     } catch (caught) {

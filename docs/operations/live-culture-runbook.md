@@ -4,6 +4,8 @@
 
 Supabase Cron calls the `ingest` Edge Function every three hours. The function authenticates with `INGESTION_SECRET`, polls only active source definitions, stores canonical raw signals and time-series snapshots idempotently, then invokes deterministic clustering and scoring in Postgres. Vercel serves the cached public Next.js application; it does not run scheduled ingestion.
 
+The raw signal's `observed_at` records its first collection. Later polls add metric snapshots without resetting that timestamp, so a repeatedly seen feed item does not regain freshness. A source marked `First collection pending` has not completed a poll; `Manual intake` is entered by an editor and does not have an automatic poll.
+
 The public feed always reads the latest published database edition. A failed ingestion run therefore leaves the last verified stories available with their original `lastCheckedAt` timestamps. It never substitutes development fixtures in production.
 
 ## First deployment
@@ -25,10 +27,12 @@ For every source, record its owner and public URL, adapter and polling interval,
 ## Daily editorial routine
 
 1. Check `/studio` pipeline status and unresolved source failures.
-2. Open the highest-heat candidates, verify every factual source, and merge obvious duplicates.
+2. Open the highest-heat candidates, verify every factual source, and merge obvious duplicates. Before publishing or scheduling, confirm that at least two original sources have independent origins; two outlets repeating one report do not qualify. Studio records the editor's confirmation in the review event. Source-definition counts alone cannot prove this.
 3. Publish 3–5 reviewed stories across at least four qualified beats. Sensitive topics always remain human-reviewed.
 4. Use briefs only when two independent allowlisted sources, heat of at least 70, confidence of at least 80, and zero sensitive flags are present.
 5. If evidence disappears or becomes private, unpublish or return the story to review. The public cache is invalidated immediately.
+
+When a scheduled story becomes due, the database checks that its candidate is still under review, two available source definitions remain, and at least one is a primary or publication source. If a check fails, it clears the schedule and records `scheduled_publish_blocked`; an editor must review and schedule it again. This automatic check does not replace the editor's original-source review at scheduling time.
 
 Auto-publishing remains operationally disabled at launch. The backend enforces eligibility, but founders should enable unattended briefs only after beta review decisions show acceptable precision.
 

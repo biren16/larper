@@ -56,6 +56,10 @@ function validateBrief(draft: BriefDraft) {
   if (draft.regions.length === 0) throw new Error("At least one region is required");
 }
 
+function confirmIndependentOrigins(confirmed: boolean) {
+  if (!confirmed) throw new Error("Confirm that the sources have independent origins");
+}
+
 function availableEvidence(candidate: CandidateRecord) {
   return candidate.evidence.filter((item) => item.availability === "available");
 }
@@ -77,6 +81,7 @@ export class EditorialService {
   async publishStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft) {
     const context = await this.candidate(actor, candidateId);
     validateStory(draft);
+    confirmIndependentOrigins(draft.independentSourcesConfirmed);
     const evidence = [...independentEvidence(context.candidate)];
     if (evidence.length < 2) throw new Error("A story requires two independent available sources");
     if (!evidence.some((item) => item.trustTier === "primary" || item.trustTier === "publication")) {
@@ -89,13 +94,14 @@ export class EditorialService {
       publicationFormat: "story",
       draft,
     });
-    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "publish_story" });
+    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "publish_story", notes: "Editor confirmed independent original sources" });
     return result;
   }
 
   async scheduleStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft, scheduledFor: string, now: string) {
     const context = await this.candidate(actor, candidateId);
     validateStory(draft);
+    confirmIndependentOrigins(draft.independentSourcesConfirmed);
     const evidence = [...independentEvidence(context.candidate)];
     if (evidence.length < 2) throw new Error("A story requires two independent available sources");
     if (!evidence.some((item) => item.trustTier === "primary" || item.trustTier === "publication")) throw new Error("A factual story requires at least one credible source");
@@ -105,13 +111,14 @@ export class EditorialService {
       candidateId, reviewerId: context.actor.id, lifecycle: "published_story", publicationFormat: "story", draft,
       scheduledFor: new Date(target).toISOString(),
     });
-    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "schedule_story", notes: new Date(target).toISOString() });
+    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "schedule_story", notes: `${new Date(target).toISOString()}; Editor confirmed independent original sources` });
     return result;
   }
 
   async publishBrief(actor: EditorialActor | null, candidateId: string, draft: BriefDraft) {
     const context = await this.candidate(actor, candidateId);
     validateBrief(draft);
+    confirmIndependentOrigins(draft.independentSourcesConfirmed);
     const evidence = [...independentEvidence(context.candidate)];
     const eligibility = briefEligibility({
       heat: context.candidate.heat,
@@ -128,7 +135,7 @@ export class EditorialService {
       publicationFormat: "brief",
       draft,
     });
-    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "publish_brief" });
+    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "publish_brief", notes: "Editor confirmed independent original sources" });
     return result;
   }
 

@@ -31,6 +31,8 @@ const fixtures = {
     { id: "paused", name: "Paused source", adapter_type: "youtube", watchlist_beat: "music", active: false, last_polled_at: "2026-09-20T07:00:00Z", trust_tier: "primary" },
     { id: "attention", name: "Needs attention", adapter_type: "rss", watchlist_beat: "f1", active: true, last_polled_at: "2026-09-21T06:00:00Z", trust_tier: "publication" },
     { id: "waiting", name: "Trends validation", adapter_type: "trend", watchlist_beat: "tech-gaming", active: false, last_polled_at: null, trust_tier: "watchlist" },
+    { id: "pending", name: "New feed", adapter_type: "rss", watchlist_beat: "books", active: true, last_polled_at: null, trust_tier: "publication" },
+    { id: "manual", name: "Founder intake", adapter_type: "manual", watchlist_beat: "internet-culture", active: true, last_polled_at: null, trust_tier: "watchlist" },
   ],
   source_failures: [{ source_definition_id: "attention" }],
   ingestion_runs: [{ id: "run-1", status: "succeeded", started_at: "2026-09-21T08:00:00Z", inserted_count: 9, error_count: 0 }],
@@ -68,7 +70,7 @@ describe("StudioReader", () => {
     expect(data.candidates[0].sourceCount).toBe(1);
   });
 
-  it("derives live, paused, needs-attention, and waiting source states", async () => {
+  it("does not label unpolled or manual sources as live feeds", async () => {
     const data = await new StudioReader(clientFor(fixtures)).sources();
 
     expect(data.sources.map(({ id, status, trustTier }) => ({ id, status, trustTier }))).toEqual([
@@ -76,6 +78,8 @@ describe("StudioReader", () => {
       { id: "paused", status: "paused", trustTier: "primary" },
       { id: "attention", status: "attention", trustTier: "publication" },
       { id: "waiting", status: "waiting", trustTier: "watchlist" },
+      { id: "pending", status: "pending", trustTier: "publication" },
+      { id: "manual", status: "manual", trustTier: "watchlist" },
     ]);
   });
 });

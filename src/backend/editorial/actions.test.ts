@@ -16,12 +16,12 @@ describe("editorial action factory", () => {
     Object.entries({
       candidateId: "cluster-1", nicheId: "books", slug: "f1-books", title: "F1 books", hook: "Hook", summary: "Summary",
       whyItMatters: "Why", lore: "Lore", beginnerContext: "Context", discoveryType: "TREND", mode: "current", regions: "india,global",
-      conversationLine: "Mention the crossover, not just the headline.", freshnessLabel: "Moving", evidenceSummary: "Two sources", tags: "books,f1",
+      conversationLine: "Mention the crossover, not just the headline.", freshnessLabel: "Moving", evidenceSummary: "Two sources", tags: "books,f1", independentSourcesConfirmed: "on",
     }).forEach(([key, value]) => form.set(key, value));
 
     await expect(actions.publishStory(form)).resolves.toEqual({ ok: true, storyId: "story-1" });
     expect(getActor).toHaveBeenCalledOnce();
-    expect(publishStory).toHaveBeenCalledWith(expect.objectContaining({ id: "editor-1" }), "cluster-1", expect.objectContaining({ regions: ["india", "global"], tags: ["books", "f1"] }));
+    expect(publishStory).toHaveBeenCalledWith(expect.objectContaining({ id: "editor-1" }), "cluster-1", expect.objectContaining({ regions: ["india", "global"], tags: ["books", "f1"], independentSourcesConfirmed: true }));
     expect(invalidatePublicContent).toHaveBeenCalledWith({ slug: "f1-books" });
   });
 

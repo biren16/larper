@@ -47,6 +47,7 @@ export function createEditorialActions(dependencies: {
           regions: list(form, "regions"),
           freshnessLabel: required(form, "freshnessLabel"),
           evidenceSummary: required(form, "evidenceSummary"),
+          independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on",
           tags: list(form, "tags"),
         });
         await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });
@@ -64,6 +65,7 @@ export function createEditorialActions(dependencies: {
           regions: list(form, "regions"),
           freshnessLabel: required(form, "freshnessLabel"),
           evidenceSummary: required(form, "evidenceSummary"),
+          independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on",
           tags: list(form, "tags"),
         });
         await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });

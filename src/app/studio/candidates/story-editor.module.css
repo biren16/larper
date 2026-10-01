@@ -26,6 +26,8 @@
   resize: vertical;
 }
 .editor textarea, .moreActions textarea { line-height: 1.45; }
+.editor .independenceCheck { align-items: start; display: flex; font-size: .78rem; gap: .7rem; line-height: 1.4; }
+.editor .independenceCheck input { flex: 0 0 1rem; height: 1rem; min-height: 0; padding: 0; width: 1rem; }
 .twoCol { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
 .actionBar { background: var(--paper); border-top: 1px solid var(--ink); bottom: 0; display: flex; gap: 1rem; justify-content: space-between; padding: .8rem 0; position: sticky; z-index: 5; }
 .actionBar > label { min-width: 13rem; }

@@ -18,6 +18,8 @@ const statusLabels: Record<StudioSourceStatus, string> = {
   paused: "Paused",
   attention: "Needs attention",
   waiting: "Waiting",
+  pending: "First collection pending",
+  manual: "Manual intake",
 };
 
 const time = (value: string | null) => value

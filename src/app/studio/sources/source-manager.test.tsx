@@ -10,7 +10,8 @@ const data: StudioSourcesData = {
     { id: "music", name: "Music desk", adapterType: "rss", watchlistBeat: "music", active: true, healthy: false, lastPolledAt: "2026-09-21T07:00:00Z", failureCount: 2, trustTier: "publication", status: "attention" },
     { id: "screen", name: "Screen desk", adapterType: "rss", watchlistBeat: "screen-culture", active: true, healthy: true, lastPolledAt: "2026-09-21T06:00:00Z", failureCount: 0, trustTier: "publication", status: "live" },
     { id: "tech", name: "Trends validation", adapterType: "trend", watchlistBeat: "tech-gaming", active: false, healthy: false, lastPolledAt: null, failureCount: 0, trustTier: "watchlist", status: "waiting" },
-    { id: "manual", name: "Founder manual intake", adapterType: "manual", watchlistBeat: "internet-culture", active: true, healthy: true, lastPolledAt: null, failureCount: 0, trustTier: "watchlist", status: "live" },
+    { id: "manual", name: "Founder manual intake", adapterType: "manual", watchlistBeat: "internet-culture", active: true, healthy: false, lastPolledAt: null, failureCount: 0, trustTier: "watchlist", status: "manual" },
+    { id: "pending", name: "New feed", adapterType: "rss", watchlistBeat: "books", active: true, healthy: false, lastPolledAt: null, failureCount: 0, trustTier: "publication", status: "pending" },
   ],
   runs: [{ id: "run-1", status: "partial", startedAt: "2026-09-21T08:00:00Z", insertedCount: 7, errorCount: 2 }],
 };
@@ -26,6 +27,8 @@ describe("SourceManager", () => {
     expect(screen.getByText("Paused")).toBeInTheDocument();
     expect(screen.getByText("Needs attention")).toBeInTheDocument();
     expect(screen.getByText("Waiting")).toBeInTheDocument();
+    expect(screen.getByText("First collection pending")).toBeInTheDocument();
+    expect(screen.getByText("Manual intake")).toBeInTheDocument();
     expect(screen.getByText("2 unresolved failures")).toBeInTheDocument();
   });
 
