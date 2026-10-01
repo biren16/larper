@@ -34,11 +34,14 @@ For every source, record its owner and public URL, adapter and polling interval,
 
 When a scheduled story becomes due, the database checks that its candidate is still under review, two available source definitions remain, and at least one is a primary or publication source. If a check fails, it clears the schedule and records `scheduled_publish_blocked`; an editor must review and schedule it again. This automatic check does not replace the editor's original-source review at scheduling time.
 
+Every collection run that completes clustering also checks published current stories. Once a current story is at least 72 hours old and has no available evidence first observed within the last 36 hours, it returns to Studio review and leaves the public feed. Deep-lore stories do not follow this live-freshness rule. The editor can republish after reviewing new evidence.
+
 Auto-publishing remains operationally disabled at launch. The backend enforces eligibility, but founders should enable unattended briefs only after beta review decisions show acceptable precision.
 
 ## Incident handling
 
 - **One source fails:** leave the verified edition online, inspect `source_failures`, confirm rate limits and feed validity, then retry. Do not broaden scraping access.
+- **A source is overdue:** Studio labels an active feed `Overdue` after two configured poll intervals. A successful poll updates its collection time and resolves earlier failure records.
 - **A full run fails:** verify Edge secrets, Supabase status, and the latest `ingestion_runs` record. Trigger the function manually with the same bearer secret after the cause is fixed.
 - **A source is deleted/private:** mark the raw signal unavailable. Review any published story relying on it and unpublish if the remaining evidence no longer meets the gate.
 - **Bad story published:** unpublish in Studio, record the reason, and verify the feed and topic cache have refreshed.

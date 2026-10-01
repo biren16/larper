@@ -40,6 +40,7 @@ export interface Database {
         Returns: Array<{ story_id: string; revision: number }>;
       };
       publish_due_stories: { Args: Record<never, never>; Returns: number };
+      reopen_stale_current_stories: { Args: Record<never, never>; Returns: number };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

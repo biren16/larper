@@ -191,7 +191,9 @@ Deno.serve(async (request) => {
   }
   const processed = await database.rpc("process_unclustered_signals");
   if (processed.error) errorCount += 1;
+  const reopened = processed.error ? { data: 0, error: null } : await database.rpc("reopen_stale_current_stories");
+  if (reopened.error) errorCount += 1;
   const status = errorCount === 0 ? "succeeded" : errorCount >= due.length && due.length > 0 ? "failed" : "partial";
-  await database.from("ingestion_runs").update({ status, finished_at: new Date().toISOString(), source_count: due.length, inserted_count: insertedCount, error_count: errorCount, details: { processedClusters: processed.data ?? 0 } }).eq("id", runId);
-  return response({ status, sourceCount: due.length, insertedCount, errorCount, processedSignals: processed.data ?? 0 });
+  await database.from("ingestion_runs").update({ status, finished_at: new Date().toISOString(), source_count: due.length, inserted_count: insertedCount, error_count: errorCount, details: { processedClusters: processed.data ?? 0, reopenedStories: reopened.data ?? 0 } }).eq("id", runId);
+  return response({ status, sourceCount: due.length, insertedCount, errorCount, processedSignals: processed.data ?? 0, reopenedStories: reopened.data ?? 0 });
 });
