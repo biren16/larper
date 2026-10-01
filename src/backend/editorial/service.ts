@@ -94,7 +94,6 @@ export class EditorialService {
       publicationFormat: "story",
       draft,
     });
-    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "publish_story", notes: "Editor confirmed independent original sources" });
     return result;
   }
 
@@ -111,7 +110,6 @@ export class EditorialService {
       candidateId, reviewerId: context.actor.id, lifecycle: "published_story", publicationFormat: "story", draft,
       scheduledFor: new Date(target).toISOString(),
     });
-    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "schedule_story", notes: `${new Date(target).toISOString()}; Editor confirmed independent original sources` });
     return result;
   }
 
@@ -135,7 +133,6 @@ export class EditorialService {
       publicationFormat: "brief",
       draft,
     });
-    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action: "publish_brief", notes: "Editor confirmed independent original sources" });
     return result;
   }
 

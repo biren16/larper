@@ -71,7 +71,7 @@ describe("EditorialService", () => {
   it("publishes a reviewed story with credible independent evidence and a revision", async () => {
     await expect(service.publishStory(actor, "cluster-1", draft)).resolves.toEqual({ storyId: "story-1", revision: 1 });
     expect(store.publications[0]).toMatchObject({ lifecycle: "published_story", publicationFormat: "story", reviewerId: "editor-1" });
-    expect(store.reviews[0]).toMatchObject({ action: "publish_story", reviewerId: "editor-1", notes: "Editor confirmed independent original sources" });
+    expect(store.reviews).toEqual([]);
   });
 
   it("blocks a story with fewer than two independent available sources", async () => {
@@ -114,7 +114,7 @@ describe("EditorialService", () => {
   it("schedules a reviewed story for a future publication time", async () => {
     await service.scheduleStory(actor, "cluster-1", draft, "2026-09-21T10:00:00.000Z", "2026-09-20T10:00:00.000Z");
     expect(store.schedules).toEqual([{ candidateId: "cluster-1", scheduledFor: "2026-09-21T10:00:00.000Z" }]);
-    expect(store.reviews.at(-1)).toMatchObject({ action: "schedule_story", notes: expect.stringContaining("Editor confirmed independent original sources") });
+    expect(store.reviews).toEqual([]);
   });
 
   it("records reject, expire, and unpublish transitions", async () => {
