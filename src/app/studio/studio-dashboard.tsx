@@ -11,7 +11,7 @@ export interface StudioDashboardData {
   recentSignals: Array<{ id: string; title: string; canonicalUrl: string; sourceName: string; sourceType: string; nicheName: string; region: string; observedAt: string; availability: string; clusterId: string | null }>;
 }
 
-export type StudioSourceStatus = "live" | "paused" | "attention" | "waiting" | "pending" | "manual";
+export type StudioSourceStatus = "live" | "stale" | "paused" | "attention" | "waiting" | "pending" | "manual";
 
 export interface StudioSource {
   id: string;

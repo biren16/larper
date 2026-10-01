@@ -8,13 +8,13 @@ function check(operation: string, error: { message: string } | null) {
 }
 
 export class StudioReader {
-  constructor(private readonly client: SupabaseClient<Database>) {}
+  constructor(private readonly client: SupabaseClient<Database>, private readonly now: () => number = Date.now) {}
 
   async dashboard(): Promise<StudioDashboardData> {
     const [clusters, niches, sources, failures, runs, links, recentSignals] = await Promise.all([
       this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, state, editorial_stage, last_checked_at, sensitive_flags").in("state", ["detected", "reviewing"]).order("heat", { ascending: false }).limit(50),
       this.client.from("niches").select("id, name"),
-      this.client.from("source_definitions").select("id, name, adapter_type, watchlist_beat, active, last_polled_at, trust_tier").order("name"),
+      this.client.from("source_definitions").select("id, name, adapter_type, watchlist_beat, active, last_polled_at, poll_minutes, trust_tier").order("name"),
       this.client.from("source_failures").select("source_definition_id").is("resolved_at", null),
       this.client.from("ingestion_runs").select("id, status, started_at, inserted_count, error_count").order("started_at", { ascending: false }).limit(20),
       this.client.from("cluster_signals").select("cluster_id, raw_signal_id"),
@@ -53,7 +53,7 @@ export class StudioReader {
 
   async sources(): Promise<StudioSourcesData> {
     const [sources, failures, runs] = await Promise.all([
-      this.client.from("source_definitions").select("id, name, adapter_type, watchlist_beat, active, last_polled_at, trust_tier").order("name"),
+      this.client.from("source_definitions").select("id, name, adapter_type, watchlist_beat, active, last_polled_at, poll_minutes, trust_tier").order("name"),
       this.client.from("source_failures").select("source_definition_id").is("resolved_at", null),
       this.client.from("ingestion_runs").select("id, status, started_at, inserted_count, error_count").order("started_at", { ascending: false }).limit(20),
     ]);
@@ -67,7 +67,7 @@ export class StudioReader {
   }
 
   private mapSource(
-    row: { id: string; name: string; adapter_type: string; watchlist_beat: string | null; active: boolean; last_polled_at: string | null; trust_tier: string },
+    row: { id: string; name: string; adapter_type: string; watchlist_beat: string | null; active: boolean; last_polled_at: string | null; poll_minutes: number; trust_tier: string },
     failureCounts: Map<string, number>,
   ): StudioSource {
     const failureCount = failureCounts.get(row.id) ?? 0;
@@ -76,6 +76,7 @@ export class StudioReader {
       : row.adapter_type === "manual" ? "manual"
       : failureCount > 0 ? "attention"
       : !row.last_polled_at ? "pending"
+      : !Number.isFinite(Date.parse(row.last_polled_at)) || this.now() - Date.parse(row.last_polled_at) > row.poll_minutes * 2 * 60_000 ? "stale"
       : "live";
     return {
       id: row.id,

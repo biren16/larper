@@ -2,6 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { XMLParser } from "npm:fast-xml-parser@5";
 import { suggestedNicheForWatchlistBeat } from "../../../src/backend/ingestion/source-url.ts";
 import { persistObservation } from "../../../src/backend/ingestion/store-observation.ts";
+import { completeSourcePoll } from "../../../src/backend/ingestion/source-health.ts";
 
 type Source = {
   id: string; name: string; adapter_type: "rss" | "youtube" | "manual" | "trend"; config: Record<string, unknown>;
@@ -141,7 +142,10 @@ Deno.serve(async (request) => {
   if (begun.error) return response({ status: "failed", error: "Could not start ingestion run" }, 500);
   const runId = begun.data.id;
   const sourceResult = await database.from("source_definitions").select("*").eq("active", true).in("adapter_type", ["rss", "youtube"]);
-  if (sourceResult.error) return response({ status: "failed", error: "Could not load source registry" }, 500);
+  if (sourceResult.error) {
+    await database.from("ingestion_runs").update({ status: "failed", finished_at: new Date().toISOString(), error_count: 1, details: { reason: "Could not load source registry" } }).eq("id", runId);
+    return response({ status: "failed", error: "Could not load source registry" }, 500);
+  }
   const now = Date.now();
   const due = (sourceResult.data as Source[]).filter((source) => !source.last_polled_at || now - Date.parse(source.last_polled_at) >= source.poll_minutes * 60_000);
   let insertedCount = 0; let errorCount = 0;
@@ -169,7 +173,16 @@ Deno.serve(async (request) => {
         }, signal, observedAt);
         if (inserted) insertedCount += 1;
       }
-      await database.from("source_definitions").update({ last_polled_at: observedAt, updated_at: observedAt }).eq("id", source.id);
+      await completeSourcePoll({
+        markPolled: async (id, at) => {
+          const result = await database.from("source_definitions").update({ last_polled_at: at, updated_at: at }).eq("id", id);
+          if (result.error) throw result.error;
+        },
+        resolveOpenFailures: async (id, at) => {
+          const result = await database.from("source_failures").update({ resolved_at: at }).eq("source_definition_id", id).is("resolved_at", null);
+          if (result.error) throw result.error;
+        },
+      }, source.id, observedAt);
     } catch (caught) {
       errorCount += 1;
       const message = caught instanceof Error ? caught.message : "Unknown source failure";

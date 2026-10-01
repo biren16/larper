@@ -15,6 +15,7 @@ const beats = [
 
 const statusLabels: Record<StudioSourceStatus, string> = {
   live: "Live",
+  stale: "Overdue",
   paused: "Paused",
   attention: "Needs attention",
   waiting: "Waiting",

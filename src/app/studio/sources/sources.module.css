@@ -16,7 +16,7 @@
 .sourceIdentity p { color: var(--muted); font-size: .7rem; margin: .2rem 0 0; text-transform: capitalize; }
 .status { border: 1px solid var(--line); font-size: .66rem; font-weight: 600; padding: .3rem .4rem; text-align: center; }
 .status[data-status="live"] { background: var(--acid); border-color: var(--acid); color: var(--acid-ink); }
-.status[data-status="attention"] { border-color: var(--signal-red); color: var(--signal-red); }
+.status[data-status="attention"], .status[data-status="stale"] { border-color: var(--signal-red); color: var(--signal-red); }
 .status[data-status="paused"], .status[data-status="waiting"] { color: var(--muted); }
 .sourceRow dl { display: flex; gap: 1rem; margin: 0; }
 .sourceRow dl div { border-left: 1px solid var(--line); max-width: 9rem; min-width: 7rem; padding-left: .55rem; }

@@ -27,7 +27,8 @@ const fixtures = {
   topic_clusters: [{ id: "cluster-1", title: "Grid reading lists", niche_id: "books", heat: 82, confidence: 86, state: "detected", editorial_stage: "reviewing", last_checked_at: "2026-09-21T08:00:00Z", sensitive_flags: [] }],
   niches: [{ id: "books", name: "Books" }],
   source_definitions: [
-    { id: "live", name: "Live source", adapter_type: "rss", watchlist_beat: "books", active: true, last_polled_at: "2026-09-21T07:00:00Z", trust_tier: "publication" },
+    { id: "live", name: "Live source", adapter_type: "rss", watchlist_beat: "books", active: true, last_polled_at: "2026-09-21T07:00:00Z", poll_minutes: 180, trust_tier: "publication" },
+    { id: "stale", name: "Overdue source", adapter_type: "rss", watchlist_beat: "books", active: true, last_polled_at: "2026-09-20T23:00:00Z", poll_minutes: 180, trust_tier: "publication" },
     { id: "paused", name: "Paused source", adapter_type: "youtube", watchlist_beat: "music", active: false, last_polled_at: "2026-09-20T07:00:00Z", trust_tier: "primary" },
     { id: "attention", name: "Needs attention", adapter_type: "rss", watchlist_beat: "f1", active: true, last_polled_at: "2026-09-21T06:00:00Z", trust_tier: "publication" },
     { id: "waiting", name: "Trends validation", adapter_type: "trend", watchlist_beat: "tech-gaming", active: false, last_polled_at: null, trust_tier: "watchlist" },
@@ -71,10 +72,11 @@ describe("StudioReader", () => {
   });
 
   it("does not label unpolled or manual sources as live feeds", async () => {
-    const data = await new StudioReader(clientFor(fixtures)).sources();
+    const data = await new StudioReader(clientFor(fixtures), () => Date.parse("2026-09-21T08:00:00Z")).sources();
 
     expect(data.sources.map(({ id, status, trustTier }) => ({ id, status, trustTier }))).toEqual([
       { id: "live", status: "live", trustTier: "publication" },
+      { id: "stale", status: "stale", trustTier: "publication" },
       { id: "paused", status: "paused", trustTier: "primary" },
       { id: "attention", status: "attention", trustTier: "publication" },
       { id: "waiting", status: "waiting", trustTier: "watchlist" },
