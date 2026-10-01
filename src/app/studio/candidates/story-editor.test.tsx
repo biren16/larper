@@ -57,4 +57,12 @@ describe("StoryEditor", () => {
     expect(screen.getByText("minors")).toBeInTheDocument();
     expect(screen.getByText("2 signals", { selector: "span" })).toBeInTheDocument();
   });
+
+  it("offers an approved cover with credit and an upload form", () => {
+    render(<StoryEditor candidate={{ ...candidate, mediaId: "asset-1", mediaOptions: [{ id: "asset-1", alt: "Race car", creditLine: "Photo by Artist" }] }} uploadMediaAction={() => undefined} />);
+    expect(screen.getByRole("combobox", { name: "Story image" })).toHaveValue("asset-1");
+    expect(screen.getByText(/Photo by Artist/)).toBeInTheDocument();
+    expect(screen.getByRole("form", { name: "Upload approved image" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Image file (WebP, under 400 KB)")).toBeInTheDocument();
+  });
 });

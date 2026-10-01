@@ -48,8 +48,15 @@ export function mapNicheRow(row: Pick<NicheRow, "id" | "slug" | "name" | "descri
   return { id: row.id, slug: row.slug, name: row.name, description: row.description, curiosityHook: row.curiosity_hook, parentCategory: row.parent_category, relatedNicheIds: row.related_niche_ids, heroMediaId: row.hero_media_id ?? undefined, status: row.status as Niche["status"], origin: row.origin as Niche["origin"] };
 }
 
-export function mapMediaRow(row: Pick<MediaRow, "id" | "src" | "alt" | "width" | "height" | "focal_position">): MediaAsset {
-  return { id: row.id, src: row.src, alt: row.alt, width: row.width, height: row.height, focalPosition: row.focal_position ?? undefined };
+export function mapMediaRow(row: Pick<MediaRow, "id" | "src" | "alt" | "width" | "height" | "focal_position"> & Partial<Pick<MediaRow, "kind" | "source_url" | "credit_line" | "license_code" | "commercial_use_allowed" | "modification_allowed" | "social_use_allowed" | "object_path">>): MediaAsset {
+  return {
+    id: row.id, src: row.src, alt: row.alt, width: row.width, height: row.height,
+    focalPosition: row.focal_position ?? undefined,
+    kind: row.kind as MediaAsset["kind"], sourceUrl: row.source_url ?? undefined,
+    creditLine: row.credit_line ?? undefined, licenseCode: row.license_code ?? undefined,
+    commercialUseAllowed: row.commercial_use_allowed, modificationAllowed: row.modification_allowed,
+    socialUseAllowed: row.social_use_allowed, objectPath: row.object_path ?? undefined,
+  };
 }
 
 export function mapSignalRow(topicId: string, row: PublicSignalRow): SourceSignal {

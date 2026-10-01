@@ -38,4 +38,13 @@ describe("Supabase discovery row mapping", () => {
     expect(mapNicheRow({ id: "books", slug: "books", name: "Books", description: "Books", curiosity_hook: "Read this", parent_category: "Culture", related_niche_ids: [], hero_media_id: null, status: "active", origin: "ingested" })).toMatchObject({ curiosityHook: "Read this", parentCategory: "Culture" });
     expect(mapMediaRow({ id: "m1", src: "/m.jpg", alt: "Cover", width: 100, height: 120, focal_position: "50% 20%" })).toMatchObject({ focalPosition: "50% 20%" });
   });
+
+  it("preserves upload rights that control public and social presentation", () => {
+    expect(mapMediaRow({
+      id: "m2", src: "https://example.com/cover.webp", alt: "Concert", width: 1200, height: 800,
+      focal_position: null, kind: "uploaded", source_url: "https://example.com/press",
+      credit_line: "Artist photo", license_code: "permission", commercial_use_allowed: true,
+      modification_allowed: false, social_use_allowed: false, object_path: "covers/m2.webp",
+    })).toMatchObject({ kind: "uploaded", creditLine: "Artist photo", modificationAllowed: false, socialUseAllowed: false });
+  });
 });

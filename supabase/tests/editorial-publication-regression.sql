@@ -63,9 +63,15 @@ begin
   select * into result from public.publish_editorial_story(
     '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000401',
     'published_story', 'story',
-    '{"nicheId":"music","slug":"music-test","title":"Music test","regions":["global"],"tags":[],"independentSourcesConfirmed":true}'::jsonb
+    '{"nicheId":"music","slug":"music-test","title":"Music test","regions":["global"],"tags":[],"mediaId":"approved-cover","independentSourcesConfirmed":true}'::jsonb
   );
   if result.story_id is null then raise exception 'Eligible publication did not return a story'; end if;
+  if (select media_id from public.stories where id = result.story_id) <> 'approved-cover' then
+    raise exception 'Chosen cover did not persist on the story';
+  end if;
+  if (select snapshot->>'media_id' from public.story_revisions where story_id = result.story_id and revision = result.revision) <> 'approved-cover' then
+    raise exception 'Chosen cover was missing from the revision snapshot';
+  end if;
   if (select count(*) from public.review_events where action = 'publish_story' and story_id = result.story_id) <> 1 then
     raise exception 'Publication audit was not atomic';
   end if;

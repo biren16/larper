@@ -114,6 +114,14 @@ export interface MediaAsset {
   width: number;
   height: number;
   focalPosition?: string;
+  kind?: "larper" | "uploaded";
+  sourceUrl?: string;
+  creditLine?: string;
+  licenseCode?: string;
+  commercialUseAllowed?: boolean;
+  modificationAllowed?: boolean;
+  socialUseAllowed?: boolean;
+  objectPath?: string;
 }
 
 export interface SeedDataset {

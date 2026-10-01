@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Artwork } from "@/components/discovery/artwork";
+import { coverContextForTopic } from "@/components/discovery/cover-presentation";
 import { InteractionBeacon } from "@/components/accounts/interaction-beacon";
 import { SavedStoryControl } from "@/components/accounts/saved-story-control";
 import { Suspense } from "react";
@@ -44,7 +45,7 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
           </div>
           <Suspense fallback={<span>Checking saves…</span>}><SavedStoryControl storyId={detail.topic.id} returnPath={`/discover/${detail.topic.slug}`} /></Suspense>
         </div>
-        <Artwork media={detail.media} priority className={styles.heroArt} />
+        <Artwork media={detail.media} context={coverContextForTopic(detail)} priority className={styles.heroArt} />
       </header>
 
       <article className={styles.story}>

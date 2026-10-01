@@ -7,6 +7,7 @@ import { rankCurrentTopics } from "@/domain/discovery/ranking";
 import { useFollowedNiches } from "@/components/preferences/followed-niches-provider";
 import { FollowButton } from "@/components/preferences/follow-button";
 import { Artwork } from "./artwork";
+import { coverContextForTopic } from "./cover-presentation";
 import { buildSignalCue, getCuriosityAction } from "./topic-presentation";
 import styles from "./discovery-home.module.css";
 
@@ -23,7 +24,7 @@ function HomeSignalCard({ item, layout }: { item: TopicViewModel; layout: HomeSi
   const action = getCuriosityAction(item.topic);
   return (
     <article className={`${styles.signalCard} ${styles[layout]}`}>
-      {layout !== "strip" && <Link className={styles.signalMedia} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`}><Artwork media={item.media} priority={layout === "lead"} /></Link>}
+      {layout !== "strip" && <Link className={styles.signalMedia} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`}><Artwork media={item.media} context={coverContextForTopic(item)} priority={layout === "lead"} /></Link>}
       <div className={styles.signalCopy}>
         <div className={styles.signalMeta}><Link href={`/niches/${item.niche.slug}`}>{item.niche.name}</Link><span>{cue.status}</span><span>{item.sourceCount} signals</span></div>
         <h3><Link href={`/discover/${item.topic.slug}`}>{item.topic.title}</Link></h3>
@@ -64,7 +65,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
           <a className={styles.nowLink} href="#larping-now">See what&apos;s peaking <ArrowDown aria-hidden /></a>
         </div>
         <div className={styles.heroCollage} aria-label="Current ranked culture signals">
-          {currentTopics.slice(0, 3).map((item, index) => <Link className={`${styles.heroSignal} ${index === 0 ? styles.heroPrimary : index === 1 ? styles.heroSecondary : styles.heroTertiary}`} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`} key={item.topic.id}><Artwork media={item.media} priority={index === 0} /><span className={styles.heroCaption}><small>{item.niche.name} / {item.topic.freshnessLabel}</small><strong>{item.topic.title}</strong></span></Link>)}
+          {currentTopics.slice(0, 3).map((item, index) => <Link className={`${styles.heroSignal} ${index === 0 ? styles.heroPrimary : index === 1 ? styles.heroSecondary : styles.heroTertiary}`} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`} key={item.topic.id}><Artwork media={item.media} context={coverContextForTopic(item)} priority={index === 0} /><span className={styles.heroCaption}><small>{item.niche.name} / {item.topic.freshnessLabel}</small><strong>{item.topic.title}</strong></span></Link>)}
         </div>
       </header>
 
@@ -82,7 +83,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
         <div className={styles.nicheRail}>{followed.map((niche) => {
           const latest = currentTopics.find((item) => item.niche.id === niche.id) ?? home.deepLore.find((item) => item.niche.id === niche.id);
           const cue = latest ? buildSignalCue(latest.topic, latest.sources) : null;
-          return <article className={styles.followedNiche} key={niche.id}><Link className={styles.nicheMedia} href={`/niches/${niche.slug}`} aria-label={`Open ${niche.name}`}><Artwork media={latest?.media ?? null} /></Link><div className={styles.nicheCopy}><div><span>{cue?.status ?? "Lore open"}</span><span>{latest ? `${latest.sourceCount} signals` : "Start here"}</span></div><h3><Link href={`/niches/${niche.slug}`}>{niche.name}</Link></h3><p>{latest?.topic.title ?? niche.curiosityHook}</p><Link className={styles.roundLink} href={`/niches/${niche.slug}`} aria-label={`Explore ${niche.name}`}><ArrowUpRight aria-hidden /></Link></div></article>;
+          return <article className={styles.followedNiche} key={niche.id}><Link className={styles.nicheMedia} href={`/niches/${niche.slug}`} aria-label={`Open ${niche.name}`}><Artwork media={latest?.media ?? null} context={latest ? coverContextForTopic(latest) : { title: niche.name, niche: niche.name, nicheId: niche.id, type: "NICHE", seed: niche.id }} /></Link><div className={styles.nicheCopy}><div><span>{cue?.status ?? "Lore open"}</span><span>{latest ? `${latest.sourceCount} signals` : "Start here"}</span></div><h3><Link href={`/niches/${niche.slug}`}>{niche.name}</Link></h3><p>{latest?.topic.title ?? niche.curiosityHook}</p><Link className={styles.roundLink} href={`/niches/${niche.slug}`} aria-label={`Explore ${niche.name}`}><ArrowUpRight aria-hidden /></Link></div></article>;
         })}</div>
       </section>
 
@@ -90,7 +91,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
         <div className={styles.chapterHeading}><div><span>Pick a new rabbit hole</span><h2 id="new-larps">Go larp something new</h2></div><p>One weirdly specific reason to care. No category-directory energy.</p></div>
         <div className={styles.curiosityGrid}>{recommended.slice(0, 5).map((niche, index) => {
           const visual = currentTopics.find((item) => item.niche.id === niche.id) ?? home.deepLore.find((item) => item.niche.id === niche.id);
-          return <article className={`${styles.curiosity} ${index > 2 ? styles.curiositySupport : ""}`} key={niche.id}><Link className={styles.curiosityMedia} href={`/niches/${niche.slug}`} aria-label={`Open ${niche.name}`}><Artwork media={visual?.media ?? null} /></Link><div className={styles.curiosityCopy}><span>{niche.parentCategory}</span><h3><Link href={`/niches/${niche.slug}`}>{niche.name}</Link></h3><p>{niche.curiosityHook}</p><FollowButton nicheId={niche.id} nicheName={niche.name} compact /></div></article>;
+          return <article className={`${styles.curiosity} ${index > 2 ? styles.curiositySupport : ""}`} key={niche.id}><Link className={styles.curiosityMedia} href={`/niches/${niche.slug}`} aria-label={`Open ${niche.name}`}><Artwork media={visual?.media ?? null} context={visual ? coverContextForTopic(visual) : { title: niche.name, niche: niche.name, nicheId: niche.id, type: "NICHE", seed: niche.id }} /></Link><div className={styles.curiosityCopy}><span>{niche.parentCategory}</span><h3><Link href={`/niches/${niche.slug}`}>{niche.name}</Link></h3><p>{niche.curiosityHook}</p><FollowButton nicheId={niche.id} nicheName={niche.name} compact /></div></article>;
         })}</div>
       </section>
 

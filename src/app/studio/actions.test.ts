@@ -101,6 +101,19 @@ describe("source actions", () => {
   });
 });
 
+describe("uploadEditorialMediaAction", () => {
+  it("rejects an unsupported image before storing it", async () => {
+    const upload = vi.fn();
+    getEditorialRuntime.mockResolvedValue({ client: { storage: { from: () => ({ upload }) } } });
+    const { uploadEditorialMediaAction } = await import("./actions");
+    const form = new FormData();
+    form.set("candidateId", "cluster-1");
+    form.set("image", new File(["not a webp"], "cover.png", { type: "image/png" }));
+    await expect(uploadEditorialMediaAction(form)).rejects.toThrow(/redirect:.*Upload%20a%20WebP/);
+    expect(upload).not.toHaveBeenCalled();
+  });
+});
+
 describe("candidate action notices", () => {
   it("confirms story and brief publication", async () => {
     getEditorialRuntime.mockResolvedValue({ actor: { id: "founder-1" }, service: {} });

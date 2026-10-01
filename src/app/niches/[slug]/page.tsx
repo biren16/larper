@@ -37,7 +37,7 @@ export default async function NichePage({ params }: { params: Promise<{ slug: st
             <FollowButton nicheId={page.niche.id} nicheName={page.niche.name} />
           </div>
           <div className={styles.heroVisual}>
-            <Artwork media={page.media} priority className={styles.art} />
+            <Artwork media={page.media} context={{ title: page.niche.name, niche: page.niche.name, nicheId: page.niche.id, type: "NICHE", seed: page.niche.id }} priority className={styles.art} />
             <blockquote>{page.niche.curiosityHook}</blockquote>
           </div>
         </header>
@@ -87,7 +87,7 @@ export default async function NichePage({ params }: { params: Promise<{ slug: st
         <div className={styles.relatedRail}>
           {page.relatedNicheCards.map(({ niche, media }) => (
             <Link key={niche.id} href={`/niches/${niche.slug}`}>
-              <div className={styles.relatedArt}><Artwork media={media} /></div>
+              <div className={styles.relatedArt}><Artwork media={media} context={{ title: niche.name, niche: niche.name, nicheId: niche.id, type: "NICHE", seed: niche.id }} /></div>
               <span className={styles.relatedCopy}>
                 <small>{niche.parentCategory}</small>
                 <strong>{niche.name}</strong>

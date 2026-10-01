@@ -26,6 +26,7 @@ export interface CandidateRecord {
 }
 
 export interface StoryDraft {
+  mediaId?: string | null;
   nicheId: string;
   slug: string;
   title: string;
@@ -45,6 +46,7 @@ export interface StoryDraft {
 }
 
 export interface BriefDraft {
+  mediaId?: string | null;
   nicheId: string;
   slug: string;
   title: string;

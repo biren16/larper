@@ -54,7 +54,7 @@ begin
     cluster_id, niche_id, slug, title, hook, summary, why_it_matters, lore, beginner_context,
     conversation_line, discovery_type, mode, publication_format, lifecycle, regions,
     freshness_label, confidence, evidence_summary, signals, tags, first_detected_at,
-    last_updated_at, last_checked_at, published_at, reviewed_by
+    last_updated_at, last_checked_at, published_at, reviewed_by, media_id
   ) values (
     candidate.id, p_draft->>'nicheId', p_draft->>'slug', p_draft->>'title',
     coalesce(p_draft->>'hook', ''), coalesce(p_draft->>'summary', ''),
@@ -68,7 +68,8 @@ begin
       'freshness', candidate.freshness, 'novelty', candidate.novelty,
       'indiaRelevance', candidate.india_relevance, 'crossover', candidate.crossover),
     coalesce(array(select jsonb_array_elements_text(p_draft->'tags')), '{}'),
-    candidate.first_detected_at, now(), candidate.last_checked_at, now(), p_reviewer_id
+    candidate.first_detected_at, now(), candidate.last_checked_at, now(), p_reviewer_id,
+    nullif(p_draft->>'mediaId', '')
   )
   on conflict (cluster_id) do update set
     niche_id = excluded.niche_id, slug = excluded.slug, title = excluded.title,
@@ -79,7 +80,7 @@ begin
     lifecycle = excluded.lifecycle, regions = excluded.regions,
     freshness_label = excluded.freshness_label, confidence = excluded.confidence,
     evidence_summary = excluded.evidence_summary, signals = excluded.signals,
-    tags = excluded.tags, last_updated_at = now(),
+    tags = excluded.tags, media_id = excluded.media_id, last_updated_at = now(),
     last_checked_at = excluded.last_checked_at, published_at = now(), reviewed_by = p_reviewer_id
   returning * into published;
 

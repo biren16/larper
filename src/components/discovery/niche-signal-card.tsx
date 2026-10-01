@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { TopicViewModel } from "@/domain/discovery/services";
 
 import { Artwork } from "./artwork";
+import { coverContextForTopic } from "./cover-presentation";
 import { buildSignalCue, getCuriosityAction } from "./topic-presentation";
 import styles from "./niche-signal-card.module.css";
 
@@ -28,7 +29,7 @@ export function NicheSignalCard({
         href={`/discover/${item.topic.slug}`}
         aria-label={`Open ${item.topic.title}`}
       >
-        <Artwork media={item.media} priority={priority} />
+        <Artwork media={item.media} context={coverContextForTopic(item)} priority={priority} />
       </Link>
       <div className={styles.copy}>
         <div className={styles.meta}>

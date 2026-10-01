@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { TopicViewModel } from "@/domain/discovery/services";
 import { Artwork } from "./artwork";
+import { coverContextForTopic } from "./cover-presentation";
 import styles from "./topic-pieces.module.css";
 
 export function TopicMeta({ item }: { item: TopicViewModel }) {
@@ -18,7 +19,7 @@ export function LeadTopic({ item }: { item: TopicViewModel }) {
   return (
     <article className={styles.lead}>
       <Link className={styles.leadImage} href={`/discover/${item.topic.slug}`} aria-label={`Read ${item.topic.title}`}>
-        <Artwork media={item.media} priority />
+        <Artwork media={item.media} context={coverContextForTopic(item)} priority />
       </Link>
       <div className={styles.leadCopy}>
         <TopicMeta item={item} />
@@ -47,7 +48,7 @@ export function TopicRow({ item, index }: { item: TopicViewModel; index?: number
 export function LoreTile({ item }: { item: TopicViewModel }) {
   return (
     <article className={styles.lore}>
-      <Link href={`/discover/${item.topic.slug}`} className={styles.loreImage} aria-label={`Explore ${item.topic.title}`}><Artwork media={item.media} /></Link>
+      <Link href={`/discover/${item.topic.slug}`} className={styles.loreImage} aria-label={`Explore ${item.topic.title}`}><Artwork media={item.media} context={coverContextForTopic(item)} /></Link>
       <div>
         <TopicMeta item={item} />
         <h3><Link href={`/discover/${item.topic.slug}`}>{item.topic.title}</Link></h3>

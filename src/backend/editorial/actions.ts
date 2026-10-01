@@ -33,6 +33,7 @@ export function createEditorialActions(dependencies: {
         if (!DISCOVERY_TYPES.has(discoveryType)) throw new Error("discoveryType is invalid");
         if (mode !== "current" && mode !== "deep-lore") throw new Error("mode is invalid");
         const result = await dependencies.service.publishStory(await dependencies.getActor(), candidateId, {
+          mediaId: String(form.get("mediaId") ?? "").trim() || null,
           nicheId: required(form, "nicheId"),
           slug: required(form, "slug"),
           title: required(form, "title"),
@@ -59,6 +60,7 @@ export function createEditorialActions(dependencies: {
     publishBrief: async (form: FormData) => {
       try {
         const result = await dependencies.service.publishBrief(await dependencies.getActor(), required(form, "candidateId"), {
+          mediaId: String(form.get("mediaId") ?? "").trim() || null,
           nicheId: required(form, "nicheId"),
           slug: required(form, "slug"),
           title: required(form, "title"),

@@ -103,8 +103,10 @@ export class StudioReader {
       ? await this.client.from("raw_signals").select("id, title, source_name, canonical_url, trust_tier, availability").in("id", ids)
       : { data: [], error: null };
     check("Load studio evidence", signals.error);
-    const story = await this.client.from("stories").select("id").eq("cluster_id", id).maybeSingle();
+    const story = await this.client.from("stories").select("id, media_id").eq("cluster_id", id).maybeSingle();
     check("Load candidate story", story.error);
+    const media = await this.client.from("media_assets").select("id, alt, credit_line, kind, commercial_use_allowed").order("created_at", { ascending: false }).limit(100);
+    check("Load approved media", media.error);
     const revisions = story.data
       ? await this.client.from("story_revisions").select("revision, created_at, editor_id").eq("story_id", story.data.id).order("revision", { ascending: false })
       : { data: [], error: null };
@@ -114,6 +116,8 @@ export class StudioReader {
       heat: Number(cluster.data.heat), confidence: Number(cluster.data.confidence), sensitiveFlags: cluster.data.sensitive_flags,
       evidence: (signals.data ?? []).map((row) => ({ id: row.id, title: row.title, sourceName: row.source_name, sourceUrl: row.canonical_url, trustTier: row.trust_tier, availability: row.availability })),
       revisions: (revisions.data ?? []).map((row) => ({ revision: row.revision, createdAt: row.created_at, editorId: row.editor_id })),
+      mediaId: story.data?.media_id ?? null,
+      mediaOptions: (media.data ?? []).filter((row) => row.kind === "larper" || row.commercial_use_allowed).map((row) => ({ id: row.id, alt: row.alt, creditLine: row.credit_line })),
     };
   }
 }

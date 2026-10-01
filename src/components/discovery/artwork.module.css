@@ -8,7 +8,18 @@
 }
 
 .frame img { filter: saturate(0.92) contrast(1.02); object-fit: cover; }
-.fallback { align-items: flex-end; display: flex; padding: 1rem; }
-.fallback::before { background: repeating-linear-gradient(135deg, transparent 0 12px, color-mix(in srgb, var(--ink) 10%, transparent) 12px 13px); content: ""; inset: 0; position: absolute; }
-.fallback span { font: 650 2rem/1 var(--font-sans); position: relative; }
-
+.frame[data-modification="restricted"] img { filter: none; object-fit: contain; }
+.underlay { inset: 0; position: absolute; }
+.credit { background: rgb(14 20 27 / 80%); bottom: 0; color: #fff; font: 600 0.68rem/1.3 var(--font-sans); left: 0; max-width: 100%; padding: 0.35rem 0.55rem; position: absolute; z-index: 1; }
+.fallback { background: #d7e4ec; color: #152537; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(0.9rem, 3%, 1.8rem); }
+.fallback::before { background: repeating-linear-gradient(135deg, transparent 0 14px, rgb(21 37 55 / 8%) 14px 15px); content: ""; inset: 0; pointer-events: none; position: absolute; }
+.fallback[data-treatment="motorsport"] { background: #d7e4ec; }
+.fallback[data-treatment="music"] { background: #e6dce9; }
+.fallback[data-treatment="screen"] { background: #ebe2cd; }
+.fallback[data-treatment="culture"] { background: #dce8cf; }
+.coverTop, .coverCopy { position: relative; z-index: 1; }
+.coverTop { border-top: 2px solid currentColor; display: flex; font: 700 clamp(0.62rem, 1vw, 0.82rem)/1.2 var(--font-sans); justify-content: space-between; letter-spacing: 0.07em; padding-top: 0.45rem; text-transform: uppercase; }
+.coverMark { color: #2859ce; font: 700 clamp(4rem, 13vw, 11rem)/0.8 var(--font-sans); opacity: 0.32; position: absolute; right: 4%; top: 21%; transform: rotate(-12deg); }
+.coverCopy { display: flex; flex-direction: column; gap: 0.45rem; max-width: 90%; }
+.coverCopy span { font: 700 clamp(0.62rem, 1vw, 0.8rem)/1.2 var(--font-sans); letter-spacing: 0.09em; text-transform: uppercase; }
+.coverCopy strong { display: -webkit-box; font: 700 clamp(1.2rem, 3vw, 3.5rem)/1.02 var(--font-sans); letter-spacing: -0.055em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }

@@ -28,6 +28,14 @@
 .editor textarea, .moreActions textarea { line-height: 1.45; }
 .editor .independenceCheck { align-items: start; display: flex; font-size: .78rem; gap: .7rem; line-height: 1.4; }
 .editor .independenceCheck input { flex: 0 0 1rem; height: 1rem; min-height: 0; padding: 0; width: 1rem; }
+.mediaHint { color: var(--muted); font-size: .73rem; line-height: 1.4; margin: 0; }
+.uploadForm { border-bottom: 1px solid var(--ink); display: grid; gap: .65rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; }
+.uploadForm h2 { margin: 0 0 .3rem; }
+.uploadForm label { display: grid; font-size: .7rem; font-weight: 600; gap: .3rem; }
+.uploadForm input { background: var(--surface); border: 1px solid var(--line); color: var(--ink); font: inherit; min-height: 2.5rem; padding: .55rem; }
+.uploadForm .permissionCheck { align-items: start; display: flex; line-height: 1.35; }
+.uploadForm .permissionCheck input { min-height: 0; }
+.uploadForm button { background: var(--acid); border: 1px solid var(--ink); color: var(--acid-ink); cursor: pointer; font: inherit; font-size: .75rem; font-weight: 650; min-height: 2.7rem; }
 .twoCol { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
 .actionBar { background: var(--paper); border-top: 1px solid var(--ink); bottom: 0; display: flex; gap: 1rem; justify-content: space-between; padding: .8rem 0; position: sticky; z-index: 5; }
 .actionBar > label { min-width: 13rem; }

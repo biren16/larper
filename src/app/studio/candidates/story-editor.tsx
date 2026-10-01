@@ -12,6 +12,8 @@ export interface StudioCandidateDetail {
   sensitiveFlags: string[];
   evidence: Array<{ id: string; title: string; sourceName: string; sourceUrl: string; trustTier: string; availability: string }>;
   revisions?: Array<{ revision: number; createdAt: string; editorId: string }>;
+  mediaId?: string | null;
+  mediaOptions?: Array<{ id: string; alt: string; creditLine: string | null }>;
 }
 
 type Action = (formData: FormData) => void | Promise<void>;
@@ -37,6 +39,7 @@ export function StoryEditor({
   mergeAction,
   splitAction,
   scheduleAction,
+  uploadMediaAction,
 }: {
   candidate: StudioCandidateDetail;
   publishAction?: Action;
@@ -45,6 +48,7 @@ export function StoryEditor({
   mergeAction?: Action;
   splitAction?: Action;
   scheduleAction?: Action;
+  uploadMediaAction?: Action;
 }) {
   return (
     <main id="main-content" className={styles.main}>
@@ -96,6 +100,15 @@ export function StoryEditor({
           </fieldset>
 
           <fieldset>
+            <legend>Cover</legend>
+            <label>Story image<select name="mediaId" defaultValue={candidate.mediaId ?? ""}>
+              <option value="">Use a LARPer cover</option>
+              {(candidate.mediaOptions ?? []).map((asset) => <option key={asset.id} value={asset.id}>{asset.alt}{asset.creditLine ? ` · ${asset.creditLine}` : ""}</option>)}
+            </select></label>
+            <p className={styles.mediaHint}>Only uploaded images with recorded commercial-use permission appear here. LARPer covers work without an upload.</p>
+          </fieldset>
+
+          <fieldset>
             <legend>Evidence summary</legend>
             <label>What the sources establish<textarea name="evidenceSummary" required rows={4} /></label>
             <label className={styles.independenceCheck}><input name="independentSourcesConfirmed" type="checkbox" required />I checked at least two independent original sources, not two copies of one report.</label>
@@ -115,6 +128,19 @@ export function StoryEditor({
 
         <aside className={styles.evidence} aria-labelledby="evidence-heading">
           <div className={styles.evidenceSticky}>
+            {uploadMediaAction && <form className={styles.uploadForm} aria-label="Upload approved image" action={uploadMediaAction}>
+              <h2>Upload a cover</h2>
+              <input type="hidden" name="candidateId" value={candidate.id} />
+              <label>Image file (WebP, under 400 KB)<input type="file" name="image" accept="image/webp" required /></label>
+              <label>Alt text<input name="alt" required /></label>
+              <label>Original source URL<input name="sourceUrl" type="url" required /></label>
+              <label>Credit line<input name="creditLine" required /></label>
+              <label>Licence or permission record<input name="licenseCode" required /></label>
+              <label className={styles.permissionCheck}><input name="commercialUseAllowed" type="checkbox" required />Commercial display is permitted</label>
+              <label className={styles.permissionCheck}><input name="modificationAllowed" type="checkbox" />Cropping and colour edits are permitted</label>
+              <label className={styles.permissionCheck}><input name="socialUseAllowed" type="checkbox" />Social sharing is permitted</label>
+              <PendingButton type="submit" pendingLabel="Uploading…">Upload image</PendingButton>
+            </form>}
             <header><h2 id="evidence-heading">Evidence</h2><span>{candidate.evidence.length} signals</span></header>
             <p>Open every source behind a factual claim before publishing.</p>
             <div className={styles.evidenceList}>{candidate.evidence.map((item) => <article key={item.id}>

@@ -5,6 +5,47 @@ import { createEditorialActions } from "@/backend/editorial/actions";
 import { getEditorialRuntime } from "@/backend/editorial/runtime";
 import { invalidatePublicDiscovery } from "@/backend/editorial/cache-invalidation";
 import { isPublicSourceUrl } from "@/backend/ingestion/source-url";
+import { validateEditorialUpload, validateMediaRights } from "@/backend/media/upload";
+
+export async function uploadEditorialMediaAction(form: FormData) {
+  const runtime = await getEditorialRuntime();
+  const candidateId = String(form.get("candidateId") ?? "").trim();
+  const destination = `/studio/candidates/${encodeURIComponent(candidateId)}`;
+  try {
+    if (!candidateId) throw new Error("Candidate is required");
+    const file = form.get("image");
+    if (!(file instanceof File)) throw new Error("Image file is required");
+    const { bytes, width, height } = await validateEditorialUpload(file);
+    const rights = validateMediaRights({
+      alt: String(form.get("alt") ?? ""), sourceUrl: String(form.get("sourceUrl") ?? ""),
+      creditLine: String(form.get("creditLine") ?? ""), licenseCode: String(form.get("licenseCode") ?? ""),
+      commercialUseAllowed: form.get("commercialUseAllowed") === "on",
+      modificationAllowed: form.get("modificationAllowed") === "on",
+      socialUseAllowed: form.get("socialUseAllowed") === "on",
+    });
+    const id = crypto.randomUUID();
+    const objectPath = `${candidateId}/${id}.webp`;
+    const bucket = runtime.client.storage.from("editorial-media");
+    const saved = await bucket.upload(objectPath, bytes, { contentType: "image/webp", cacheControl: "31536000", upsert: false });
+    if (saved.error) throw new Error(`Image upload failed: ${saved.error.message}`);
+    const { data: publicUrl } = bucket.getPublicUrl(objectPath);
+    const recorded = await runtime.client.from("media_assets").insert({
+      id, src: publicUrl.publicUrl, alt: rights.alt, width, height, focal_position: null,
+      kind: "uploaded", source_url: rights.sourceUrl, credit_line: rights.creditLine,
+      license_code: rights.licenseCode, commercial_use_allowed: rights.commercialUseAllowed,
+      modification_allowed: rights.modificationAllowed, social_use_allowed: rights.socialUseAllowed,
+      object_path: objectPath,
+    });
+    if (recorded.error) {
+      await bucket.remove([objectPath]);
+      throw new Error(`Image record failed: ${recorded.error.message}`);
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not upload image";
+    redirect(`${destination}?error=${encodeURIComponent(message)}`);
+  }
+  redirect(`${destination}?notice=image-uploaded`);
+}
 
 export async function publishCandidateAction(form: FormData) {
   const runtime = await getEditorialRuntime();
@@ -25,6 +66,7 @@ export async function scheduleCandidateAction(form: FormData) {
   const scheduledFor = scheduleInput && !/(?:Z|[+-]\d\d:\d\d)$/.test(scheduleInput) ? `${scheduleInput}:00+05:30` : scheduleInput;
   try {
     await runtime.service.scheduleStory(runtime.actor, String(form.get("candidateId") ?? ""), {
+      mediaId: String(form.get("mediaId") ?? "").trim() || null,
       nicheId: String(form.get("nicheId") ?? ""), slug: String(form.get("slug") ?? ""), title: String(form.get("title") ?? ""),
       hook: String(form.get("hook") ?? ""), summary: String(form.get("summary") ?? ""), whyItMatters: String(form.get("whyItMatters") ?? ""),
       lore: String(form.get("lore") ?? ""), beginnerContext: String(form.get("beginnerContext") ?? ""), conversationLine: String(form.get("conversationLine") ?? ""), discoveryType, mode,

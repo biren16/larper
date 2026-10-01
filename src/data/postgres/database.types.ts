@@ -11,7 +11,7 @@ export interface Database {
   public: {
     Tables: {
       niches: Table<{ id: string; slug: string; name: string; description: string; curiosity_hook: string; parent_category: string; related_niche_ids: string[]; hero_media_id: string | null; status: string; origin: string; created_at: string; updated_at: string }>;
-      media_assets: Table<{ id: string; src: string; alt: string; width: number; height: number; focal_position: string | null; created_at: string }>;
+      media_assets: Table<{ id: string; src: string; alt: string; width: number; height: number; focal_position: string | null; kind: string; source_url: string | null; credit_line: string | null; license_code: string | null; commercial_use_allowed: boolean; modification_allowed: boolean; social_use_allowed: boolean; object_path: string | null; created_at: string }>;
       source_definitions: Table<{ id: string; name: string; adapter_type: string; config: Json; trust_tier: string; locale: string; region: string; poll_minutes: number; allowlisted: boolean; active: boolean; watchlist_beat: string | null; last_polled_at: string | null; created_at: string; updated_at: string }>;
       raw_signals: Table<{ id: string; source_definition_id: string; canonical_url: string; external_id: string | null; source_type: string; source_name: string; author: string | null; title: string; body: string | null; locale: string; region: string; suggested_niche_id: string | null; published_at: string; observed_at: string; trust_tier: string; availability: string; metrics: Json; sensitive_flags: string[]; created_at: string; updated_at: string }>;
       signal_snapshots: Table<{ id: string; raw_signal_id: string; metrics: Json; captured_at: string }>;
