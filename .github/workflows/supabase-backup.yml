@@ -39,9 +39,9 @@ jobs:
         env:
           BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
         run: |
+          trap 'test ! -f restore.sql || shred -u restore.sql' EXIT
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in larper-backup.sql.enc -out restore.sql -pass env:BACKUP_ENCRYPTION_KEY
-          docker run --detach --name larper-restore -e POSTGRES_PASSWORD=restore -p 54329:5432 postgres:17
+          docker run --detach --name larper-restore -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=restore -e PGPASSWORD=restore -p 54329:5432 public.ecr.aws/supabase/postgres:17.11.0.002
           for attempt in {1..30}; do docker exec larper-restore pg_isready -U postgres && break; sleep 2; done
           PGPASSWORD=restore psql "postgresql://postgres@127.0.0.1:54329/postgres" -v ON_ERROR_STOP=1 -f restore.sql
           PGPASSWORD=restore psql "postgresql://postgres@127.0.0.1:54329/postgres" -v ON_ERROR_STOP=1 -c "select count(*) from public.niches"
-          shred -u restore.sql
