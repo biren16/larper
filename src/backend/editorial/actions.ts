@@ -86,7 +86,7 @@ export function createEditorialActions(dependencies: {
         else if (action === "expire") await dependencies.service.expire(actor, candidateId, notes);
         else if (action === "unpublish") await dependencies.service.unpublish(actor, candidateId, notes);
         else throw new Error("action is invalid");
-        if (action === "unpublish") await dependencies.invalidatePublicContent?.({ slug: String(form.get("slug") ?? "").trim() || undefined });
+        await dependencies.invalidatePublicContent?.({ slug: String(form.get("slug") ?? "").trim() || undefined });
         return { ok: true as const };
       } catch (error) {
         return { ok: false as const, error: message(error) };

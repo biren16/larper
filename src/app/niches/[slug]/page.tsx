@@ -16,6 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: page.niche.name, description: page.niche.description };
 }
 
+export const instant = false;
+
 export default async function NichePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const page = await getCachedNichePage(slug);

@@ -32,9 +32,13 @@ For every source, record its owner and public URL, adapter and polling interval,
 4. Use briefs only when two independent allowlisted sources, heat of at least 70, confidence of at least 80, and zero sensitive flags are present.
 5. If evidence disappears or becomes private, unpublish or return the story to review. The public cache is invalidated immediately.
 
+For a story image, upload a WebP smaller than 400 KB in the candidate editor. Record the source URL, credit, licence or permission record, and explicit commercial-use permission. Set cropping and social-sharing permissions separately. Select the uploaded asset in the Cover field before publication. Without an approved image, the page and social preview use a subject-specific LARPer cover. Generated AI imagery is not part of the current publishing workflow.
+
 When a scheduled story becomes due, the database checks that its candidate is still under review, two available source definitions remain, and at least one is a primary or publication source. If a check fails, it clears the schedule and records `scheduled_publish_blocked`; an editor must review and schedule it again. This automatic check does not replace the editor's original-source review at scheduling time.
 
 Every collection run that completes clustering also checks published current stories. Once a current story is at least 72 hours old and has no available evidence first observed within the last 36 hours, it returns to Studio review and leaves the public feed. Deep-lore stories do not follow this live-freshness rule. The editor can republish after reviewing new evidence.
+
+An editor's reject, expire, or unpublish action updates the story and review trail in one database transaction. An automatic freshness return happens in Supabase rather than a Next.js Server Action, so the public cache uses a short 30-second stale window and 60-second revalidation interval. Check the public route after a freshness return; it is not an immediate push invalidation.
 
 Auto-publishing remains operationally disabled at launch. The backend enforces eligibility, but founders should enable unattended briefs only after beta review decisions show acceptable precision.
 
@@ -48,6 +52,12 @@ Auto-publishing remains operationally disabled at launch. The backend enforces e
 - **Account concern:** inspect Auth logs and RLS policies. Never use a service credential in the browser.
 
 Launch health targets are at least 95% successful scheduled runs and review-queue arrival within six hours. Alerting can be added once a no-cost channel is chosen; until then, Studio is the operational source of truth.
+
+## Release verification
+
+The `Quality` GitHub Actions workflow runs lint, typecheck, unit tests, production build, browser checks against fixture data, and disposable PostgreSQL SQL regressions. The database journey covers a founder-entered lead plus an RSS-style signal through clustering, publication, evidence linkage, and unpublish. Browser fixtures do not prove that real Supabase Auth, adapters, Edge scheduling, Storage, Vercel caching, and domain configuration work together.
+
+Before public launch, apply migrations to staging and complete one real authenticated Studio journey: add an approved source and manual signal, run ingestion, confirm a two-source candidate, upload and select a licensed image, publish, inspect the public page and Open Graph preview, then unpublish and confirm it disappears. Check a recovered and an overdue source in Studio. Record the run ID, story URL, and any errors. The separate backup restore test must also pass before launch.
 
 ## Backup and restore
 

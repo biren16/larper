@@ -13,8 +13,11 @@ alter table public.media_assets
 alter table public.media_assets
   add constraint uploaded_media_has_rights check (
     kind = 'larper' or (
-      source_url is not null and credit_line is not null and license_code is not null
-      and object_path is not null and commercial_use_allowed
+      coalesce(source_url ~ '^https://[^/]+', false)
+      and coalesce(length(trim(credit_line)) > 0, false)
+      and coalesce(length(trim(license_code)) > 0, false)
+      and coalesce(length(trim(object_path)) > 0, false)
+      and commercial_use_allowed
     )
   );
 

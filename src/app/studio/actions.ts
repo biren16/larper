@@ -12,7 +12,7 @@ export async function uploadEditorialMediaAction(form: FormData) {
   const candidateId = String(form.get("candidateId") ?? "").trim();
   const destination = `/studio/candidates/${encodeURIComponent(candidateId)}`;
   try {
-    if (!candidateId) throw new Error("Candidate is required");
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(candidateId)) throw new Error("A valid candidate is required");
     const file = form.get("image");
     if (!(file instanceof File)) throw new Error("Image file is required");
     const { bytes, width, height } = await validateEditorialUpload(file);

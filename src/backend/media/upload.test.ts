@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import sharp from "sharp";
 import { validateEditorialUpload, validateMediaRights } from "./upload";
 
 function webp(width: number, height: number) {
@@ -18,13 +19,16 @@ function webp(width: number, height: number) {
 }
 
 describe("validateEditorialUpload", () => {
-  it("accepts a compact WebP with dimensions verified from its bytes", async () => {
-    await expect(validateEditorialUpload(webp(1200, 800))).resolves.toMatchObject({ width: 1200, height: 800 });
+  it("accepts a decodable WebP with dimensions verified from its bytes", async () => {
+    const bytes = await sharp({ create: { width: 1200, height: 800, channels: 3, background: "#f0f0f0" } }).webp().toBuffer();
+    await expect(validateEditorialUpload(new File([new Uint8Array(bytes)], "cover.webp", { type: "image/webp" })))
+      .resolves.toMatchObject({ width: 1200, height: 800 });
   });
 
   it("rejects forged images and oversized dimensions", async () => {
     await expect(validateEditorialUpload(new File(["<script>"], "cover.webp", { type: "image/webp" }))).rejects.toThrow("WebP");
     await expect(validateEditorialUpload(webp(1600, 800))).rejects.toThrow("1400");
+    await expect(validateEditorialUpload(webp(1200, 800))).rejects.toThrow("decodable");
   });
 });
 

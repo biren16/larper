@@ -1,0 +1,53 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e -- --workers=1 --reporter=line
+
+  database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: test
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: SQL regressions
+        run: |
+          set -euo pipefail
+          for fixture in supabase/tests/*.sql; do
+            echo "Running $fixture"
+            psql -v ON_ERROR_STOP=1 -f "$fixture"
+          done

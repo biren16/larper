@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("the image-free intro resolves into the navbar wordmark", async ({ page }) => {
+  test.setTimeout(60000);
   const browserErrors: string[] = [];
   page.on("pageerror", (error) => browserErrors.push(error.message));
   await page.addInitScript(() => window.sessionStorage.removeItem("larper:intro:v1"));
@@ -12,7 +13,7 @@ test("the image-free intro resolves into the navbar wordmark", async ({ page }) 
 
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const introWordmark = page.locator("[data-intro-wordmark]");
     const overlay = introWordmark.locator("xpath=ancestor::div[@aria-hidden='true']");

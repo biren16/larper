@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import sharp from "sharp";
 
 const redirect = vi.fn((url: string) => { throw new Error(`redirect:${url}`); });
 const getEditorialRuntime = vi.fn();
@@ -107,10 +108,36 @@ describe("uploadEditorialMediaAction", () => {
     getEditorialRuntime.mockResolvedValue({ client: { storage: { from: () => ({ upload }) } } });
     const { uploadEditorialMediaAction } = await import("./actions");
     const form = new FormData();
-    form.set("candidateId", "cluster-1");
+    form.set("candidateId", "00000000-0000-0000-0000-000000000101");
     form.set("image", new File(["not a webp"], "cover.png", { type: "image/png" }));
     await expect(uploadEditorialMediaAction(form)).rejects.toThrow(/redirect:.*Upload%20a%20WebP/);
     expect(upload).not.toHaveBeenCalled();
+  });
+
+  it("stores an approved cover and its rights record", async () => {
+    const upload = vi.fn(async () => ({ error: null }));
+    const insert = vi.fn(async () => ({ error: null }));
+    getEditorialRuntime.mockResolvedValue({ client: {
+      storage: { from: () => ({ upload, getPublicUrl: () => ({ data: { publicUrl: "https://storage.example/cover.webp" } }) }) },
+      from: () => ({ insert }),
+    } });
+    const bytes = await sharp({ create: { width: 200, height: 100, channels: 3, background: "#eeeeee" } }).webp().toBuffer();
+    const form = new FormData();
+    form.set("candidateId", "00000000-0000-0000-0000-000000000101");
+    form.set("image", new File([new Uint8Array(bytes)], "cover.webp", { type: "image/webp" }));
+    form.set("alt", "Race car at the circuit");
+    form.set("sourceUrl", "https://example.com/original");
+    form.set("creditLine", "Photo by Artist");
+    form.set("licenseCode", "permission");
+    form.set("commercialUseAllowed", "on");
+    const { uploadEditorialMediaAction } = await import("./actions");
+    await expect(uploadEditorialMediaAction(form)).rejects.toThrow(/notice=image-uploaded/);
+    expect(upload).toHaveBeenCalledOnce();
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({
+      alt: "Race car at the circuit", credit_line: "Photo by Artist",
+      commercial_use_allowed: true, modification_allowed: false, social_use_allowed: false,
+      width: 200, height: 100, src: "https://storage.example/cover.webp",
+    }));
   });
 });
 

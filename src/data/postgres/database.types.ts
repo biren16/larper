@@ -41,6 +41,10 @@ export interface Database {
       };
       publish_due_stories: { Args: Record<never, never>; Returns: number };
       reopen_stale_current_stories: { Args: Record<never, never>; Returns: number };
+      transition_editorial_candidate: {
+        Args: { p_candidate_id: string; p_reviewer_id: string; p_state: string; p_action: string; p_notes: string };
+        Returns: undefined;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

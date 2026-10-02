@@ -44,6 +44,7 @@ class MemoryStore implements EditorialStore {
   publications: PublicationCommand[] = [];
   reviews: ReviewEvent[] = [];
   transitions: string[] = [];
+  transitionEvents: ReviewEvent[] = [];
   merges: Array<[string, string]> = [];
   splits: Array<[string, string[]]> = [];
   manuals: unknown[] = [];
@@ -53,6 +54,7 @@ class MemoryStore implements EditorialStore {
   async commitPublication(command: PublicationCommand) { this.publications.push(command); return { storyId: "story-1", revision: this.publications.length }; }
   async recordReview(event: ReviewEvent) { this.reviews.push(event); }
   async setCandidateState(_id: string, state: string) { this.current = { ...this.current, state: state as CandidateRecord["state"] }; this.transitions.push(state); }
+  async commitTransition(event: ReviewEvent & { state: CandidateRecord["state"] }) { await this.setCandidateState(event.candidateId, event.state); this.transitionEvents.push(event); }
   async mergeClusters(target: string, source: string) { this.merges.push([target, source]); }
   async splitCluster(id: string, signalIds: string[]) { this.splits.push([id, signalIds]); return "cluster-2"; }
   async addManualSignal(signal: unknown) { this.manuals.push(signal); return "signal-1"; }
@@ -122,6 +124,8 @@ describe("EditorialService", () => {
     await service.expire(actor, "cluster-1", "Momentum ended");
     await service.unpublish(actor, "cluster-1", "Source was removed");
     expect(store.transitions).toEqual(["rejected", "expired", "reviewing"]);
+    expect(store.transitionEvents.map((event) => event.action)).toEqual(["reject", "expire", "unpublish"]);
+    expect(store.reviews).toEqual([]);
   });
 
   it("supports auditable merge, split, and manual intake operations", async () => {

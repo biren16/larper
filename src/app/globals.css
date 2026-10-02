@@ -108,6 +108,10 @@ img { display: block; max-width: 100%; }
   --focus: #8da7ff;
 }
 
+@media (max-width: 767px) {
+  html { scroll-behavior: auto; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }

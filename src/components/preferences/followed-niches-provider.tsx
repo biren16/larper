@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import {
   DEFAULT_FOLLOWED_NICHE_IDS,
   PREFERENCES_STORAGE_KEY,
@@ -9,6 +9,7 @@ import {
 } from "@/domain/preferences/preferences";
 
 interface FollowedNichesContextValue {
+  initialNicheIds: string[];
   followedNicheIds: string[];
   isFollowed: (id: string) => boolean;
   toggleFollow: (id: string, name: string) => void;
@@ -17,9 +18,11 @@ interface FollowedNichesContextValue {
 }
 
 const FollowedNichesContext = createContext<FollowedNichesContextValue | null>(null);
+const subscribeHydration = () => () => {};
 
 export function FollowedNichesProvider({ children, knownNicheIds, syncFollow }: { children: ReactNode; knownNicheIds?: string[]; syncFollow?: (id: string, followed: boolean) => Promise<unknown> }) {
   const knownIds = useMemo(() => knownNicheIds ? new Set(knownNicheIds) : undefined, [knownNicheIds]);
+  const initialNicheIds = useMemo(() => knownIds ? DEFAULT_FOLLOWED_NICHE_IDS.filter((id) => knownIds.has(id)) : [...DEFAULT_FOLLOWED_NICHE_IDS], [knownIds]);
   const [followedNicheIds, setFollowedNicheIds] = useState(() =>
     knownIds ? DEFAULT_FOLLOWED_NICHE_IDS.filter((id) => knownIds.has(id)) : [...DEFAULT_FOLLOWED_NICHE_IDS],
   );
@@ -62,12 +65,13 @@ export function FollowedNichesProvider({ children, knownNicheIds, syncFollow }: 
   }, [knownIds]);
 
   const value = useMemo<FollowedNichesContextValue>(() => ({
+    initialNicheIds,
     followedNicheIds,
     isFollowed: (id) => followedNicheIds.includes(id),
     toggleFollow,
     hydrateFollows,
     registerAccountSync: (sync) => { accountSync.current = sync; },
-  }), [followedNicheIds, hydrateFollows, toggleFollow]);
+  }), [followedNicheIds, hydrateFollows, initialNicheIds, toggleFollow]);
 
   return (
     <FollowedNichesContext.Provider value={value}>
@@ -79,6 +83,9 @@ export function FollowedNichesProvider({ children, knownNicheIds, syncFollow }: 
 
 export function useFollowedNiches(): FollowedNichesContextValue {
   const context = useContext(FollowedNichesContext);
+  const hydrated = useSyncExternalStore(subscribeHydration, () => true, () => false);
   if (!context) throw new Error("useFollowedNiches must be used inside FollowedNichesProvider");
-  return context;
+  if (hydrated) return context;
+  const followedNicheIds = context.initialNicheIds;
+  return { ...context, followedNicheIds, isFollowed: (id) => followedNicheIds.includes(id) };
 }

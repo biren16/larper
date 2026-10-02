@@ -19,6 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: detail.topic.title, description: detail.topic.hook };
 }
 
+export const instant = false;
+
 export default async function TopicDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const detail = await getCachedTopicDetail(slug);

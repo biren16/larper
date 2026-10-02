@@ -25,6 +25,7 @@ export interface EditorialStore {
   commitPublication(command: PublicationCommand): Promise<{ storyId: string; revision: number }>;
   recordReview(event: ReviewEvent): Promise<void>;
   setCandidateState(id: string, state: TopicLifecycle): Promise<void>;
+  commitTransition(event: ReviewEvent & { state: TopicLifecycle }): Promise<void>;
   mergeClusters(targetId: string, sourceId: string): Promise<void>;
   splitCluster(clusterId: string, signalIds: string[]): Promise<string>;
   addManualSignal(signal: NormalizedSignal): Promise<string>;
@@ -139,8 +140,7 @@ export class EditorialService {
   private async transition(actor: EditorialActor | null, candidateId: string, state: TopicLifecycle, action: string, notes: string) {
     const context = await this.candidate(actor, candidateId);
     if (!notes.trim()) throw new Error("A review note is required");
-    await this.store.setCandidateState(candidateId, state);
-    await this.store.recordReview({ candidateId, reviewerId: context.actor.id, action, notes: notes.trim() });
+    await this.store.commitTransition({ candidateId, reviewerId: context.actor.id, state, action, notes: notes.trim() });
   }
 
   reject(actor: EditorialActor | null, candidateId: string, notes: string) { return this.transition(actor, candidateId, "rejected", "reject", notes); }

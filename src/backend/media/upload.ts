@@ -1,3 +1,5 @@
+import sharp from "sharp";
+
 export interface MediaRights {
   alt: string;
   sourceUrl: string;
@@ -48,5 +50,11 @@ export async function validateEditorialUpload(file: File): Promise<{ bytes: Uint
     throw new Error("Unsupported WebP image");
   }
   if (width < 1 || height < 1 || width > 1400 || height > 1400) throw new Error("Image dimensions must be at most 1400 × 1400");
+  try {
+    const { info } = await sharp(bytes, { limitInputPixels: 1400 * 1400 }).raw().toBuffer({ resolveWithObject: true });
+    if (info.width !== width || info.height !== height) throw new Error("Dimensions do not match decoded image");
+  } catch {
+    throw new Error("Image must be a decodable WebP");
+  }
   return { bytes, width, height };
 }

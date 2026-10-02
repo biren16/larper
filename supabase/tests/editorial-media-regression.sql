@@ -23,6 +23,14 @@ begin
   exception when check_violation then rejected := true;
   end;
   if not rejected then raise exception 'Unlicensed upload was accepted'; end if;
+  rejected := false;
+  begin
+    insert into public.media_assets(id, src, alt, width, height, kind, source_url, credit_line, license_code, object_path)
+    values ('empty-rights', 'https://example.com/image.webp', 'Image', 1200, 800,
+      'uploaded', 'https://example.com/original', ' ', ' ', 'candidate/empty.webp');
+  exception when check_violation then rejected := true;
+  end;
+  if not rejected then raise exception 'Blank rights record was accepted'; end if;
   insert into public.media_assets(
     id, src, alt, width, height, kind, source_url, credit_line, license_code,
     commercial_use_allowed, modification_allowed, social_use_allowed, object_path

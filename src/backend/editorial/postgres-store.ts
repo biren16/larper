@@ -65,6 +65,13 @@ export class PostgresEditorialStore implements EditorialStore {
       failure("Unpublish story", story.error);
     }
   }
+  async commitTransition(event: ReviewEvent & { state: CandidateRecord["state"] }) {
+    const result = await this.client.rpc("transition_editorial_candidate", {
+      p_candidate_id: event.candidateId, p_reviewer_id: event.reviewerId,
+      p_state: event.state, p_action: event.action, p_notes: event.notes ?? "",
+    });
+    failure("Transition candidate", result.error);
+  }
   async mergeClusters(targetId: string, sourceId: string) {
     const links = await this.client.from("cluster_signals").select("raw_signal_id, match_score, match_reasons").eq("cluster_id", sourceId);
     failure("Load merge evidence", links.error);

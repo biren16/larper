@@ -36,6 +36,23 @@ describe("editorial action factory", () => {
     expect(publishStory).not.toHaveBeenCalled();
   });
 
+  it("invalidates public discovery after an editorial removal", async () => {
+    const invalidatePublicContent = vi.fn();
+    const unpublish = vi.fn();
+    const actions = createEditorialActions({
+      getActor: async () => ({ id: "editor-1", email: "founder@example.com", role: "founder" as const }),
+      now: () => "2026-09-20T10:00:00.000Z",
+      service: { unpublish } as never, invalidatePublicContent,
+    });
+    const form = new FormData();
+    form.set("candidateId", "cluster-1");
+    form.set("action", "unpublish");
+    form.set("notes", "Evidence removed");
+    await expect(actions.transition(form)).resolves.toEqual({ ok: true });
+    expect(unpublish).toHaveBeenCalledOnce();
+    expect(invalidatePublicContent).toHaveBeenCalledWith({ slug: undefined });
+  });
+
   it("passes structured founder pulse details to the editorial service", async () => {
     const addManualSignal = vi.fn(async () => "signal-1");
     const actions = createEditorialActions({
