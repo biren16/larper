@@ -4,7 +4,8 @@ create role service_role;
 create role anon;
 create role authenticated;
 create table public.topic_clusters (
-  id uuid primary key, state text, editorial_stage text, niche_id text,
+  id uuid primary key, state text, editorial_stage text not null default 'watching'
+    check (editorial_stage in ('watching', 'rising', 'confirmed')), niche_id text,
   confidence numeric, momentum numeric, source_diversity numeric, freshness numeric,
   novelty numeric, india_relevance numeric, crossover numeric, heat numeric,
   sensitive_flags text[], first_detected_at timestamptz, last_checked_at timestamptz,
@@ -44,6 +45,7 @@ insert into public.cluster_signals values
 
 \i supabase/migrations/202610010003_atomic_editorial_publication.sql
 \i supabase/migrations/202610020002_origins_and_private_drafts.sql
+\i supabase/migrations/202610020008_draft_evidence_stage.sql
 update public.source_definitions set config = '{"url":"https://www.one.example/feed","domains":["one.example"]}';
 update public.raw_signals set availability = 'available';
 
@@ -53,6 +55,7 @@ begin
  select * into saved from public.save_editorial_draft('00000000-0000-0000-0000-000000000101','00000000-0000-0000-0000-000000000401',draft);
  perform * from public.save_editorial_draft('00000000-0000-0000-0000-000000000101','00000000-0000-0000-0000-000000000401',draft || '{"hook":"Updated hook"}');
  if (select count(*) from public.stories) <> 1 then raise exception 'Repeated draft save created duplicates'; end if;
+ if (select editorial_stage from public.topic_clusters where id='00000000-0000-0000-0000-000000000101') <> 'confirmed' then raise exception 'Draft save changed the existing evidence stage'; end if;
  if not exists(select 1 from public.stories where id = saved.story_id and lifecycle = 'reviewing' and published_at is null and hook = 'Updated hook') then raise exception 'Draft persisted incorrectly'; end if;
  if (select count(*) from public.review_events where action = 'save_draft') <> 2 then raise exception 'Draft audit missing'; end if;
  if (select count(*) from public.story_revisions) <> 2 then raise exception 'Draft revisions missing'; end if;
