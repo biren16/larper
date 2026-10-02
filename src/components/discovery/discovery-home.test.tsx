@@ -45,6 +45,23 @@ describe("DiscoveryHome", () => {
     expect(screen.getAllByRole("link", { name: /silver runners are back in rotation/i }).length).toBeGreaterThan(0);
   });
 
+  it("shows published deep lore when no current stories exist", async () => {
+    const home = await buildDiscoveryHome(seedRepository, DEFAULT_FOLLOWED_NICHE_IDS);
+    const story = home.deepLore[0];
+    render(
+      <FollowedNichesProvider knownNicheIds={home.niches.map((niche) => niche.id)}>
+        <DiscoveryHome home={{ ...home, currentTopics: [], deepLore: [story] }} />
+      </FollowedNichesProvider>,
+    );
+
+    expect(screen.queryByRole("heading", { name: "The radar is recalibrating." })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Missed the origin story?" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Explore deep lore" })).toHaveAttribute("href", "#deep-lore");
+    expect(within(screen.getByLabelText("Featured deep lore")).getByRole("link", { name: `Open ${story.topic.title}` })).toHaveAttribute("href", `/discover/${story.topic.slug}`);
+    expect(screen.getByText("No verified current stories yet. Explore the deep lore below.")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "See what's peaking" })).not.toBeInTheDocument();
+  });
+
   it("renders an honest verified-edition state when no publishable signals exist", () => {
     const { container } = render(
       <FollowedNichesProvider knownNicheIds={[]}>

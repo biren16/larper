@@ -38,10 +38,11 @@ function HomeSignalCard({ item, layout }: { item: TopicViewModel; layout: HomeSi
 export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
   const { followedNicheIds } = useFollowedNiches();
   const currentTopics = rerank(home.currentTopics, followedNicheIds);
+  const featuredTopics = currentTopics.length > 0 ? currentTopics : home.deepLore;
   const followed = followedNicheIds.map((id) => home.niches.find((niche) => niche.id === id)).filter((niche): niche is DiscoveryHomeViewModel["niches"][number] => Boolean(niche));
   const recommended = home.niches.filter((niche) => !followedNicheIds.includes(niche.id));
 
-  if (currentTopics.length === 0) {
+  if (currentTopics.length === 0 && home.deepLore.length === 0) {
     return (
       <main id="main-content" className={styles.main}>
         <section className={styles.emptyRadar} aria-labelledby="empty-radar-heading">
@@ -62,20 +63,20 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
           <p className={styles.kicker}>Find new shit to get obsessed with.</p>
           <h1>Wanna larp bout smth? Find a niche rn.</h1>
           <p className={styles.dek}>Niche obsessions, drops, memes, debates and lore. With enough context to get why people care.</p>
-          <a className={styles.nowLink} href="#larping-now">See what&apos;s peaking <ArrowDown aria-hidden /></a>
+          <a className={styles.nowLink} href={currentTopics.length > 0 ? "#larping-now" : "#deep-lore"}>{currentTopics.length > 0 ? "See what's peaking" : "Explore deep lore"} <ArrowDown aria-hidden /></a>
         </div>
-        <div className={styles.heroCollage} aria-label="Current ranked culture signals">
-          {currentTopics.slice(0, 3).map((item, index) => <Link className={`${styles.heroSignal} ${index === 0 ? styles.heroPrimary : index === 1 ? styles.heroSecondary : styles.heroTertiary}`} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`} key={item.topic.id}><Artwork media={item.media} context={coverContextForTopic(item)} priority={index === 0} /><span className={styles.heroCaption}><small>{item.niche.name} / {item.topic.freshnessLabel}</small><strong>{item.topic.title}</strong></span></Link>)}
+        <div className={styles.heroCollage} aria-label={currentTopics.length > 0 ? "Current ranked culture signals" : "Featured deep lore"}>
+          {featuredTopics.slice(0, 3).map((item, index) => <Link className={`${styles.heroSignal} ${index === 0 ? styles.heroPrimary : index === 1 ? styles.heroSecondary : styles.heroTertiary}`} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`} key={item.topic.id}><Artwork media={item.media} context={coverContextForTopic(item)} priority={index === 0} /><span className={styles.heroCaption}><small>{item.niche.name} / {item.topic.freshnessLabel}</small><strong>{item.topic.title}</strong></span></Link>)}
         </div>
       </header>
 
       <section className={styles.now} aria-labelledby="larping-now">
         <div className={styles.chapterHeading}><div><h2 id="larping-now">Internet RN</h2></div><p>The drops, memes and micro-drama moving fastest through niche communities.</p></div>
-        <div className={styles.currentScene}>
+        {currentTopics.length > 0 ? <><div className={styles.currentScene}>
           <div className={styles.leadStage}><HomeSignalCard item={currentTopics[0]} layout="lead" /></div>
           <div className={styles.spotlightStack}>{currentTopics.slice(1, 5).map((item) => <HomeSignalCard key={item.topic.id} item={item} layout="spotlight" />)}</div>
         </div>
-        <div className={styles.signalStrips}>{currentTopics.slice(5, 7).map((item) => <HomeSignalCard key={item.topic.id} item={item} layout="strip" />)}</div>
+        <div className={styles.signalStrips}>{currentTopics.slice(5, 7).map((item) => <HomeSignalCard key={item.topic.id} item={item} layout="strip" />)}</div></> : <p>No verified current stories yet. Explore the deep lore below.</p>}
       </section>
 
       <section className={styles.yours} aria-labelledby="your-larps">
