@@ -60,3 +60,11 @@ Final: Ruling: preserve pre-existing recapture availability restoration and sche
 - Local desktop/mobile browser suite: 32 passed, 14 viewport-specific skips.
 - `npm run test:staging`: exit 9, `.env.staging: not found`; no live staging mutation or publication performed.
 - Node feed recheck: 21/21 reachable and parsed; reviewed permission and deployed collection remain separate gates.
+
+## Staging bootstrap correction — 2026-10-02
+
+The founder linked isolated staging `rllftxsfixgkcmjvpypu` and ran `supabase db push --include-seed`. Twelve historical migrations applied; `202609220003` then failed with a foreign key violation because Screen Culture only existed in the seed, which runs after migrations. Prior SQL fixtures did not exercise this fresh-project seed ordering.
+
+Added `202609220001_bootstrap_screen_culture.sql` ahead of the dependent historical migration, preserving all existing migration files. It inserts only a missing Screen Culture niche and preserves existing content/status on upgrades. The already partially migrated staging database must resume with `--include-all --include-seed`; successful migration history entries remain intact.
+
+Reproduced the exact foreign key failure on empty local tables before the fix. The new transactional SQL regression passes fresh installation and repeated installation with founder edits/inactive status. All 12 SQL regressions and 282 unit tests pass. All 28 migration files followed by seed also pass in an empty local database, with local substitutes for Supabase-managed auth/storage/cron schema dependencies and without the unavailable pg_cron/pg_net extension creation statements. This local check does not verify hosted extension behavior, actual scheduler delivery, or staging completion. Remote continuation remains founder-operated.
