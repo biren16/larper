@@ -59,6 +59,8 @@ The `Quality` GitHub Actions workflow runs lint, typecheck, unit tests, producti
 
 Before public launch, apply migrations to staging and complete one real authenticated Studio journey: add an approved source and manual signal, run ingestion, confirm a two-source candidate, upload and select a licensed image, publish, inspect the public page and Open Graph preview, then unpublish and confirm it disappears. Check a recovered and an overdue source in Studio. Record the run ID, story URL, and any errors. The separate backup restore test must also pass before launch.
 
+Run `npm run test:staging` for the authenticated RSS-to-publication journey using the setup in [Staging release test](staging-release-test.md). This mode targets a separate deployed environment and writes a release evidence record; local fixture browser checks remain separate.
+
 ## Backup and restore
 
 The GitHub workflow exports the database weekly, encrypts it before upload, removes plaintext, and retains the private artifact for 14 days. On the first day of each month (and manual runs), it restores the export into an isolated Postgres container and verifies the schema is queryable.

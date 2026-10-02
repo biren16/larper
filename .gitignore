@@ -2,10 +2,13 @@
 node_modules/
 .env*
 !.env.example
+!.env.staging.example
 .vercel/
 coverage/
 playwright-report/
 test-results/
+staging-results/
+.auth/
 .superpowers/
 .worktrees/
 .agents/

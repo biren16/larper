@@ -1,0 +1,27 @@
+{
+  "feed": {
+    "url": "https://approved-publisher.example/rss",
+    "beat": "f1",
+    "trustTier": "publication"
+  },
+  "manual": {
+    "url": "https://independent-original-source.example/report",
+    "title": "Replace with a real title closely matching the current RSS report",
+    "sourceName": "Replace with the independent original source name",
+    "publishedAt": "2026-10-02T09:00:00Z",
+    "nicheId": "f1",
+    "region": "global"
+  },
+  "story": {
+    "title": "Replace with a reviewed factual title",
+    "hook": "Replace with the reviewed hook",
+    "summary": "Replace with what the two sources establish",
+    "whyItMatters": "Replace with why people care",
+    "lore": "Replace with verified background",
+    "beginnerContext": "Replace with context for a new reader",
+    "conversationLine": "Replace with a useful accurate line",
+    "freshnessLabel": "Checked today",
+    "evidenceSummary": "Replace with the factual contribution of each independent original source",
+    "independentSourcesConfirmed": false
+  }
+}

@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:staging": "node --env-file=.env.staging node_modules/@playwright/test/cli.js test --config=playwright.staging.config.ts"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
