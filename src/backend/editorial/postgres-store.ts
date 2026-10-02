@@ -1,8 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Json } from "@/data/postgres/database.types";
-import type { NormalizedSignal } from "@/backend/ingestion/types";
+import { sourceOriginKey } from "@/backend/ingestion/source-catalog";
+import type { NormalizedSignal, SourceDefinition } from "@/backend/ingestion/types";
 import type { CandidateRecord } from "./types";
-import type { EditorialStore, PublicationCommand, ReviewEvent } from "./service";
+import type { EditorialStore, PublicationCommand, ReviewEvent, DraftCommand } from "./service";
 
 function failure(operation: string, error: { message: string } | null) {
   if (error) throw new Error(`${operation}: ${error.message}`);
@@ -10,6 +11,13 @@ function failure(operation: string, error: { message: string } | null) {
 
 export class PostgresEditorialStore implements EditorialStore {
   constructor(private readonly client: SupabaseClient<Database>) {}
+
+  async commitStarterDraft(command: { reviewerId: string; starter: import("./starters").StarterDraft }) {
+    const result = await this.client.rpc("prepare_starter_draft", { p_reviewer_id: command.reviewerId, p_starter: command.starter as unknown as Json });
+    failure("Prepare starter draft", result.error);
+    if (!result.data) throw new Error("Prepare starter draft: no candidate returned");
+    return result.data;
+  }
 
   async getCandidate(id: string): Promise<CandidateRecord | null> {
     const cluster = await this.client.from("topic_clusters").select("*").eq("id", id).maybeSingle();
@@ -21,14 +29,15 @@ export class PostgresEditorialStore implements EditorialStore {
     const signals = signalIds.length ? await this.client.from("raw_signals").select("id, source_definition_id, trust_tier, availability").in("id", signalIds) : { data: [], error: null };
     failure("Load candidate evidence", signals.error);
     const definitionIds = [...new Set((signals.data ?? []).map((row) => row.source_definition_id))];
-    const definitions = definitionIds.length ? await this.client.from("source_definitions").select("id, allowlisted").in("id", definitionIds) : { data: [], error: null };
+    const definitions = definitionIds.length ? await this.client.from("source_definitions").select("id, allowlisted, config").in("id", definitionIds) : { data: [], error: null };
     failure("Load evidence definitions", definitions.error);
     const allowlisted = new Map((definitions.data ?? []).map((row) => [row.id, row.allowlisted]));
+    const origins = new Map((definitions.data ?? []).map((row) => [row.id, sourceOriginKey(row)]));
     return {
       id: cluster.data.id, title: cluster.data.title, nicheId: cluster.data.niche_id,
       state: cluster.data.state as CandidateRecord["state"], heat: Number(cluster.data.heat), confidence: Number(cluster.data.confidence),
       sensitiveFlags: cluster.data.sensitive_flags,
-      evidence: (signals.data ?? []).map((row) => ({ id: row.id, sourceDefinitionId: row.source_definition_id, trustTier: row.trust_tier as CandidateRecord["evidence"][number]["trustTier"], availability: row.availability as CandidateRecord["evidence"][number]["availability"], allowlisted: allowlisted.get(row.source_definition_id) ?? false })),
+      evidence: (signals.data ?? []).map((row) => ({ id: row.id, sourceDefinitionId: row.source_definition_id, originKey: origins.get(row.source_definition_id), trustTier: row.trust_tier as CandidateRecord["evidence"][number]["trustTier"], availability: row.availability as CandidateRecord["evidence"][number]["availability"], allowlisted: allowlisted.get(row.source_definition_id) ?? false })),
     };
   }
 
@@ -94,15 +103,31 @@ export class PostgresEditorialStore implements EditorialStore {
     failure("Move split evidence", moved.error);
     return created.data!.id;
   }
+  async getSourceDefinition(id: string): Promise<SourceDefinition | null> {
+    const result = await this.client.from("source_definitions").select("*").eq("id", id).maybeSingle();
+    failure("Load registered source", result.error);
+    const row = result.data;
+    if (!row) return null;
+    return { id: row.id, name: row.name, adapterType: row.adapter_type as SourceDefinition["adapterType"],
+      trustTier: row.trust_tier as SourceDefinition["trustTier"], locale: row.locale, region: row.region,
+      allowlisted: row.allowlisted, config: row.config as Record<string, unknown> };
+  }
+
+  async commitDraft(command: DraftCommand) {
+    const result = await this.client.rpc("save_editorial_draft", {
+      p_candidate_id: command.candidateId, p_reviewer_id: command.reviewerId,
+      p_draft: command.draft as unknown as Json,
+    });
+    failure("Save draft", result.error);
+    const row = result.data?.[0];
+    if (!row) throw new Error("Save draft: no revision returned");
+    return { storyId: row.story_id, revision: row.revision };
+  }
+
   async addManualSignal(signal: NormalizedSignal) {
-    const result = await this.client.from("raw_signals").upsert({
-      source_definition_id: signal.sourceDefinitionId, canonical_url: signal.canonicalUrl, external_id: signal.externalId ?? null,
-      source_type: signal.sourceType, source_name: signal.sourceName, author: signal.author ?? null, title: signal.title,
-      body: signal.body ?? null, locale: signal.locale, region: signal.region, suggested_niche_id: signal.suggestedNicheId ?? null, published_at: signal.publishedAt,
-      observed_at: signal.observedAt, trust_tier: signal.trustTier, availability: signal.availability,
-      metrics: signal.metrics, sensitive_flags: signal.sensitiveFlags,
-    }, { onConflict: "source_definition_id,canonical_url" }).select("id").single();
+    const result = await this.client.rpc("record_manual_signal", { p_source_id: signal.sourceDefinitionId, p_signal: signal as unknown as Json });
     failure("Add manual signal", result.error);
-    return result.data!.id;
+    if (!result.data) throw new Error("Add manual signal: no signal returned");
+    return result.data;
   }
 }

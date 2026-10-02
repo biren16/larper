@@ -2,7 +2,12 @@
   "feed": {
     "url": "https://approved-publisher.example/rss",
     "beat": "f1",
-    "trustTier": "publication"
+    "trustTier": "publication",
+    "usageReview": {
+      "termsUrl": "https://approved-publisher.example/terms",
+      "basis": "Replace with reviewed permission basis",
+      "notes": "Replace with permitted method and restrictions"
+    }
   },
   "manual": {
     "url": "https://independent-original-source.example/report",
@@ -10,7 +15,8 @@
     "sourceName": "Replace with the independent original source name",
     "publishedAt": "2026-10-02T09:00:00Z",
     "nicheId": "f1",
-    "region": "global"
+    "region": "global",
+    "sourceDefinitionId": "Replace with its registered source UUID from Studio"
   },
   "story": {
     "title": "Replace with a reviewed factual title",

@@ -39,4 +39,16 @@ describe("parseFeed", () => {
   it("rejects malformed feeds rather than inserting empty evidence", () => {
     expect(() => parseFeed("not xml", source, "2026-09-20T10:00:00.000Z")).toThrow("valid RSS or Atom");
   });
+
+  it("selects the Atom article link instead of self or enclosure links", () => {
+    const xml = `<feed><entry><title><![CDATA[Archive style]]></title><link rel="self" href="https://example.com/api/1"/><link rel="enclosure" href="https://example.com/image.jpg"/><link rel="alternate" type="text/html" href="https://example.com/archive?utm_source=feed"/><updated>not a date</updated><author><name>A Writer</name></author><summary><![CDATA[<p>Context, not a copied image.</p>]]></summary></entry></feed>`;
+    expect(parseFeed(xml, source, "2026-10-02T10:00:00.000Z")[0]).toMatchObject({
+      canonicalUrl: "https://example.com/archive", title: "Archive style", author: "A Writer",
+      body: "Context, not a copied image.", publishedAt: "2026-10-02T10:00:00.000Z",
+    });
+  });
+
+  it("rejects feeds whose entries cannot produce any usable evidence", () => {
+    expect(() => parseFeed(`<rss><channel><item><title>No link</title></item></channel></rss>`, source, "2026-10-02T10:00:00Z")).toThrow("usable");
+  });
 });

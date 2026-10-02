@@ -11,7 +11,7 @@ export interface StudioDashboardData {
   recentSignals: Array<{ id: string; title: string; canonicalUrl: string; sourceName: string; sourceType: string; nicheName: string; region: string; observedAt: string; availability: string; clusterId: string | null }>;
 }
 
-export type StudioSourceStatus = "live" | "stale" | "paused" | "attention" | "waiting" | "pending" | "manual";
+export type StudioSourceStatus = "live" | "stale" | "paused" | "attention" | "waiting" | "pending" | "manual" | "review";
 
 export interface StudioSource {
   id: string;
@@ -24,6 +24,12 @@ export interface StudioSource {
   failureCount: number;
   trustTier: string;
   status: StudioSourceStatus;
+  config?: Record<string, unknown>;
+  locator?: string;
+  usageNotes?: string;
+  usageReviewed?: boolean;
+  usageReview?: { termsUrl: string; basis: string; notes: string };
+
 }
 
 export interface StudioSourcesData {
@@ -39,7 +45,7 @@ function ReviewQueue({ candidates }: Pick<StudioDashboardData, "candidates">) {
   return (
     <section className={styles.queue} aria-labelledby="queue-heading">
       <div className={styles.sectionHeading}>
-        <div><p className={styles.kicker}>Ranked by evidence</p><h2 id="queue-heading">Review queue</h2></div>
+        <div><p className={styles.kicker}>Ranked by evidence</p><h2 id="queue-heading">Review queue</h2><Link href="/studio/starters">Seven starter drafts</Link></div>
         <span>{candidates.length} {candidates.length === 1 ? "candidate" : "candidates"}</span>
       </div>
       <div className={styles.candidateList}>
@@ -143,7 +149,7 @@ export function StudioDashboard({
           <RecentEvidence signals={data.recentSignals} />
         </div>
         <aside className={styles.composerRail} aria-label="Signal capture">
-          <SignalComposer niches={data.niches ?? []} action={manualSignalAction} />
+          <SignalComposer niches={data.niches ?? []} sources={data.sources} action={manualSignalAction} />
         </aside>
       </div>
 

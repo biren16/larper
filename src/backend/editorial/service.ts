@@ -1,6 +1,7 @@
+import { starterForKey, type StarterDraft } from "./starters";
 import { briefEligibility } from "@/backend/intelligence/publication";
 import { normalizeManualSignal, type ManualSignalInput } from "@/backend/ingestion/manual";
-import type { NormalizedSignal } from "@/backend/ingestion/types";
+import type { NormalizedSignal, SourceDefinition } from "@/backend/ingestion/types";
 import type { PublicationFormat, TopicLifecycle } from "@/domain/discovery/types";
 import { assertEditorialAccess } from "./authorization";
 import type { BriefDraft, CandidateRecord, EditorialActor, StoryDraft } from "./types";
@@ -13,6 +14,8 @@ export interface PublicationCommand {
   draft: StoryDraft | BriefDraft;
 }
 
+export interface DraftCommand { candidateId: string; reviewerId: string; draft: StoryDraft; }
+
 export interface ReviewEvent {
   candidateId: string;
   reviewerId: string;
@@ -21,6 +24,9 @@ export interface ReviewEvent {
 }
 
 export interface EditorialStore {
+  commitStarterDraft(command: { reviewerId: string; starter: StarterDraft }): Promise<string>;
+  getSourceDefinition(id: string): Promise<SourceDefinition | null>;
+  commitDraft(command: DraftCommand): Promise<{ storyId: string; revision: number }>;
   getCandidate(id: string): Promise<CandidateRecord | null>;
   commitPublication(command: PublicationCommand): Promise<{ storyId: string; revision: number }>;
   recordReview(event: ReviewEvent): Promise<void>;
@@ -66,7 +72,15 @@ function availableEvidence(candidate: CandidateRecord) {
 }
 
 function independentEvidence(candidate: CandidateRecord) {
-  return new Map(availableEvidence(candidate).map((item) => [item.sourceDefinitionId, item])).values();
+  const origins = new Map<string, CandidateRecord["evidence"][number]>();
+  for (const item of availableEvidence(candidate)) {
+    const key = item.originKey ?? `source:${item.sourceDefinitionId}`;
+    const existing = origins.get(key);
+    const credible = (tier: string) => tier === "primary" || tier === "publication";
+    const chosen = existing && credible(existing.trustTier) ? existing : item;
+    origins.set(key, { ...chosen, allowlisted: Boolean(existing?.allowlisted || item.allowlisted) });
+  }
+  return origins.values();
 }
 
 export class EditorialService {
@@ -77,6 +91,21 @@ export class EditorialService {
     const candidate = await this.store.getCandidate(candidateId);
     if (!candidate) throw new Error("Candidate not found");
     return { actor, candidate };
+  }
+
+  async prepareStarterDraft(actor: EditorialActor | null, key: string, receiptsChecked: boolean) {
+    assertEditorialAccess(actor, this.allowlistedEmails);
+    if (!receiptsChecked) throw new Error("Open both source receipts before importing this draft");
+    const starter = starterForKey(key);
+    validateStory(starter.draft);
+    return this.store.commitStarterDraft({ reviewerId: actor.id, starter });
+  }
+
+  async saveDraft(actor: EditorialActor | null, candidateId: string, draft: StoryDraft) {
+    const context = await this.candidate(actor, candidateId);
+    if (!["detected", "reviewing"].includes(context.candidate.state)) throw new Error("Draft saves require an unpublished candidate");
+    validateStory(draft);
+    return this.store.commitDraft({ candidateId, reviewerId: context.actor.id, draft: { ...draft, independentSourcesConfirmed: false } });
   }
 
   async publishStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft) {
@@ -167,7 +196,9 @@ export class EditorialService {
 
   async addManualSignal(actor: EditorialActor | null, input: ManualSignalInput, sourceDefinitionId: string, observedAt: string) {
     assertEditorialAccess(actor, this.allowlistedEmails);
-    const signal = normalizeManualSignal(input, sourceDefinitionId, observedAt);
+    const source = await this.store.getSourceDefinition(sourceDefinitionId);
+    if (!source) throw new Error("Select a registered publisher or creator source");
+    const signal = normalizeManualSignal(input, source, observedAt);
     return this.store.addManualSignal(signal);
   }
 }

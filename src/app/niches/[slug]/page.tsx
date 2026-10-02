@@ -6,6 +6,7 @@ import { Artwork } from "@/components/discovery/artwork";
 import { NicheSectionNav } from "@/components/discovery/niche-section-nav";
 import { NicheSignalCard } from "@/components/discovery/niche-signal-card";
 import { FollowButton } from "@/components/preferences/follow-button";
+import { filterStyleTopics, parseStyleSubtopic } from "@/domain/discovery/style-subtopics";
 import { getCachedNichePage } from "@/data/discovery-cache";
 import styles from "./page.module.css";
 
@@ -18,10 +19,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export const instant = false;
 
-export default async function NichePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function NichePage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams?: Promise<{ subtopic?: string | string[] }> }) {
   const { slug } = await params;
-  const page = await getCachedNichePage(slug);
-  if (!page) notFound();
+  const cached = await getCachedNichePage(slug);
+  if (!cached) notFound();
+  const subtopic = slug === "style" ? parseStyleSubtopic((await searchParams)?.subtopic) : null;
+  // Filter after loading the cached base page; query variants never share filtered cache entries.
+  const page = { ...cached, currentTopics: filterStyleTopics(cached.currentTopics, subtopic), deepLore: filterStyleTopics(cached.deepLore, subtopic) };
 
   return (
     <main id="main-content" className={styles.main}>
@@ -45,6 +49,12 @@ export default async function NichePage({ params }: { params: Promise<{ slug: st
         </header>
       </div>
 
+      {slug === "style" && <nav className={styles.subtopics} aria-label="Style subtopics">
+        <Link href="/niches/style" aria-current={!subtopic ? "page" : undefined}>All Style</Link>
+        <Link href="/niches/style?subtopic=sneakers" aria-current={subtopic === "sneakers" ? "page" : undefined}>Sneakers</Link>
+        <Link href="/niches/style?subtopic=streetwear" aria-current={subtopic === "streetwear" ? "page" : undefined}>Streetwear</Link>
+      </nav>}
+      {subtopic && page.currentTopics.length === 0 && page.deepLore.length === 0 && <p className={styles.empty} role="status">No published {subtopic} stories yet. Explore All Style while this shelf grows.</p>}
       <NicheSectionNav nicheName={page.niche.name} hasLore={page.deepLore.length > 0} />
 
       <section id="current" className={styles.current} aria-labelledby="current-heading">
@@ -53,6 +63,7 @@ export default async function NichePage({ params }: { params: Promise<{ slug: st
           <h2 id="current-heading">What’s happening</h2>
           <span>The signals, arguments and drops moving through {page.niche.name.toLowerCase()} right now.</span>
         </div>
+        {page.currentTopics.length === 0 && <p className={styles.empty}>No current stories {subtopic ? `for ${subtopic}` : "in this niche"} yet.</p>}
         <div className={styles.currentScene}>
           {page.currentTopics[0] && (
             <div className={styles.leadStage}>

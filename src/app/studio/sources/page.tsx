@@ -1,4 +1,4 @@
-import { createSourceAction, toggleSourceAction } from "../actions";
+import { createSourceAction, toggleSourceAction, registerSourcePresetsAction, reviewSourceUsageAction } from "../actions";
 import { authorizedStudioRuntime } from "../runtime";
 import { SourceManager } from "./source-manager";
 
@@ -11,6 +11,8 @@ export default async function StudioSourcesPage({ searchParams }: { searchParams
       data={await runtime.reader.sources()}
       createSourceAction={createSourceAction}
       toggleSourceAction={toggleSourceAction}
+      registerPresetsAction={registerSourcePresetsAction}
+      reviewSourceAction={reviewSourceUsageAction}
       notice={first(query.notice)}
       error={first(query.error)}
     />

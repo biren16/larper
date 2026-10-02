@@ -14,8 +14,8 @@ const env = {
 };
 
 const input = {
-  feed: { url: "https://publisher.example/feed", beat: "f1", trustTier: "publication" },
-  manual: { url: "https://independent.example/report", title: "A real race report", sourceName: "Independent source", publishedAt: "2026-10-02T09:00:00Z", nicheId: "f1", region: "global" },
+  feed: { url: "https://publisher.example/feed", beat: "f1", trustTier: "publication", usageReview: { termsUrl: "https://publisher.example/terms", basis: "Test record", notes: "Metadata only" } },
+  manual: { sourceDefinitionId: "registered-publication-id", url: "https://independent.example/report", title: "A real race report", sourceName: "Independent source", publishedAt: "2026-10-02T09:00:00Z", nicheId: "f1", region: "global" },
   story: { title: "A reviewed story", hook: "Hook", summary: "Summary", whyItMatters: "Why", lore: "Lore", beginnerContext: "Context", conversationLine: "Conversation", freshnessLabel: "Today", evidenceSummary: "Two independent reports", independentSourcesConfirmed: true },
 };
 
@@ -66,5 +66,16 @@ describe("deployed Studio database identity", () => {
     expect(() => assertSourceRegistryMatches([], [])).toThrow();
     expect(() => assertSourceRegistryMatches(["live-source"], ["staging-source"])).toThrow();
     expect(() => assertSourceRegistryMatches(["shared-source"], ["shared-source", "staging-only-source"])).toThrow();
+  });
+});
+
+describe("seven-lane staging founder inputs", () => {
+  it("requires explicit review of every lane before any publication run", async () => {
+    const { readCultureStagingInput } = await import("../../staging/config");
+    const lanes = ["music", "screen-culture", "style", "gaming-tech", "internet-culture", "books", "f1"].map((key) => ({ key, receiptsChecked: true, independentOriginsConfirmed: true }));
+    expect(readCultureStagingInput({ kind: "seven-lanes", lanes }).lanes).toHaveLength(7);
+    expect(() => readCultureStagingInput({ kind: "seven-lanes", lanes: lanes.slice(1) })).toThrow("seven");
+    expect(() => readCultureStagingInput({ kind: "seven-lanes", lanes: lanes.map((lane) => ({ ...lane, receiptsChecked: false })) })).toThrow("Founder");
+    expect(() => readCultureStagingInput({ kind: "seven-lanes", lanes: [...lanes].reverse() })).toThrow("Founder");
   });
 });

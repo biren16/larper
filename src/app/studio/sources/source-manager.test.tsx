@@ -20,7 +20,7 @@ describe("SourceManager", () => {
   it("groups watchlists by beat and explains all four operational states", () => {
     render(<SourceManager data={data} />);
 
-    for (const beat of ["F1", "Books", "Music", "Screen culture", "Tech + gaming", "Internet culture"]) {
+    for (const beat of ["F1", "Books", "Music", "Screen Culture", "Gaming & Tech", "Internet Culture", "Style"]) {
       expect(screen.getByRole("heading", { name: beat })).toBeInTheDocument();
     }
     expect(screen.getAllByText("Live").length).toBeGreaterThan(0);
@@ -49,6 +49,16 @@ describe("SourceManager", () => {
     expect(screen.getByRole("heading", { name: "Recent collection runs" })).toBeInTheDocument();
     expect(screen.getByText("7 added")).toBeInTheDocument();
     expect(screen.getByText("2 errors")).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Screen culture" })).toHaveValue("screen-culture");
+    expect(screen.getByRole("option", { name: "Screen Culture" })).toHaveValue("screen-culture");
   });
+});
+
+it("offers all seven beats and usage review before paused-feed activation", () => {
+  render(<SourceManager data={data} createSourceAction={() => undefined} toggleSourceAction={() => undefined} reviewSourceAction={() => undefined} registerPresetsAction={() => undefined} />);
+  expect(screen.getByRole("option", { name: "Style" })).toHaveValue("style");
+  expect(screen.getByRole("option", { name: "Internet Culture" })).toHaveValue("internet-culture");
+  expect(screen.getByRole("button", { name: "Register seven-lane sources" })).toBeInTheDocument();
+  const books = screen.getByRole("region", { name: "Books" });
+  expect(within(books).getByRole("button", { name: "Activate Book channel" })).toBeDisabled();
+  expect(within(books).getByRole("form", { name: "Review usage for Book channel" })).toBeInTheDocument();
 });

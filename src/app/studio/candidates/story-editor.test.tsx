@@ -66,3 +66,21 @@ describe("StoryEditor", () => {
     expect(screen.getByLabelText("Image file (WebP, under 400 KB)")).toBeInTheDocument();
   });
 });
+
+it("reloads a saved Style draft with named subtopics and fresh publication confirmation", () => {
+  render(<StoryEditor candidate={{ ...candidate, nicheId: "style", storyLifecycle: "reviewing", draft: {
+    nicheId: "style", slug: "samba-lore", title: "The Samba archive", hook: "Saved hook", summary: "Saved summary", whyItMatters: "Saved context", lore: "Saved lore", beginnerContext: "Saved beginner context", conversationLine: "Saved chat line", discoveryType: "LORE", mode: "deep-lore", regions: ["global"], freshnessLabel: "Archive", evidenceSummary: "Saved receipts", independentSourcesConfirmed: false, tags: ["sneakers", "streetwear"],
+  } }} saveDraftAction={() => undefined} />);
+  expect(screen.getByLabelText("Hook")).toHaveValue("Saved hook");
+  expect(screen.getByLabelText("Slug")).toHaveValue("samba-lore");
+  expect(screen.getByLabelText("Mode")).toHaveValue("deep-lore");
+  expect(screen.getByRole("checkbox", { name: "Sneakers" })).toBeChecked();
+  expect(screen.getByRole("checkbox", { name: "Streetwear" })).toBeChecked();
+  expect(screen.getByRole("checkbox", { name: /independent original sources/i })).not.toBeChecked();
+  expect(screen.getByRole("button", { name: "Save draft" })).toHaveAttribute("formnovalidate");
+});
+
+it("does not offer draft saving for a published story", () => {
+  render(<StoryEditor candidate={{ ...candidate, storyLifecycle: "published_story" }} saveDraftAction={() => undefined} />);
+  expect(screen.queryByRole("button", { name: "Save draft" })).not.toBeInTheDocument();
+});

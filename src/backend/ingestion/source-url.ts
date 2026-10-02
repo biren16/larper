@@ -1,6 +1,7 @@
 const PRIVATE_IPV4 = /^(?:127\.|10\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/;
 
 const WATCHLIST_NICHES: Record<string, string> = {
+  style: "style",
   f1: "f1",
   books: "books",
   music: "music",

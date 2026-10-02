@@ -1,0 +1,12 @@
+{
+  "kind": "seven-lanes",
+  "lanes": [
+    {"key":"music","receiptsChecked":false,"independentOriginsConfirmed":false},
+    {"key":"screen-culture","receiptsChecked":false,"independentOriginsConfirmed":false},
+    {"key":"style","receiptsChecked":false,"independentOriginsConfirmed":false},
+    {"key":"gaming-tech","receiptsChecked":false,"independentOriginsConfirmed":false},
+    {"key":"internet-culture","receiptsChecked":false,"independentOriginsConfirmed":false},
+    {"key":"books","receiptsChecked":false,"independentOriginsConfirmed":false},
+    {"key":"f1","receiptsChecked":false,"independentOriginsConfirmed":false}
+  ]
+}

@@ -9,6 +9,7 @@ export interface EditorialActor {
 export interface EvidenceRecord {
   id: string;
   sourceDefinitionId: string;
+  originKey?: string;
   trustTier: SourceTrustTier;
   allowlisted: boolean;
   availability: SourceAvailability;

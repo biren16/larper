@@ -1,9 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createEditorialActions } from "@/backend/editorial/actions";
+import { createEditorialActions, storyDraftFromForm, editorialDate } from "@/backend/editorial/actions";
 import { getEditorialRuntime } from "@/backend/editorial/runtime";
 import { invalidatePublicDiscovery } from "@/backend/editorial/cache-invalidation";
+import { CULTURE_BEATS, CULTURE_SOURCE_PRESETS, hasUsageReview, validateUsageReview } from "@/backend/ingestion/source-catalog";
+import type { Json } from "@/data/postgres/database.types";
+import { isSocialCreatorDomain, validateCreatorProfile } from "@/backend/ingestion/creator-profile";
 import { isPublicSourceUrl } from "@/backend/ingestion/source-url";
 import { validateEditorialUpload, validateMediaRights } from "@/backend/media/upload";
 
@@ -47,6 +50,15 @@ export async function uploadEditorialMediaAction(form: FormData) {
   redirect(`${destination}?notice=image-uploaded`);
 }
 
+export async function saveCandidateDraftAction(form: FormData) {
+  const runtime = await getEditorialRuntime();
+  const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString() });
+  const destination = `/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}`;
+  const result = await actions.saveDraft(form);
+  if (!result.ok) redirect(`${destination}?error=${encodeURIComponent(result.error)}`);
+  redirect(`${destination}?notice=draft-saved`);
+}
+
 export async function publishCandidateAction(form: FormData) {
   const runtime = await getEditorialRuntime();
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString(), invalidatePublicContent: invalidatePublicDiscovery });
@@ -58,20 +70,9 @@ export async function publishCandidateAction(form: FormData) {
 
 export async function scheduleCandidateAction(form: FormData) {
   const runtime = await getEditorialRuntime();
-  const discoveryType = String(form.get("discoveryType") ?? "TREND") as import("@/domain/discovery/types").DiscoveryType;
-  const mode = String(form.get("mode") ?? "current") as import("@/domain/discovery/types").TopicMode;
-  if (!new Set(["DROP", "LORE", "MEME", "TREND", "DEBATE", "COMEBACK", "PRODUCT", "EVENT", "PERSON", "AESTHETIC", "DRAMA", "RABBIT_HOLE"]).has(discoveryType) || !new Set(["current", "deep-lore"]).has(mode)) redirect("/studio?error=Invalid+story+classification");
-  const values = (key: string) => String(form.get(key) ?? "").split(",").map((value) => value.trim()).filter(Boolean);
-  const scheduleInput = String(form.get("scheduledFor") ?? "").trim();
-  const scheduledFor = scheduleInput && !/(?:Z|[+-]\d\d:\d\d)$/.test(scheduleInput) ? `${scheduleInput}:00+05:30` : scheduleInput;
+  const scheduledFor = editorialDate(String(form.get("scheduledFor") ?? "").trim());
   try {
-    await runtime.service.scheduleStory(runtime.actor, String(form.get("candidateId") ?? ""), {
-      mediaId: String(form.get("mediaId") ?? "").trim() || null,
-      nicheId: String(form.get("nicheId") ?? ""), slug: String(form.get("slug") ?? ""), title: String(form.get("title") ?? ""),
-      hook: String(form.get("hook") ?? ""), summary: String(form.get("summary") ?? ""), whyItMatters: String(form.get("whyItMatters") ?? ""),
-      lore: String(form.get("lore") ?? ""), beginnerContext: String(form.get("beginnerContext") ?? ""), conversationLine: String(form.get("conversationLine") ?? ""), discoveryType, mode,
-      regions: values("regions"), freshnessLabel: String(form.get("freshnessLabel") ?? ""), evidenceSummary: String(form.get("evidenceSummary") ?? ""), independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on", tags: values("tags"),
-    }, scheduledFor, new Date().toISOString());
+    await runtime.service.scheduleStory(runtime.actor, String(form.get("candidateId") ?? ""), storyDraftFromForm(form), scheduledFor, new Date().toISOString());
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not schedule story";
     redirect(`/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}?error=${encodeURIComponent(message)}`);
@@ -81,9 +82,21 @@ export async function scheduleCandidateAction(form: FormData) {
 
 export async function addManualSignalAction(form: FormData) {
   const runtime = await getEditorialRuntime();
-  const definition = await runtime.client.from("source_definitions").select("id").eq("adapter_type", "manual").limit(1).maybeSingle();
-  if (definition.error || !definition.data) redirect("/studio?error=Create+a+manual+source+first");
-  form.set("sourceDefinitionId", definition.data.id);
+  let sourceId = String(form.get("sourceDefinitionId") ?? "").trim();
+  if (!sourceId) {
+    let profile;
+    try {
+      if (form.get("creatorOwnershipConfirmed") !== "on") throw new Error("Confirm the post belongs to this creator profile");
+      profile = validateCreatorProfile(String(form.get("creatorProfileUrl") ?? ""));
+      if (!String(form.get("sourceName") ?? "").trim()) throw new Error("Creator name is required");
+    } catch (error) {
+      redirect(`/studio?error=${encodeURIComponent(error instanceof Error ? error.message : "Invalid creator profile")}`);
+    }
+    const creator = await runtime.client.rpc("register_manual_creator", { p_profile_url: profile.profileUrl, p_domain: profile.domain, p_name: String(form.get("sourceName")).trim() });
+    if (creator.error || !creator.data) redirect(`/studio?error=${encodeURIComponent(creator.error?.message ?? "Could not register creator")}`);
+    sourceId = creator.data;
+    form.set("sourceDefinitionId", sourceId);
+  }
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString() });
   const result = await actions.addManualSignal(form);
   if (!result.ok) redirect(`/studio?error=${encodeURIComponent(result.error)}`);
@@ -100,18 +113,21 @@ export async function createSourceAction(form: FormData) {
   const name = String(form.get("name") ?? "").trim();
   const watchlistBeat = String(form.get("watchlistBeat") ?? "").trim();
   if (!name || !locator) redirect("/studio/sources?error=Source+name+and+locator+are+required");
-  if (!new Set(["rss", "youtube"]).has(adapterType) || !new Set(["primary", "publication", "community", "watchlist"]).has(trustTier)) redirect("/studio/sources?error=Invalid+source+settings");
-  if (!new Set(["f1", "books", "music", "tech-gaming", "screen-culture"]).has(watchlistBeat)) redirect("/studio/sources?error=Choose+a+valid+watchlist+beat");
-  let config: Record<string, string>;
-  if (adapterType === "rss") {
+  if (!new Set(["rss", "youtube", "manual"]).has(adapterType) || !new Set(["primary", "publication", "community", "watchlist"]).has(trustTier)) redirect("/studio/sources?error=Invalid+source+settings");
+  if (!new Set<string>(CULTURE_BEATS.map((beat) => beat.id)).has(watchlistBeat)) redirect("/studio/sources?error=Choose+a+valid+watchlist+beat");
+  let config: Record<string, Json | undefined>;
+  if (adapterType === "rss" || adapterType === "manual") {
     if (!isPublicSourceUrl(locator)) redirect("/studio/sources?error=Enter+a+public+feed+URL");
-    config = { url: new URL(locator).toString() };
+    const url = new URL(locator);
+    const domain = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (isSocialCreatorDomain(domain)) redirect("/studio/sources?error=Register+social+creator+profiles+through+manual+capture");
+    config = { url: url.toString(), owner: name, originKey: `publisher:${domain}`, domains: [domain] };
   } else {
     config = locator.startsWith("UC") ? { channelId: locator } : { query: locator };
   }
   const result = await runtime.client.from("source_definitions").insert({
     name, adapter_type: adapterType, trust_tier: trustTier,
-    config, locale: String(form.get("locale") ?? "en-IN").trim(), region: String(form.get("region") ?? "india").trim(),
+    config, locale: String(form.get("locale") ?? "en").trim(), region: String(form.get("region") ?? "global").trim(),
     poll_minutes: 180, allowlisted: form.get("allowlisted") === "on", active: false, watchlist_beat: watchlistBeat,
   });
   if (result.error) redirect(`/studio/sources?error=${encodeURIComponent(result.error.message)}`);
@@ -122,6 +138,12 @@ export async function toggleSourceAction(form: FormData) {
   const runtime = await getEditorialRuntime();
   const sourceId = String(form.get("sourceId") ?? "");
   const active = form.get("active") === "true";
+  if (active) {
+    const source = await runtime.client.from("source_definitions").select("config, adapter_type").eq("id", sourceId).maybeSingle();
+    if (source.error || !source.data) redirect("/studio/sources?error=Source+not+found");
+    if (source.data.adapter_type === "manual") redirect("/studio/sources?error=Manual+references+do+not+need+polling");
+    if (!hasUsageReview(source.data.config)) redirect("/studio/sources?error=Record+a+usage+review+before+activation");
+  }
   const result = await runtime.client.from("source_definitions").update({ active, updated_at: new Date().toISOString() }).eq("id", sourceId);
   if (result.error) redirect(`/studio/sources?error=${encodeURIComponent(result.error.message)}`);
   redirect(`/studio/sources?notice=${active ? "source-activated" : "source-paused"}`);
@@ -150,4 +172,39 @@ export async function splitCandidateAction(form: FormData) {
   const result = await actions.split(form);
   if (!result.ok) redirect(`/studio/candidates/${encodeURIComponent(String(form.get("clusterId") ?? ""))}?error=${encodeURIComponent(result.error)}`);
   redirect("/studio?notice=cluster-split");
+}
+
+export async function registerSourcePresetsAction() {
+  const runtime = await getEditorialRuntime();
+  const result = await runtime.client.rpc("register_culture_sources", { p_presets: CULTURE_SOURCE_PRESETS as unknown as Json });
+  if (result.error) redirect(`/studio/sources?error=${encodeURIComponent(result.error.message)}`);
+  redirect("/studio/sources?notice=sources-registered");
+}
+
+export async function reviewSourceUsageAction(form: FormData) {
+  const runtime = await getEditorialRuntime();
+  const sourceId = String(form.get("sourceId") ?? "");
+  let review;
+  try {
+    review = validateUsageReview({ termsUrl: String(form.get("termsUrl") ?? ""), basis: String(form.get("basis") ?? ""), notes: String(form.get("notes") ?? "") }, runtime.actor.id, new Date().toISOString());
+  } catch (error) {
+    redirect(`/studio/sources?error=${encodeURIComponent(error instanceof Error ? error.message : "Invalid usage review")}`);
+  }
+  const source = await runtime.client.from("source_definitions").select("config").eq("id", sourceId).maybeSingle();
+  if (source.error || !source.data) redirect("/studio/sources?error=Source+not+found");
+  const config = source.data.config && typeof source.data.config === "object" && !Array.isArray(source.data.config) ? source.data.config : {};
+  const result = await runtime.client.from("source_definitions").update({ config: { ...config, usageReview: review }, updated_at: new Date().toISOString() }).eq("id", sourceId);
+  if (result.error) redirect(`/studio/sources?error=${encodeURIComponent(result.error.message)}`);
+  redirect("/studio/sources?notice=usage-reviewed");
+}
+
+export async function prepareStarterDraftAction(form: FormData) {
+  const runtime = await getEditorialRuntime();
+  let candidateId;
+  try {
+    candidateId = await runtime.service.prepareStarterDraft(runtime.actor, String(form.get("starterKey") ?? ""), form.get("receiptsChecked") === "on");
+  } catch (error) {
+    redirect(`/studio/starters?error=${encodeURIComponent(error instanceof Error ? error.message : "Could not prepare starter draft")}`);
+  }
+  redirect(`/studio/candidates/${encodeURIComponent(candidateId)}?notice=draft-saved`);
 }

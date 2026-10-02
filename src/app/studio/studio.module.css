@@ -304,3 +304,5 @@
 @media (prefers-reduced-motion: reduce) {
   .main *, .main *::before, .main *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+.signalForm input[type="checkbox"] { width: auto; min-height: 24px; margin-right: .5rem; }

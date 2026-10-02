@@ -4,6 +4,7 @@ import { mapMediaRow, mapNicheRow, mapSignalRow, mapStoryRow } from "./supabase-
 describe("Supabase discovery row mapping", () => {
   it("maps published database stories into live discovery topics", () => {
     expect(mapStoryRow({
+      starter_key: null,
       id: "story-1", cluster_id: "cluster-1", niche_id: "books", slug: "romantasy-racing",
       title: "Romantasy found the paddock", hook: "Fast cars, slower burns.", summary: "A summary",
       why_it_matters: "Why it matters", lore: "The lore", beginner_context: "Start here", conversation_line: "Mention the crossover, not just the headline.",

@@ -16,11 +16,15 @@ export function SignalComposerLink({ children }: { children: ReactNode }) {
 export function SignalComposer({
   niches,
   action,
+  sources = [],
 }: {
   niches: Array<{ id: string; name: string }>;
+  sources?: Array<{ id: string; name: string; config?: Record<string, unknown> }>;
   action?: (form: FormData) => void | Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
+  const [sourceId, setSourceId] = useState("");
+  const selected = sources.find((source) => source.id === sourceId);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLElement>(null);
@@ -88,10 +92,18 @@ export function SignalComposer({
           <label>Public URL<input ref={urlRef} name="url" type="url" required placeholder="https://…" /></label>
           <label>What is moving?<input name="title" required maxLength={180} placeholder="The one-line version of the moment" /></label>
           <div className={styles.formPair}>
-            <label>Platform<select name="platform" defaultValue="instagram"><option value="instagram">Instagram</option><option value="tiktok">TikTok</option><option value="reddit">Reddit</option><option value="x">X</option><option value="youtube">YouTube</option><option value="web">Web</option></select></label>
+            <label>Platform<select name="platform" defaultValue="web"><option value="instagram">Instagram</option><option value="tiktok">TikTok</option><option value="reddit">Reddit</option><option value="x">X</option><option value="youtube">YouTube</option><option value="web">Web</option></select></label>
             <label>Region<select name="region" defaultValue="india"><option value="india">India</option><option value="global">Global</option></select></label>
           </div>
-          <label>Source name<input name="sourceName" required placeholder="Account, publication, or creator" /></label>
+          <label>Registered publisher or creator<select name="sourceDefinitionId" value={sourceId} onChange={(event) => setSourceId(event.target.value)}>
+            <option value="">Register a creator profile</option>
+            {sources.filter((source) => Array.isArray(source.config?.domains)).map((source) => <option key={source.id} value={source.id}>{source.name}</option>)}
+          </select></label>
+          {selected ? <input type="hidden" name="sourceName" value={selected.name} /> : <>
+            <label>Source name<input name="sourceName" required placeholder="Creator name" /></label>
+            <label>Creator profile URL<input name="creatorProfileUrl" type="url" required placeholder="https://instagram.com/creator" /></label>
+          </>}
+          {(!selected || Boolean(selected.config?.creatorProfileUrl)) && <label><input name="creatorOwnershipConfirmed" type="checkbox" required />I opened the post and confirmed it belongs to this creator profile.</label>}
           <label>Niche<select name="suggestedNicheId" defaultValue=""><option value="">Choose later</option>{niches.map((niche) => <option key={niche.id} value={niche.id}>{niche.name}</option>)}</select></label>
           <label>Observation<textarea name="observationNote" rows={3} placeholder="What makes this feel real, not just loud?" /></label>
           <label>Published at<input name="publishedAt" type="datetime-local" required /></label>

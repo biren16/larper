@@ -1,0 +1,340 @@
+[
+  {
+    "key": "music",
+    "researchedAt": "2026-10-02",
+    "originAssessment": "Different publishers and reporting dates: a scene survey and an eyewitness concert report. Each supports its own contribution; neither establishes today’s popularity. Founder must reopen both before publication.",
+    "receipts": [
+      {
+        "presetKey": "bandcamp-daily",
+        "url": "https://daily.bandcamp.com/scene-report/indian-hip-hop-list",
+        "title": "The Explosive Evolution of Hip-Hop in India",
+        "publishedAt": "2019-08-05T00:00:00Z",
+        "author": "Nyshka Chandran",
+        "assessment": "Authored scene reporting; regional-language context and a Seedhe Maut profile."
+      },
+      {
+        "presetKey": "rolling-stone-india",
+        "url": "https://rollingstoneindia.com/seedhe-maut-nation-desi-hip-hop-punk-moment",
+        "title": "Live Inside Seedhe Maut Nation: Desi Hip-Hop’s Punk Moment",
+        "publishedAt": "2024-08-13T00:00:00Z",
+        "author": "Palash Krishna Mehrotra",
+        "assessment": "First-person reporting from Delhi and Dehradun concerts, including crowd participation."
+      }
+    ],
+    "draft": {
+      "nicheId": "music",
+      "title": "Why a Seedhe Maut gig feels like a shared language",
+      "slug": "seedhe-maut-shared-language",
+      "hook": "Knowing the bars can feel like knowing the people around you.",
+      "summary": "Rolling Stone India’s 2024 eyewitness tour report describes crowds rapping together and newcomers being welcomed. Bandcamp’s 2019 scene report places the duo in India’s expanding local-language rap landscape.",
+      "whyItMatters": "The entry point is a scene and its rituals, not a follower count.",
+      "lore": "Calm and Encore ABJ are a Delhi duo. The two reports capture different stages of the scene: regional-language experimentation, then a concert community built around familiar references.",
+      "beginnerContext": "Start with a track, then read the live report. You do not need to know every reference to join the conversation.",
+      "conversationLine": "The crowd knows the bars, but the gig also makes room for first-timers.",
+      "discoveryType": "LORE",
+      "mode": "deep-lore",
+      "regions": [
+        "india"
+      ],
+      "freshnessLabel": "Deep lore · archive sources",
+      "evidenceSummary": "Different publishers and reporting dates: a scene survey and an eyewitness concert report. Each supports its own contribution; neither establishes today’s popularity. Founder must reopen both before publication.",
+      "independentSourcesConfirmed": false,
+      "tags": [
+        "desi-hip-hop",
+        "seedhe-maut",
+        "fandom"
+      ],
+      "mediaId": null
+    }
+  },
+  {
+    "key": "screen-culture",
+    "researchedAt": "2026-10-02",
+    "originAssessment": "Two distinct authored critical essays. The ma interview is attributed only to Ebert; the second essay supports a separate interpretation. These are readings of the film, not claims that every viewer feels the same. Founder must reopen receipts.",
+    "receipts": [
+      {
+        "presetKey": "rogerebert",
+        "url": "https://www.rogerebert.com/reviews/great-movie-spirited-away-2002",
+        "title": "A magical dot over in the corner",
+        "publishedAt": "2012-07-11T00:00:00Z",
+        "author": "Roger Ebert",
+        "assessment": "Original review with the critic’s own Miyazaki interview recollection about ma."
+      },
+      {
+        "presetKey": "letterboxd-journal",
+        "url": "https://letterboxd.com/journal/spirited-away-deep-impact-anniversary",
+        "title": "Crossing the Threshold: exploring the deep impact of Spirited Away at 25",
+        "publishedAt": "2026-07-21T00:00:00Z",
+        "author": "Claira Curtis",
+        "assessment": "Distinct authored critical interpretation of liminal spaces and Chihiro’s transition."
+      }
+    ],
+    "draft": {
+      "nicheId": "screen-culture",
+      "title": "Spirited Away gives you room to breathe",
+      "slug": "spirited-away-room-to-breathe",
+      "hook": "A pause can tell you as much as a plot twist.",
+      "summary": "Roger Ebert’s 2012 essay connects Miyazaki’s deliberate pauses to a feeling of time and place. Letterboxd’s anniversary essay explores Chihiro’s journey through unfamiliar spaces and growing up.",
+      "whyItMatters": "It offers a way to discuss a comfort film beyond a star rating.",
+      "lore": "In Ebert’s own account of his Miyazaki interview, ma names an intentional interval. Letterboxd supplies a separate critical reading of transitions and identity, rather than another confirmation of that interview.",
+      "beginnerContext": "Chihiro enters a spirit world and works in a bathhouse while trying to save her parents. This explainer contains premise-level spoilers.",
+      "conversationLine": "The quiet bits are part of the storytelling, not gaps between the good scenes.",
+      "discoveryType": "LORE",
+      "mode": "deep-lore",
+      "regions": [
+        "global"
+      ],
+      "freshnessLabel": "Deep lore · archive sources",
+      "evidenceSummary": "Two distinct authored critical essays. The ma interview is attributed only to Ebert; the second essay supports a separate interpretation. These are readings of the film, not claims that every viewer feels the same. Founder must reopen receipts.",
+      "independentSourcesConfirmed": false,
+      "tags": [
+        "anime",
+        "studio-ghibli",
+        "comfort-films"
+      ],
+      "mediaId": null
+    }
+  },
+  {
+    "key": "style",
+    "researchedAt": "2026-10-02",
+    "originAssessment": "Separate publishers, interviewees and projects; not two rewrites of one launch release. Both have commercial product context. Their own interviews support their respective examples, not current availability or resale value. Founder must review.",
+    "receipts": [
+      {
+        "presetKey": "dazed",
+        "url": "https://www.dazeddigital.com/fashion/article/59791/1/pharrell-adidas-samba-something-in-the-water-2023-virginia-beach",
+        "title": "Pharrell on his new adidas Samba and taking it back to the start",
+        "publishedAt": "2023-05-09T00:00:00Z",
+        "author": "Habi Diallo",
+        "assessment": "Original on-location interview with Pharrell at Something in the Water; branded access and supplied images disclosed."
+      },
+      {
+        "presetKey": "hypebae",
+        "url": "https://hypebae.com/2024/7/caroline-hu-adidas-samba-collaboration-interview",
+        "title": "Caroline Hu on Transforming the Adidas Samba Into Soft, Satin Armor",
+        "publishedAt": "2024-07-11T00:00:00Z",
+        "author": "Amber De Luca-Tao",
+        "assessment": "Original Q&A with a different designer about a different collaboration; designer supplied imagery."
+      }
+    ],
+    "draft": {
+      "nicheId": "style",
+      "title": "One Samba shape, two very different design languages",
+      "slug": "samba-collaboration-design-languages",
+      "hook": "A collaboration has more lore than a logo swap.",
+      "summary": "Dazed interviewed Pharrell around his 2023 Humanrace Samba launch. Hypebae interviewed Caroline Hu in 2024 about adapting the same silhouette with lace and pleated satin.",
+      "whyItMatters": "Compare what a designer changes before deciding what a collaboration means to your own style.",
+      "lore": "Hu described moving from customized runway pairs to an official collaboration. Pharrell’s interview places his collection alongside a hometown festival. These are separate projects and designer accounts.",
+      "beginnerContext": "A silhouette is the recognizable shape of a shoe. Collaborations can keep that outline while changing materials, colour and the story around it.",
+      "conversationLine": "Same silhouette, different design language: what changed besides the branding?",
+      "discoveryType": "LORE",
+      "mode": "deep-lore",
+      "regions": [
+        "global"
+      ],
+      "freshnessLabel": "Deep lore · archive sources",
+      "evidenceSummary": "Separate publishers, interviewees and projects; not two rewrites of one launch release. Both have commercial product context. Their own interviews support their respective examples, not current availability or resale value. Founder must review.",
+      "independentSourcesConfirmed": false,
+      "tags": [
+        "sneakers",
+        "streetwear",
+        "collaboration-lore",
+        "adidas-samba"
+      ],
+      "mediaId": null
+    }
+  },
+  {
+    "key": "gaming-tech",
+    "researchedAt": "2026-10-02",
+    "originAssessment": "Different developer teams, games, authors and platform publishers; each primary account supports its own example. The relationship between them is explicitly our interpretation. Promotional context remains disclosed; founder review is required.",
+    "receipts": [
+      {
+        "presetKey": "playstation-blog",
+        "url": "https://blog.playstation.com/2016/12/08/country-life-rpg-stardew-valley-coming-to-ps4-on-december-13",
+        "title": "Country-life RPG Stardew Valley Coming to PS4 on December 13",
+        "publishedAt": "2016-12-08T00:00:00Z",
+        "author": "Eric Barone",
+        "assessment": "First-person account by Stardew Valley’s creator, hosted by Sony; promotional primary source."
+      },
+      {
+        "presetKey": "xbox-wire",
+        "url": "https://news.xbox.com/en-us/2025/05/23/tempopo-melody-garden-guide",
+        "title": "Tempopo: How to Create Your Own Music in the Melody Garden",
+        "publishedAt": "2025-05-23T00:00:00Z",
+        "author": "Jeff van Dyck",
+        "assessment": "Original guide by Tempopo’s composer describing his own game’s music system, hosted by Microsoft."
+      }
+    ],
+    "draft": {
+      "nicheId": "gaming-tech",
+      "title": "Cozy game worlds leave something for you to make",
+      "slug": "cozy-games-farms-and-melody-gardens",
+      "hook": "Sometimes the satisfying part is making a small world your own.",
+      "summary": "In his 2016 PlayStation post, Stardew Valley creator Eric Barone describes rebuilding an inherited farm and meeting its neighbours. Tempopo composer Jeff van Dyck’s 2025 Xbox guide explains arranging musical flowers into a tune.",
+      "whyItMatters": "These offer two concrete entry points into games built around making and experimenting.",
+      "lore": "The farm and the Melody Garden are different systems. Our connection between them is an editorial reading of player agency, not a claim that the games share a developer or mechanics.",
+      "beginnerContext": "Stardew Valley is a country-life RPG; Tempopo is a musical puzzle game. Neither historical post confirms a current subscription entitlement.",
+      "conversationLine": "One lets you grow a farm; the other lets you grow a melody. Which kind of making sounds good today?",
+      "discoveryType": "LORE",
+      "mode": "deep-lore",
+      "regions": [
+        "global"
+      ],
+      "freshnessLabel": "Deep lore · archive sources",
+      "evidenceSummary": "Different developer teams, games, authors and platform publishers; each primary account supports its own example. The relationship between them is explicitly our interpretation. Promotional context remains disclosed; founder review is required.",
+      "independentSourcesConfirmed": false,
+      "tags": [
+        "cozy-games",
+        "indie-games",
+        "stardew-valley",
+        "tempopo"
+      ],
+      "mediaId": null
+    }
+  },
+  {
+    "key": "internet-culture",
+    "researchedAt": "2026-10-02",
+    "originAssessment": "Distinct authored example curation, with shared upstream artist statements explicitly treated as one origin. Founder must assess original examples and attribution before publishing. No assertion that this is currently trending.",
+    "receipts": [
+      {
+        "presetKey": "daily-dot",
+        "url": "https://dailydot.com/how-to-have-a-brat-summer-charli-xcx",
+        "title": "How To Have A Brat Summer Like Charli XCX",
+        "publishedAt": "2024-06-25T00:00:00Z",
+        "author": "Angela Andaloro",
+        "assessment": "Authored contemporary curation of social examples; artist interview statements have shared upstream origins."
+      },
+      {
+        "presetKey": "know-your-meme",
+        "url": "https://knowyourmeme.com/editorials/guides/what-is-brat-summer-the-viral-meme-inspired-by-the-new-charli-xcx-album-explained",
+        "title": "What Is Brat Summer? The Viral Meme Inspired By The New Charli XCX Album Explained",
+        "publishedAt": "2024-07-16T00:00:00Z",
+        "author": "Phillip Hamilton",
+        "assessment": "Separate guide documenting meme usage and examples at a later date; not an independent artist-interview witness."
+      }
+    ],
+    "draft": {
+      "nicheId": "internet-culture",
+      "title": "How brat green became a remixable shorthand",
+      "slug": "brat-green-remixable-shorthand",
+      "hook": "Sometimes an album’s visual language becomes the template for the joke.",
+      "summary": "Daily Dot’s June 2024 explainer and Know Your Meme’s July guide document different examples of people adapting Charli xcx’s Brat-era identity into online jokes and self-description.",
+      "whyItMatters": "The useful question is how a fandom reference becomes legible outside its original audience.",
+      "lore": "These receipts describe the 2024 brat summer moment. They share some artist statements, so repeating the same interview does not create another original witness.",
+      "beginnerContext": "Brat is an album; brat summer became a loosely used cultural label. Meme usage varies with its creator and context.",
+      "conversationLine": "The reference starts with the album, but the remix can say something different.",
+      "discoveryType": "LORE",
+      "mode": "deep-lore",
+      "regions": [
+        "global"
+      ],
+      "freshnessLabel": "Deep lore · archive sources",
+      "evidenceSummary": "Distinct authored example curation, with shared upstream artist statements explicitly treated as one origin. Founder must assess original examples and attribution before publishing. No assertion that this is currently trending.",
+      "independentSourcesConfirmed": false,
+      "tags": [
+        "meme-origins",
+        "charli-xcx",
+        "fandom"
+      ],
+      "mediaId": null
+    }
+  },
+  {
+    "key": "books",
+    "researchedAt": "2026-10-02",
+    "originAssessment": "Different authors, publishers and publication dates; independent editorial arguments rather than repeated launch copy. The proposed boundary remains attributed and debated. Founder must review the receipts and book-specific content before recommendations.",
+    "receipts": [
+      {
+        "presetKey": "book-riot",
+        "url": "https://bookriot.com/beginners-guide-to-romantasy",
+        "title": "A Beginner’s Guide to Romantasy",
+        "publishedAt": "2025-10-14T00:00:00Z",
+        "author": "Courtney Rodgers",
+        "assessment": "Original beginner guide and editorial selections; supports the fantasy/romance introduction."
+      },
+      {
+        "presetKey": "reactor",
+        "url": "https://reactormag.com/what-exactly-makes-a-romantasy-and-what-are-your-favorite-examples",
+        "title": "What Exactly Makes a Romantasy — And What Are Your Favorite Examples?",
+        "publishedAt": "2024-07-23T00:00:00Z",
+        "author": "R. Nassor",
+        "assessment": "Original authored genre argument including reader expectations and historical examples; Reactor is publisher-owned."
+      }
+    ],
+    "draft": {
+      "nicheId": "books",
+      "title": "Romantasy is a reading promise, not a spice score",
+      "slug": "romantasy-reading-promise",
+      "hook": "Dragons tell you the setting. The relationship tells you what kind of story you signed up for.",
+      "summary": "Book Riot’s beginner guide explains the combination of fantasy and romance. Reactor’s genre essay argues that a central relationship and a hopeful romantic ending matter to readers expecting romance.",
+      "whyItMatters": "It makes choosing a reading rabbit hole easier than judging it by cover shorthand.",
+      "lore": "Reactor treats the ending as a genre expectation; that is an argued definition, not a universal rule for every book marketed as romantasy. Both essays point to an older history of romance and fantasy together.",
+      "beginnerContext": "HEA means happily ever after; HFN means happy for now. Explicitness varies independently, so check an individual book’s content information.",
+      "conversationLine": "Before asking how spicy it is, ask whether romance is the main story promise.",
+      "discoveryType": "LORE",
+      "mode": "deep-lore",
+      "regions": [
+        "global"
+      ],
+      "freshnessLabel": "Deep lore · archive sources",
+      "evidenceSummary": "Different authors, publishers and publication dates; independent editorial arguments rather than repeated launch copy. The proposed boundary remains attributed and debated. Founder must review the receipts and book-specific content before recommendations.",
+      "independentSourcesConfirmed": false,
+      "tags": [
+        "romantasy",
+        "genre-lore",
+        "reading-communities"
+      ],
+      "mediaId": null
+    }
+  },
+  {
+    "key": "f1",
+    "researchedAt": "2026-10-02",
+    "originAssessment": "Separate publishers and reporting occasions; source one establishes the dated Monza wording, source two reports subsequent changes. Shared press-session quotes remain single upstream origins. Founder assessment is required; no claim of unchanged 2026 policy.",
+    "receipts": [
+      {
+        "presetKey": "racefans",
+        "url": "https://www.racefans.net/2024/09/01/mclaren-explains-cryptic-papaya-rules-radio-messages-to-norris",
+        "title": "McLaren explains cryptic papaya rules radio messages to Norris",
+        "publishedAt": "2024-09-01T00:00:00Z",
+        "author": "Keith Collantine",
+        "assessment": "Contemporary reporting on race radio and Brown’s explanation. The Brown interview is a shared upstream source, not a second witness."
+      },
+      {
+        "presetKey": "the-race",
+        "url": "https://www.the-race.com/formula-1/mclaren-f1-team-orders-2024-timing-explained",
+        "title": "McLaren team orders: Why now and how they will work",
+        "publishedAt": "2024-09-12T00:00:00Z",
+        "author": "Scott Mitchell-Malm",
+        "assessment": "Later Baku reporting and analysis with Norris and Piastri responses about a changed approach, not a rewrite of the same Monza quote."
+      }
+    ],
+    "draft": {
+      "nicheId": "f1",
+      "title": "Papaya rules became a shorthand for a team dilemma",
+      "slug": "papaya-rules-team-dilemma",
+      "hook": "Two drivers, one team: even a colour can become a debate.",
+      "summary": "RaceFans reported McLaren’s papaya rules radio messages at Monza in September 2024. The Race later examined the team’s changing approach to helping Lando Norris’s title bid.",
+      "whyItMatters": "It is a clear entry point into the tension between teammates competing and the team maximizing its result.",
+      "lore": "The Monza report described an internal agreement to race respectfully. The later Baku report explains a changed, flexible approach. Treat these as dated team policies, not a statement of today’s arrangements.",
+      "beginnerContext": "Papaya refers to McLaren’s team colour here. This nickname names a team agreement; it is not the name of an FIA sporting regulation.",
+      "conversationLine": "When someone says papaya rules, ask which race and which version of the team agreement.",
+      "discoveryType": "LORE",
+      "mode": "deep-lore",
+      "regions": [
+        "global"
+      ],
+      "freshnessLabel": "Deep lore · archive sources",
+      "evidenceSummary": "Separate publishers and reporting occasions; source one establishes the dated Monza wording, source two reports subsequent changes. Shared press-session quotes remain single upstream origins. Founder assessment is required; no claim of unchanged 2026 policy.",
+      "independentSourcesConfirmed": false,
+      "tags": [
+        "paddock-culture",
+        "mclaren",
+        "team-orders"
+      ],
+      "mediaId": null
+    }
+  }
+]

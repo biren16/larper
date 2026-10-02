@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { EditorialService, type EditorialStore, type PublicationCommand, type ReviewEvent } from "./service";
+import { EditorialService, type EditorialStore, type PublicationCommand, type ReviewEvent, type DraftCommand } from "./service";
 import type { CandidateRecord, EditorialActor, StoryDraft } from "./types";
 
 const actor: EditorialActor = { id: "editor-1", email: "founder@example.com", role: "founder" };
@@ -41,6 +41,11 @@ function candidate(overrides: Partial<CandidateRecord> = {}): CandidateRecord {
 
 class MemoryStore implements EditorialStore {
   current = candidate();
+  drafts: DraftCommand[] = [];
+  starters: unknown[] = [];
+  async commitStarterDraft(command: unknown) { this.starters.push(command); return "starter-cluster"; }
+  async commitDraft(command: DraftCommand) { this.drafts.push(command); return { storyId: "story-1", revision: this.drafts.length }; }
+  async getSourceDefinition(id: string) { return { id, name: "Founder watchlist", adapterType: "manual" as const, trustTier: "watchlist" as const, locale: "en", region: "global", allowlisted: false, config: { domains: [id === "manual-youtube" ? "youtube.com" : "instagram.com"], creatorProfileUrl: id === "manual-youtube" ? "https://youtube.com/@artist" : "https://instagram.com/artist" } }; }
   publications: PublicationCommand[] = [];
   reviews: ReviewEvent[] = [];
   transitions: string[] = [];
@@ -132,7 +137,7 @@ describe("EditorialService", () => {
     await service.merge(actor, "cluster-1", "cluster-duplicate");
     await expect(service.split(actor, "cluster-1", ["signal-b"])).resolves.toBe("cluster-2");
     await service.addManualSignal(actor, {
-      url: "https://www.instagram.com/reel/abc/?igsh=tracking",
+      url: "https://www.instagram.com/reel/abc/?igsh=tracking", creatorOwnershipConfirmed: true,
       title: "F1 book edit",
       sourceName: "Founder watchlist",
       publishedAt: "2026-09-20T08:00:00.000Z",
@@ -145,15 +150,56 @@ describe("EditorialService", () => {
 
   it("does not write a cluster review event before a manual signal has been clustered", async () => {
     await service.addManualSignal(actor, {
-      url: "https://www.youtube.com/watch?v=signal-1",
+      url: "https://www.youtube.com/watch?v=signal-1", creatorOwnershipConfirmed: true,
       title: "A new music release",
       sourceName: "Official artist channel",
       publishedAt: "2026-09-20T08:00:00.000Z",
       region: "global",
       suggestedNicheId: "music",
-    }, "manual-source", "2026-09-20T10:00:00.000Z");
+    }, "manual-youtube", "2026-09-20T10:00:00.000Z");
 
     expect(store.manuals).toHaveLength(1);
     expect(store.reviews).toEqual([]);
   });
+});
+
+it("counts publisher origins rather than separate feeds from one publisher", async () => {
+  const store = new MemoryStore();
+  store.current.evidence = store.current.evidence.map((item) => ({ ...item, originKey: "publisher:one.example" }));
+  const service = new EditorialService(store, new Set(["founder@example.com"]));
+  await expect(service.publishStory(actor, "cluster-1", draft)).rejects.toThrow("two independent");
+  await expect(service.scheduleStory(actor, "cluster-1", draft, "2026-10-03T10:00:00Z", "2026-10-02T10:00:00Z")).rejects.toThrow("two independent");
+});
+
+it("does not discard credible evidence when another signal shares its origin", async () => {
+  const store = new MemoryStore();
+  store.current.evidence = [
+    { ...store.current.evidence[0], originKey: "publisher:one.example" },
+    { ...store.current.evidence[1], originKey: "creator:two" },
+    { ...store.current.evidence[1], sourceDefinitionId: "same-publisher-feed", originKey: "publisher:one.example", trustTier: "watchlist", allowlisted: false },
+  ];
+  await expect(new EditorialService(store, new Set(["founder@example.com"])).publishStory(actor, "cluster-1", draft)).resolves.toMatchObject({ storyId: "story-1" });
+});
+
+it("saves a private draft without publication approval", async () => {
+  const store = new MemoryStore();
+  store.current.evidence = [];
+  const service = new EditorialService(store, new Set(["founder@example.com"]));
+  await expect(service.saveDraft(actor, "cluster-1", { ...draft, independentSourcesConfirmed: false })).resolves.toMatchObject({ storyId: "story-1" });
+  expect(store.publications).toHaveLength(0);
+  expect(store.drafts).toHaveLength(1);
+  await expect(service.saveDraft(null, "cluster-1", draft)).rejects.toThrow();
+  store.current.state = "published_story";
+  await expect(service.saveDraft(actor, "cluster-1", draft)).rejects.toThrow("unpublished");
+});
+
+it("imports only reviewed starter receipts for an authenticated editorial actor", async () => {
+  const store = new MemoryStore();
+  const service = new EditorialService(store, new Set(["founder@example.com"]));
+  await expect(service.prepareStarterDraft(null, "music", true)).rejects.toThrow("Unauthorized");
+  await expect(service.prepareStarterDraft(actor, "music", false)).rejects.toThrow("Open both");
+  await expect(service.prepareStarterDraft(actor, "food", true)).rejects.toThrow("Unknown");
+  expect(store.starters).toHaveLength(0);
+  await expect(service.prepareStarterDraft(actor, "music", true)).resolves.toBe("starter-cluster");
+  expect(store.starters[0]).toMatchObject({ reviewerId: actor.id, starter: { key: "music", draft: { independentSourcesConfirmed: false } } });
 });

@@ -49,8 +49,7 @@ test("real staging source to publication and removal", async ({ page, browser },
       await expect(publicPage).toHaveURL(/\/auth\?next=/);
       // Check the database before creating a source. A wrong service key fails here.
       checked("Load staging niches", await database.from("niches").select("id").eq("id", input.manual.nicheId).single());
-      const manualSources = checked("Load manual intake", await database.from("source_definitions").select("id").eq("adapter_type", "manual"));
-      expect(manualSources, "Seed exactly one manual intake source on staging").toHaveLength(1);
+      checked("Load registered manual publisher", await database.from("source_definitions").select("id").eq("id", input.manual.sourceDefinitionId).single());
       const registry = checked("Load staging source registry", await database.from("source_definitions").select("id").in("adapter_type", ["rss", "youtube"]));
       const visibleIds = await page.locator('input[name="sourceId"]').evaluateAll((elements) => elements.map((element) => (element as HTMLInputElement).value));
       assertSourceRegistryMatches(visibleIds, registry.map((row) => row.id));
@@ -72,6 +71,14 @@ test("real staging source to publication and removal", async ({ page, browser },
       const source = checked("Verify app and staging database match", await database.from("source_definitions").select("id, active").eq("name", sourceName).single());
       report.sourceId = source.id;
       expect(source.active).toBe(false);
+      const sourceRow = page.locator("article").filter({ has: page.getByRole("heading", { name: sourceName, exact: true }) });
+      await sourceRow.getByText("Review source usage", { exact: true }).click();
+      const review = sourceRow.getByRole("form", { name: `Review usage for ${sourceName}` });
+      await review.getByLabel("Terms or permission URL").fill(input.feed.usageReview.termsUrl);
+      await review.getByLabel("Permission basis").fill(input.feed.usageReview.basis);
+      await review.getByLabel("Permitted usage and restrictions").fill(input.feed.usageReview.notes);
+      await review.getByRole("button", { name: "Record usage review", exact: true }).click();
+      await expect(page).toHaveURL(/notice=usage-reviewed/);
       await page.getByRole("button", { name: `Activate ${sourceName}`, exact: true }).click();
       await expect(page).toHaveURL(/notice=source-activated/);
       report.stages.push("studio-source-created-and-activated");
@@ -109,17 +116,17 @@ test("real staging source to publication and removal", async ({ page, browser },
       await form.getByLabel("What is moving?").fill(input.manual.title);
       await form.getByLabel("Platform", { exact: true }).selectOption("web");
       await form.getByLabel("Region", { exact: true }).selectOption(input.manual.region);
-      await form.getByLabel("Source name", { exact: true }).fill(input.manual.sourceName);
+      await form.getByLabel("Registered publisher or creator", { exact: true }).selectOption(input.manual.sourceDefinitionId);
       await form.getByLabel("Niche", { exact: true }).selectOption(input.manual.nicheId);
       // datetime-local has no offset. Use the browser's local time for the actual instant.
       const publishedLocal = await page.evaluate((iso) => {
         const date = new Date(iso);
-        return new Date(date.getTime() - date.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
+        return new Date(date.getTime() + 330 * 60_000).toISOString().slice(0, 16);
       }, input.manual.publishedAt);
       await form.getByLabel("Published at", { exact: true }).fill(publishedLocal);
       await form.getByRole("button", { name: "Add to evidence inbox" }).click();
       await expect(page).toHaveURL(/notice=signal-added/);
-      const manualSource = checked("Load manual intake", await database.from("source_definitions").select("id").eq("adapter_type", "manual").single());
+      const manualSource = { id: input.manual.sourceDefinitionId };
       const signal = checked("Load captured manual evidence", await database.from("raw_signals").select("id").eq("canonical_url", canonicalizeUrl(input.manual.url)).eq("source_definition_id", manualSource.id).single());
       const link = checked("Load clustered manual evidence", await database.from("cluster_signals").select("cluster_id").eq("raw_signal_id", signal.id).single());
       candidateId = link.cluster_id;

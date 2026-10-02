@@ -1,4 +1,6 @@
 import Link from "next/link";
+import type { StoryDraft } from "@/backend/editorial/types";
+import { StatusNotice } from "../status-notice";
 import { PendingButton } from "../pending-button";
 import styles from "./story-editor.module.css";
 import { StoryPreview } from "./story-preview";
@@ -13,6 +15,9 @@ export interface StudioCandidateDetail {
   evidence: Array<{ id: string; title: string; sourceName: string; sourceUrl: string; trustTier: string; availability: string }>;
   revisions?: Array<{ revision: number; createdAt: string; editorId: string }>;
   mediaId?: string | null;
+  draft?: StoryDraft;
+  storyLifecycle?: string;
+  scheduledFor?: string | null;
   mediaOptions?: Array<{ id: string; alt: string; creditLine: string | null }>;
 }
 
@@ -34,6 +39,8 @@ function MoreActions({ candidate, transitionAction, mergeAction, splitAction }: 
 export function StoryEditor({
   candidate,
   publishAction,
+  saveDraftAction,
+  notice,
   error,
   transitionAction,
   mergeAction,
@@ -43,6 +50,8 @@ export function StoryEditor({
 }: {
   candidate: StudioCandidateDetail;
   publishAction?: Action;
+  saveDraftAction?: Action;
+  notice?: string;
   error?: string;
   transitionAction?: Action;
   mergeAction?: Action;
@@ -50,6 +59,7 @@ export function StoryEditor({
   scheduleAction?: Action;
   uploadMediaAction?: Action;
 }) {
+  const draft = candidate.draft;
   return (
     <main id="main-content" className={styles.main}>
       <nav className={styles.breadcrumb} aria-label="Studio breadcrumb"><Link href="/studio">Studio</Link><span>/</span><span>Candidate</span></nav>
@@ -64,6 +74,7 @@ export function StoryEditor({
       </header>
 
       {candidate.sensitiveFlags.length > 0 && <div className={styles.alert} role="alert"><strong>Mandatory review</strong><span>{candidate.sensitiveFlags.join(", ")}</span></div>}
+      <StatusNotice notice={notice} />
       {error && <div className={styles.alert} role="alert"><strong>Could not complete that action</strong><span>{error}</span></div>}
 
       <div className={styles.workspace}>
@@ -72,31 +83,37 @@ export function StoryEditor({
 
           <fieldset>
             <legend>Story</legend>
-            <label>Title<input name="title" required maxLength={140} defaultValue={candidate.title} /></label>
-            <label>Hook<textarea name="hook" required rows={3} /></label>
-            <label>What happened?<textarea name="summary" required rows={5} /></label>
+            <label>Title<input name="title" required maxLength={140} defaultValue={draft?.title ?? candidate.title} /></label>
+            <label>Hook<textarea name="hook" defaultValue={draft?.hook ?? ""} required rows={3} /></label>
+            <label>What happened?<textarea name="summary" defaultValue={draft?.summary ?? ""} required rows={5} /></label>
           </fieldset>
 
           <fieldset>
             <legend>Context</legend>
-            <label>Why people care<textarea name="whyItMatters" required rows={5} /></label>
-            <label>The lore<textarea name="lore" required rows={7} /></label>
-            <label>If you’re new<textarea name="beginnerContext" required rows={4} /></label>
-            <label>Say this in the group chat<textarea name="conversationLine" required rows={3} placeholder="The useful line a reader can repeat without faking expertise." /></label>
+            <label>Why people care<textarea name="whyItMatters" defaultValue={draft?.whyItMatters ?? ""} required rows={5} /></label>
+            <label>The lore<textarea name="lore" defaultValue={draft?.lore ?? ""} required rows={7} /></label>
+            <label>If you’re new<textarea name="beginnerContext" defaultValue={draft?.beginnerContext ?? ""} required rows={4} /></label>
+            <label>Say this in the group chat<textarea name="conversationLine" defaultValue={draft?.conversationLine ?? ""} required rows={3} placeholder="The useful line a reader can repeat without faking expertise." /></label>
           </fieldset>
 
           <fieldset>
             <legend>Classification</legend>
             <div className={styles.twoCol}>
-              <label>Niche ID<input name="nicheId" required defaultValue={candidate.nicheId ?? ""} /></label>
-              <label>Slug<input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
+              <label>Niche ID<input name="nicheId" required defaultValue={draft?.nicheId ?? candidate.nicheId ?? ""} /></label>
+              <label>Slug<input name="slug" defaultValue={draft?.slug ?? ""} required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
             </div>
             <div className={styles.twoCol}>
-              <label>Discovery type<select name="discoveryType" defaultValue="TREND"><option>TREND</option><option>MEME</option><option>DROP</option><option>LORE</option><option>DEBATE</option><option>COMEBACK</option><option>PRODUCT</option><option>EVENT</option><option>PERSON</option><option>AESTHETIC</option><option>DRAMA</option><option>RABBIT_HOLE</option></select></label>
-              <label>Mode<select name="mode" defaultValue="current"><option value="current">Current</option><option value="deep-lore">Deep Lore</option></select></label>
+              <label>Discovery type<select name="discoveryType" defaultValue={draft?.discoveryType ?? "TREND"}><option>TREND</option><option>MEME</option><option>DROP</option><option>LORE</option><option>DEBATE</option><option>COMEBACK</option><option>PRODUCT</option><option>EVENT</option><option>PERSON</option><option>AESTHETIC</option><option>DRAMA</option><option>RABBIT_HOLE</option></select></label>
+              <label>Mode<select name="mode" defaultValue={draft?.mode ?? "current"}><option value="current">Current</option><option value="deep-lore">Deep Lore</option></select></label>
             </div>
-            <div className={styles.twoCol}><label>Regions<input name="regions" required defaultValue="india,global" /></label><label>Freshness label<input name="freshnessLabel" required /></label></div>
-            <label>Tags<input name="tags" placeholder="books,f1,romance" /></label>
+            <div className={styles.twoCol}><label>Regions<input name="regions" required defaultValue={draft?.regions.join(",") ?? "india,global"} /></label><label>Freshness label<input name="freshnessLabel" defaultValue={draft?.freshnessLabel ?? ""} required /></label></div>
+            {(draft?.nicheId ?? candidate.nicheId) === "style" && <fieldset>
+              <legend>Style subtopics</legend>
+              <input type="hidden" name="styleSubtopicsPresent" value="true" />
+              <label className={styles.independenceCheck}><input type="checkbox" name="styleSubtopics" value="sneakers" defaultChecked={draft?.tags.some((tag) => tag.toLowerCase() === "sneakers")} />Sneakers</label>
+              <label className={styles.independenceCheck}><input type="checkbox" name="styleSubtopics" value="streetwear" defaultChecked={draft?.tags.some((tag) => tag.toLowerCase() === "streetwear")} />Streetwear</label>
+            </fieldset>}
+            <label>Tags<input name="tags" defaultValue={draft?.tags.filter((tag) => draft.nicheId !== "style" || !["sneakers", "streetwear"].includes(tag.toLowerCase())).join(",") ?? ""} placeholder="books,f1,romance" /></label>
           </fieldset>
 
           <fieldset>
@@ -110,7 +127,7 @@ export function StoryEditor({
 
           <fieldset>
             <legend>Evidence summary</legend>
-            <label>What the sources establish<textarea name="evidenceSummary" required rows={4} /></label>
+            <label>What the sources establish<textarea name="evidenceSummary" defaultValue={draft?.evidenceSummary ?? ""} required rows={4} /></label>
             <label className={styles.independenceCheck}><input name="independentSourcesConfirmed" type="checkbox" required />I checked at least two independent original sources, not two copies of one report.</label>
           </fieldset>
 
@@ -118,7 +135,9 @@ export function StoryEditor({
 
           <div className={styles.actionBar} role="group" aria-label="Publication actions">
             {scheduleAction && <label>Schedule for (IST)<input name="scheduledFor" type="datetime-local" /></label>}
+            {candidate.scheduledFor && <p>Saving a draft cancels its pending publication schedule.</p>}
             <div>
+              {saveDraftAction && !["published_story", "published_brief"].includes(candidate.storyLifecycle ?? "") && <PendingButton type="submit" name="intent" value="draft" intentValue="draft" pendingLabel="Saving draft…" formAction={saveDraftAction} formNoValidate className={styles.secondary}>Save draft</PendingButton>}
               <PendingButton type="submit" name="intent" value="story" intentValue="story" pendingLabel="Publishing…">Publish story</PendingButton>
               <PendingButton type="submit" name="format" value="brief" intentField="format" intentValue="brief" pendingLabel="Publishing brief…" formNoValidate className={styles.secondary}>Publish brief</PendingButton>
               {scheduleAction && <PendingButton type="submit" name="intent" value="schedule" intentValue="schedule" pendingLabel="Scheduling…" formAction={scheduleAction} className={styles.secondary}>Schedule</PendingButton>}
@@ -152,7 +171,7 @@ export function StoryEditor({
             <section className={styles.revisions} aria-labelledby="revisions-heading">
               <h2 id="revisions-heading">Revision history</h2>
               {candidate.revisions?.map((revision) => <p key={revision.revision}>Revision {revision.revision} · {new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(revision.createdAt))}</p>)}
-              {!candidate.revisions?.length && <p>No published revisions yet.</p>}
+              {!candidate.revisions?.length && <p>No saved revisions yet.</p>}
             </section>
 
             <MoreActions candidate={candidate} transitionAction={transitionAction} mergeAction={mergeAction} splitAction={splitAction} />

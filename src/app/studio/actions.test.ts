@@ -26,6 +26,7 @@ describe("addManualSignalAction", () => {
     createEditorialActions.mockReturnValue({ addManualSignal: async () => ({ ok: true, signalId: "signal-1" }) });
     const { addManualSignalAction } = await import("./actions");
     const form = new FormData();
+    form.set("sourceDefinitionId", "manual-source");
 
     await expect(addManualSignalAction(form)).rejects.toThrow("redirect:/studio?notice=signal-added");
     expect(rpc).toHaveBeenCalledWith("process_unclustered_signals");
@@ -48,9 +49,9 @@ describe("addManualSignalAction", () => {
     createEditorialActions.mockReturnValue({ addManualSignal: async () => ({ ok: true, signalId: "signal-1" }) });
     const { addManualSignalAction } = await import("./actions");
 
-    await expect(addManualSignalAction(new FormData())).rejects.toThrow("redirect:/studio?notice=signal-added");
-    expect(eq).toHaveBeenCalledTimes(1);
-    expect(eq).toHaveBeenCalledWith("adapter_type", "manual");
+    const form = new FormData(); form.set("sourceDefinitionId", "manual-source");
+    await expect(addManualSignalAction(form)).rejects.toThrow("redirect:/studio?notice=signal-added");
+    expect(eq).not.toHaveBeenCalled();
   });
 });
 
@@ -87,7 +88,7 @@ describe("source actions", () => {
   it("returns activation and pause notices to the Sources workspace", async () => {
     const eq = vi.fn(async () => ({ error: null }));
     const update = vi.fn(() => ({ eq }));
-    getEditorialRuntime.mockResolvedValue({ client: { from: () => ({ update }) } });
+    getEditorialRuntime.mockResolvedValue({ client: { from: () => ({ update, select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { adapter_type: "rss", config: { usageReview: { termsUrl: "https://example.com/terms", basis: "Feed usage allowed", notes: "Links only", reviewedBy: "founder", reviewedAt: "2026-10-02T10:00:00Z" } } }, error: null }) }) }) }) } });
     const { toggleSourceAction } = await import("./actions");
 
     const activate = new FormData();
@@ -157,5 +158,40 @@ describe("candidate action notices", () => {
     brief.set("candidateId", "cluster-1");
     brief.set("format", "brief");
     await expect(publishCandidateAction(brief)).rejects.toThrow("redirect:/studio?notice=brief-published");
+  });
+});
+
+describe("seven-lane source actions", () => {
+  it.each(["style", "internet-culture"])("accepts %s for a paused source", async (beat) => {
+    const insert = vi.fn(async () => ({ error: null }));
+    getEditorialRuntime.mockResolvedValue({ client: { from: () => ({ insert }) } });
+    const { createSourceAction } = await import("./actions");
+    const form = new FormData();
+    for (const [key, value] of Object.entries({ name: "Culture desk", adapterType: "rss", trustTier: "publication", watchlistBeat: beat, locator: "https://example.com/feed" })) form.set(key, value);
+    await expect(createSourceAction(form)).rejects.toThrow("notice=source-added");
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ watchlist_beat: beat, active: false, region: "global", locale: "en" }));
+  });
+
+  it("blocks activation without a recorded usage review", async () => {
+    const update = vi.fn();
+    const query = { select: () => query, eq: () => query, maybeSingle: async () => ({ data: { config: {} }, error: null }), update };
+    getEditorialRuntime.mockResolvedValue({ client: { from: () => query } });
+    const { toggleSourceAction } = await import("./actions");
+    const form = new FormData(); form.set("sourceId", "source-1"); form.set("active", "true");
+    await expect(toggleSourceAction(form)).rejects.toThrow(/usage.*review/i);
+    expect(update).not.toHaveBeenCalled();
+  });
+});
+
+
+describe("creator registration cannot bypass origin and trust controls", () => {
+  it.each(["manual", "rss"])("rejects a social creator through the %s publisher form", async (adapterType) => {
+    const insert = vi.fn(async () => ({ error: null }));
+    getEditorialRuntime.mockResolvedValue({ client: { from: () => ({ insert }) } });
+    const { createSourceAction } = await import("./actions");
+    const form = new FormData();
+    for (const [key, value] of Object.entries({ name: "Creator", adapterType, trustTier: "primary", watchlistBeat: "internet-culture", locator: "https://www.instagram.com/person" })) form.set(key, value);
+    await expect(createSourceAction(form)).rejects.toThrow(/creator/);
+    expect(insert).not.toHaveBeenCalled();
   });
 });

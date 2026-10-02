@@ -48,3 +48,9 @@
 @media (max-width: 660px) { .header { align-items: start; flex-direction: column; } .sourceRow { align-items: start; grid-template-columns: 1fr auto; } .sourceRow dl { grid-column: 1 / -1; grid-row: 2; } .sourceRow form { grid-column: 2; grid-row: 1; } .operations { grid-template-columns: 1fr; } }
 @media (max-width: 480px) { .sourceIdentity { grid-template-columns: 1fr; } .sourceRow { display: block; } .sourceRow dl { display: grid; grid-template-columns: 1fr 1fr; margin-top: .8rem; } .sourceRow form { margin-top: .8rem; } .manualCallout { align-items: start; flex-direction: column; } .formPair { grid-template-columns: 1fr; } .runList article { grid-template-columns: 1fr 1fr; } }
 @media (prefers-reduced-motion: reduce) { .main *, .main *::before, .main *::after { transition-duration: .01ms !important; } }
+
+.reviewPanel { grid-column: 1 / -1; width: 100%; }
+.reviewPanel summary { cursor: pointer; padding: 12px 0; }
+.reviewPanel form { display: grid; gap: 14px; margin-top: 16px; }
+.reviewPanel label { display: grid; gap: 6px; }
+.reviewPanel input, .reviewPanel textarea { width: 100%; min-height: 44px; }

@@ -66,16 +66,19 @@ export function readStagingInput(value: unknown) {
   const manual = object(input.manual, "manual");
   const story = object(input.story, "story");
   if (story.independentSourcesConfirmed !== true) throw new Error("Review the two independent original sources before running the staging test");
+  const usageReview = object(feed.usageReview, "feed.usageReview");
   const publishedAt = text(manual, "publishedAt");
   if (!Number.isFinite(Date.parse(publishedAt))) throw new Error("publishedAt must be a valid publication date");
   return {
     feed: {
       url: httpsUrl(text(feed, "url"), "feed.url").toString(),
-      beat: choice(feed, "beat", ["f1", "books", "music", "tech-gaming", "screen-culture"]),
+      beat: choice(feed, "beat", ["f1", "books", "music", "tech-gaming", "screen-culture", "style", "internet-culture"]),
+      usageReview: { termsUrl: httpsUrl(text(usageReview, "termsUrl"), "usageReview.termsUrl").toString(), basis: text(usageReview, "basis"), notes: text(usageReview, "notes") },
       trustTier: choice(feed, "trustTier", ["primary", "publication"]),
     },
     manual: {
       url: httpsUrl(text(manual, "url"), "manual.url").toString(),
+      sourceDefinitionId: text(manual, "sourceDefinitionId"),
       title: text(manual, "title"), sourceName: text(manual, "sourceName"),
       publishedAt, nicheId: text(manual, "nicheId"),
       region: choice(manual, "region", ["india", "global"]),
@@ -87,4 +90,15 @@ export function readStagingInput(value: unknown) {
       freshnessLabel: text(story, "freshnessLabel"), evidenceSummary: text(story, "evidenceSummary"),
     },
   };
+}
+
+export function readCultureStagingInput(value: unknown) {
+  const input = object(value, "Seven-lane staging input");
+  const lanes = ["music", "screen-culture", "style", "gaming-tech", "internet-culture", "books", "f1"];
+  if (input.kind !== "seven-lanes" || !Array.isArray(input.lanes) || input.lanes.length !== lanes.length) throw new Error("Supply exactly the seven reviewed lanes");
+  for (const [index, key] of lanes.entries()) {
+    const lane = object(input.lanes[index], "lane");
+    if (lane.key !== key || lane.receiptsChecked !== true || lane.independentOriginsConfirmed !== true) throw new Error(`Founder must review both receipts and original reporting for ${key}`);
+  }
+  return { kind: "seven-lanes" as const, lanes };
 }

@@ -14,6 +14,10 @@ describe("source URL safety", () => {
 });
 
 describe("watchlist routing", () => {
+  it("routes Style and Internet Culture independently", () => {
+    expect(sourceRouting.suggestedNicheForWatchlistBeat("style")).toBe("style");
+    expect(sourceRouting.suggestedNicheForWatchlistBeat("internet-culture")).toBe("internet-culture");
+  });
   it("routes the screen-culture beat directly to the screen-culture niche", () => {
     const suggestedNicheForWatchlistBeat = (sourceRouting as Record<string, unknown>).suggestedNicheForWatchlistBeat as ((beat: string | null) => string | undefined) | undefined;
 

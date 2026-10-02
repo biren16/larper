@@ -39,3 +39,22 @@ describe("normalizeManualSignal", () => {
       .toThrow();
   });
 });
+
+it("inherits a registered publisher's trust and refuses another publisher's link", () => {
+  const source = { id: "fia", name: "FIA documents", adapterType: "manual" as const, trustTier: "primary" as const, locale: "en", region: "global", allowlisted: false, config: { domains: ["fia.com"] } };
+  const input = { url: "https://www.fia.com/documents/rules", title: "Regulations", sourceName: "Untrusted form name", publishedAt: "2026-10-02T08:00:00Z", region: "global" };
+  expect(normalizeManualSignal(input, source, "2026-10-02T10:00:00Z")).toMatchObject({ sourceDefinitionId: "fia", sourceName: "FIA documents", trustTier: "primary", locale: "en" });
+  expect(() => normalizeManualSignal({ ...input, url: "https://other.example/rules" }, source, "2026-10-02T10:00:00Z")).toThrow("publisher");
+});
+
+it("requires attribution confirmation for creator posts with no author in their URL", () => {
+  const source = { id: "creator", name: "Artist", adapterType: "manual" as const, trustTier: "watchlist" as const, locale: "en", region: "global", allowlisted: false, config: { domains: ["instagram.com"], creatorProfileUrl: "https://www.instagram.com/artist" } };
+  const input = { url: "https://www.instagram.com/reel/abc", title: "Artist reel", sourceName: "Artist", publishedAt: "2026-10-02T08:00:00Z", region: "global" };
+  expect(() => normalizeManualSignal(input, source, "2026-10-02T10:00:00Z")).toThrow("creator");
+  expect(normalizeManualSignal({ ...input, creatorOwnershipConfirmed: true }, source, "2026-10-02T10:00:00Z").trustTier).toBe("watchlist");
+});
+
+it("rejects a legacy social reference without a registered creator profile", () => {
+  const source = { id: "legacy", name: "Generic creator", adapterType: "manual" as const, trustTier: "primary" as const, locale: "en", region: "global", allowlisted: true, config: { domains: ["instagram.com"] } };
+  expect(() => normalizeManualSignal({ url: "https://instagram.com/reel/abc", title: "Creator reel", sourceName: "Creator", publishedAt: "2026-10-02T08:00:00Z", region: "global" }, source, "2026-10-02T10:00:00Z")).toThrow("creator profile");
+});

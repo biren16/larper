@@ -8,6 +8,7 @@ class Query {
 
   constructor(private readonly rows: Row[]) {}
 
+  maybeSingle() { return Promise.resolve({ data: this.rows[0] ?? null, error: null }); }
   select() { return this; }
   in() { return this; }
   is() { return this; }
@@ -51,7 +52,21 @@ const fixtures = {
   })),
 };
 
+const reviewed = { usageReview: { reviewedBy: "founder", reviewedAt: "2026-09-20T00:00:00Z", termsUrl: "https://example.com/terms", basis: "Permitted", notes: "Metadata" } };
+fixtures.source_definitions = fixtures.source_definitions.map((source) => ({ ...source, config: reviewed }));
+
 describe("StudioReader", () => {
+  it("shows unreviewed active feeds as needing review, never healthy", async () => {
+    const data = await new StudioReader(clientFor({ source_definitions: [{ ...fixtures.source_definitions[0], config: {} }] })).sources();
+    expect(data.sources[0]).toMatchObject({ status: "review", healthy: false, usageReviewed: false });
+  });
+
+  it("reloads every private draft field without retaining publication approval", async () => {
+    const story = { id: "story", lifecycle: "reviewing", media_id: "cover", niche_id: "style", slug: "samba-lore", title: "Samba", hook: "Hook", summary: "Summary", why_it_matters: "Why", lore: "Lore", beginner_context: "Context", conversation_line: "Line", discovery_type: "LORE", mode: "deep-lore", regions: ["global"], freshness_label: "Archive", evidence_summary: "Two interviews", tags: ["sneakers", "streetwear"], scheduled_for: null };
+    const data = await new StudioReader(clientFor({ ...fixtures, stories: [story] })).candidate("cluster-1");
+    expect(data?.draft).toEqual({ mediaId: "cover", nicheId: "style", slug: "samba-lore", title: "Samba", hook: "Hook", summary: "Summary", whyItMatters: "Why", lore: "Lore", beginnerContext: "Context", conversationLine: "Line", discoveryType: "LORE", mode: "deep-lore", regions: ["global"], freshnessLabel: "Archive", evidenceSummary: "Two interviews", tags: ["sneakers", "streetwear"], independentSourcesConfirmed: false });
+  });
+
   it("maps the latest eight signals with niche and cluster context", async () => {
     const data = await new StudioReader(clientFor(fixtures)).dashboard();
 

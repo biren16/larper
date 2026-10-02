@@ -1,10 +1,10 @@
 # Staging release test
 
-`npm run test:staging` runs one serial browser journey against an existing staging deployment. It uses the deployed Studio, Supabase Edge Function, database, Storage, and anonymous public routes. The normal `test:e2e` suite continues to use local fixtures. Missing staging inputs fail the command; they do not skip the release test or produce a passing release result.
+`npm run test:staging` runs either the seven-lane rollout (see [seven-lane-rollout.md](seven-lane-rollout.md)) or, with `STAGING_ROLLOUT` unset, one serial browser journey against an existing staging deployment. It uses the deployed Studio, Supabase Edge Function, database, Storage, and anonymous public routes. The normal `test:e2e` suite continues to use local fixtures. Missing staging inputs fail the command; they do not skip the release test or produce a passing release result.
 
 ## Prepare the staging environment
 
-Use a separate Supabase project and Vercel deployment. A Vercel preview connected to the live Supabase project is not isolated staging. Apply every repository migration in filename order and run `supabase/seed.sql` once. Keep the automatic ingestion cron inactive while running this test so its run can be identified unambiguously. Keep template sources paused. Do not copy live user data into staging.
+Use a separate Supabase project and Vercel deployment. A Vercel preview connected to the live Supabase project is not isolated staging. Apply every repository migration in filename order and run `supabase/seed.sql` once. For the single-story runner, keep the automatic ingestion cron inactive while running this test so its run can be identified unambiguously. Keep template sources paused. Do not copy live user data into staging.
 
 Deploy the `ingest` Edge Function to the staging project with its own `INGESTION_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and any required adapter credentials. Set the staging Vercel deployment's `NEXT_PUBLIC_SUPABASE_URL`, publishable key, service role key, founder email allowlist, and `NEXT_PUBLIC_SITE_URL` to the staging values. Redeploy after changing public environment variables; they are embedded at build time. Set the Supabase Auth Site URL and callback allowlist to the exact staging origin and `/auth/callback`. Give the test account a founder/editor profile role and include its email in the deployment's founder allowlist.
 
@@ -51,4 +51,6 @@ On success the story stays unpublished and the test source is paused. On failure
 
 Source, signal, candidate, media, story, and audit records are retained for inspection. No automatic deletion or rollback removes evidence of the test. A rerun may reuse an unpublished story only when its slug begins `staging-smoke-`; the runner refuses to republish another existing story. Run against a small dedicated staging dataset so the test publication can appear in the public feed. Refresh the evidence pair when a feed report is no longer current or the manual signal's candidate no longer accepts new evidence.
 
-This manual release test verifies one real adapter and publication path. It does not verify cron delivery, YouTube credentials, overdue-source recovery, every account feature, or backup restoration. Record those separately before claiming broader release readiness. The backup restore remains a separate launch gate.
+The single-story runner verifies one real adapter and publication path. It does not verify cron delivery, YouTube credentials, overdue-source recovery, every account feature, or backup restoration. Record those separately before claiming broader release readiness. The backup restore remains a separate launch gate.
+
+The single-story input now includes a recorded feed usage review and the registered manual publisher’s source UUID. Generic manual-source capture has been replaced by domain-validated registered selection. Enter real permissions and an existing registered publisher in the local input file.

@@ -1,14 +1,15 @@
 import { existsSync, readFileSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
-import { readStagingConfig, readStagingInput } from "./staging/config";
+import { readStagingConfig, readStagingInput, readCultureStagingInput } from "./staging/config";
 
 const staging = readStagingConfig(process.env);
 if (!existsSync(staging.authState)) throw new Error("STAGING_AUTH_STATE does not exist; sign in on staging and save the browser session first");
-readStagingInput(JSON.parse(readFileSync(staging.inputFile, "utf8")));
+const culture = process.env.STAGING_ROLLOUT === "seven-lanes";
+(culture ? readCultureStagingInput : readStagingInput)(JSON.parse(readFileSync(staging.inputFile, "utf8")));
 
 export default defineConfig({
   testDir: "./staging",
-  testMatch: "release.spec.ts",
+  testMatch: culture ? "culture.spec.ts" : "release.spec.ts",
   fullyParallel: false,
   workers: 1,
   retries: 0,

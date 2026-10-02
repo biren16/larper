@@ -1,0 +1,10 @@
+[
+  {
+    "xml":"<rss><channel><item><guid>item-1</guid><title><![CDATA[Sneaker lore]]></title><link>http://example.com/story/?utm_source=feed</link><description><![CDATA[<p>Original context.</p>]]></description><pubDate>bad date</pubDate><dc:creator>Writer</dc:creator></item></channel></rss>",
+    "expected":[{"canonicalUrl":"https://example.com/story","title":"Sneaker lore","externalId":"item-1","author":"Writer","body":"Original context.","publishedAt":"2026-10-02T09:00:00.000Z"}]
+  },
+  {
+    "xml":"<feed><entry><id>tag:one</id><title>Quiet train</title><link rel='self' href='https://example.com/api/1'/><link rel='enclosure' href='https://example.com/cover.jpg'/><link rel='alternate' type='text/html' href='https://example.com/train?utm_medium=rss'/><author><name>Critic</name></author><updated>2026-09-30T10:00:00+05:30</updated><summary><![CDATA[<p>Room to breathe.</p>]]></summary></entry></feed>",
+    "expected":[{"canonicalUrl":"https://example.com/train","title":"Quiet train","externalId":"tag:one","author":"Critic","body":"Room to breathe.","publishedAt":"2026-09-30T04:30:00.000Z"}]
+  }
+]

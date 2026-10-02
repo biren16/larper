@@ -1,6 +1,9 @@
 import styles from "./studio.module.css";
 
 const noticeMessages: Record<string, string> = {
+  "draft-saved": "Draft saved privately. Review and publication approval are still required.",
+  "sources-registered": "Seven-lane sources registered. New feeds are paused for usage review.",
+  "usage-reviewed": "Source usage review recorded. You can now activate collection.",
   "signal-added": "Signal added to the evidence inbox.",
   "source-added": "Source saved as paused. Review it before activation.",
   "source-activated": "Source activated. It will join the next collection run.",

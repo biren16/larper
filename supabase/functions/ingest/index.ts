@@ -1,5 +1,8 @@
+import { ingestionTrigger } from "../../../src/backend/ingestion/ingestion-trigger.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { XMLParser } from "npm:fast-xml-parser@5";
+import { XMLParser } from "npm:fast-xml-parser@5.11.1";
+import { FEED_PARSER_OPTIONS, normalizeFeedDocument, feedDate as iso } from "../../../src/backend/ingestion/feed-normalizer.ts";
+import { hasUsageReview } from "../../../src/backend/ingestion/source-review.ts";
 import { suggestedNicheForWatchlistBeat } from "../../../src/backend/ingestion/source-url.ts";
 import { persistObservation } from "../../../src/backend/ingestion/store-observation.ts";
 import { completeSourcePoll } from "../../../src/backend/ingestion/source-health.ts";
@@ -15,7 +18,7 @@ type Signal = {
   sensitive_flags: string[]; suggested_niche_id: string | null;
 };
 
-const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@", textNodeName: "#text", trimValues: true });
+const parser = new XMLParser(FEED_PARSER_OPTIONS);
 const jsonHeaders = { "content-type": "application/json" };
 
 function response(body: unknown, status = 200) {
@@ -29,34 +32,12 @@ function sameSecret(actual: string, expected: string) {
   return difference === 0;
 }
 
-function canonical(value: string) {
-  const url = new URL(value);
-  url.hash = "";
-  ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "fbclid", "gclid", "igsh"].forEach((key) => url.searchParams.delete(key));
-  url.hostname = url.hostname.toLowerCase();
-  if (url.pathname !== "/") url.pathname = url.pathname.replace(/\/+$/, "");
-  url.searchParams.sort();
-  return url.toString();
-}
-
 function publicHttpUrl(value: string) {
   const url = new URL(value);
   const host = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (!new Set(["http:", "https:"]).has(url.protocol) || host === "localhost" || host === "::1" || host === "0.0.0.0" || /^(?:127\.|10\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(host)) throw new Error("Source URL must be public");
   return url;
 }
-
-function text(value: unknown): string {
-  if (typeof value === "string" || typeof value === "number") return String(value).trim();
-  if (value && typeof value === "object") {
-    const record = value as Record<string, unknown>;
-    return text(record["#text"] ?? "");
-  }
-  return "";
-}
-
-function list<T>(value: T | T[] | undefined): T[] { return value === undefined ? [] : Array.isArray(value) ? value : [value]; }
-function iso(value: unknown, fallback: string) { const parsed = Date.parse(text(value)); return Number.isFinite(parsed) ? new Date(parsed).toISOString() : fallback; }
 
 function sensitiveFlags(value: string): string[] {
   const normalized = value.toLowerCase();
@@ -76,23 +57,14 @@ async function rssSignals(source: Source, observedAt: string): Promise<Signal[]>
   const approvedUrl = publicHttpUrl(feedUrl);
   const fetched = await fetch(approvedUrl, { headers: { "user-agent": "LARPer-Culture-Radar/1.0" }, signal: AbortSignal.timeout(15000), redirect: "error" });
   if (!fetched.ok) throw new Error(`RSS returned ${fetched.status}`);
-  const parsed = parser.parse(await fetched.text()) as Record<string, unknown>;
-  const channel = parsed.rss && typeof parsed.rss === "object" ? (parsed.rss as Record<string, unknown>).channel as Record<string, unknown> : undefined;
-  const atom = parsed.feed && typeof parsed.feed === "object" ? parsed.feed as Record<string, unknown> : undefined;
-  if (!channel && !atom) throw new Error("Invalid RSS or Atom document");
-  return list<Record<string, unknown>>(channel?.item as Record<string, unknown> | Record<string, unknown>[] | undefined ?? atom?.entry as Record<string, unknown> | Record<string, unknown>[] | undefined).flatMap((item) => {
-    const linkValue = atom && item.link && typeof item.link === "object" ? (item.link as Record<string, unknown>)["@href"] : item.link;
-    const url = text(linkValue); const title = text(item.title);
-    if (!url || !title) return [];
-    return [{
-      source_definition_id: source.id, canonical_url: canonical(url), external_id: text(item.guid ?? item.id) || null,
-      source_type: "rss", source_name: source.name, author: text(item.author) || null, title,
-      body: text(item.description ?? item.summary ?? item.content).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() || null,
-      locale: source.locale, region: source.region, published_at: iso(item.pubDate ?? item.published ?? item.updated, observedAt),
-      observed_at: observedAt, trust_tier: source.trust_tier, availability: "available" as const, metrics: {}, sensitive_flags: sensitiveFlags(`${title} ${text(item.description ?? item.summary ?? item.content)}`),
-      suggested_niche_id: suggestedNicheForWatchlistBeat(source.watchlist_beat) ?? null,
-    }];
-  });
+  return normalizeFeedDocument(parser.parse(await fetched.text()), observedAt).map((item) => ({
+    source_definition_id: source.id, canonical_url: item.canonicalUrl, external_id: item.externalId ?? null,
+    source_type: "rss", source_name: source.name, author: item.author ?? null, title: item.title,
+    body: item.body ?? null, locale: source.locale, region: source.region,
+    published_at: item.publishedAt, observed_at: observedAt, trust_tier: source.trust_tier,
+    availability: "available" as const, metrics: {}, sensitive_flags: sensitiveFlags(`${item.title} ${item.body ?? ""}`),
+    suggested_niche_id: suggestedNicheForWatchlistBeat(source.watchlist_beat) ?? null,
+  }));
 }
 
 async function youtubeSignals(source: Source, observedAt: string, apiKey: string): Promise<Signal[]> {
@@ -137,8 +109,9 @@ Deno.serve(async (request) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   if (!supabaseUrl || !serviceKey) return response({ status: "failed", error: "Database configuration is missing" }, 500);
   const database = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  const trigger = ingestionTrigger(await request.json().catch(() => null));
   const startedAt = new Date().toISOString();
-  const begun = await database.from("ingestion_runs").insert({ trigger: "supabase_cron", status: "running", started_at: startedAt }).select("id").single();
+  const begun = await database.from("ingestion_runs").insert({ trigger, status: "running", started_at: startedAt }).select("id").single();
   if (begun.error) return response({ status: "failed", error: "Could not start ingestion run" }, 500);
   const runId = begun.data.id;
   const sourceResult = await database.from("source_definitions").select("*").eq("active", true).in("adapter_type", ["rss", "youtube"]);
@@ -147,7 +120,8 @@ Deno.serve(async (request) => {
     return response({ status: "failed", error: "Could not load source registry" }, 500);
   }
   const now = Date.now();
-  const due = (sourceResult.data as Source[]).filter((source) => !source.last_polled_at || now - Date.parse(source.last_polled_at) >= source.poll_minutes * 60_000);
+  const unreviewedSources = (sourceResult.data as Source[]).filter((source) => !hasUsageReview(source.config)).map((source) => source.id);
+  const due = (sourceResult.data as Source[]).filter((source) => hasUsageReview(source.config) && ( !source.last_polled_at || now - Date.parse(source.last_polled_at) >= source.poll_minutes * 60_000));
   let insertedCount = 0; let errorCount = 0;
   for (const source of due) {
     try {
@@ -194,6 +168,6 @@ Deno.serve(async (request) => {
   const reopened = processed.error ? { data: 0, error: null } : await database.rpc("reopen_stale_current_stories");
   if (reopened.error) errorCount += 1;
   const status = errorCount === 0 ? "succeeded" : errorCount >= due.length && due.length > 0 ? "failed" : "partial";
-  await database.from("ingestion_runs").update({ status, finished_at: new Date().toISOString(), source_count: due.length, inserted_count: insertedCount, error_count: errorCount, details: { processedClusters: processed.data ?? 0, reopenedStories: reopened.data ?? 0 } }).eq("id", runId);
-  return response({ status, sourceCount: due.length, insertedCount, errorCount, processedSignals: processed.data ?? 0, reopenedStories: reopened.data ?? 0 });
+  await database.from("ingestion_runs").update({ status, finished_at: new Date().toISOString(), source_count: due.length, inserted_count: insertedCount, error_count: errorCount, details: { sourceIds: due.map((source) => source.id), unreviewedSources, processedClusters: processed.data ?? 0, reopenedStories: reopened.data ?? 0 } }).eq("id", runId);
+  return response({ status, unreviewedSources, sourceCount: due.length, insertedCount, errorCount, processedSignals: processed.data ?? 0, reopenedStories: reopened.data ?? 0 });
 });

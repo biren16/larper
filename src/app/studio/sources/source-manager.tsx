@@ -4,17 +4,11 @@ import { StatusNotice } from "../status-notice";
 import type { StudioSource, StudioSourceStatus, StudioSourcesData } from "../studio-dashboard";
 import styles from "./sources.module.css";
 
-const beats = [
-  { id: "f1", label: "F1", description: "Race weekends, drivers, teams, and the culture around the grid." },
-  { id: "books", label: "Books", description: "Reading communities, breakout titles, adaptations, and fandom crossovers." },
-  { id: "music", label: "Music", description: "Releases, fan movements, tours, and sounds crossing into culture." },
-  { id: "tech-gaming", label: "Tech + gaming", description: "Games, devices, creators, and internet-native product moments." },
-  { id: "screen-culture", label: "Screen culture", description: "Films, series, streaming releases, festivals, and the discourse around them." },
-  { id: "internet-culture", label: "Internet culture", description: "Founder-led capture for memes, style, food, places, and hard-to-access platforms." },
-] as const;
+import { CULTURE_BEATS as beats } from "@/backend/ingestion/source-catalog";
 
 const statusLabels: Record<StudioSourceStatus, string> = {
   live: "Live",
+  review: "Usage review needed",
   stale: "Overdue",
   paused: "Paused",
   attention: "Needs attention",
@@ -27,7 +21,9 @@ const time = (value: string | null) => value
   ? new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(value))
   : "Never";
 
-function SourceRow({ source, toggleSourceAction }: { source: StudioSource; toggleSourceAction?: (form: FormData) => void | Promise<void> }) {
+type Action = (form: FormData) => void | Promise<void>;
+
+function SourceRow({ source, toggleSourceAction, reviewSourceAction }: { source: StudioSource; toggleSourceAction?: Action; reviewSourceAction?: Action }) {
   const canToggle = source.status !== "waiting" && source.adapterType !== "manual";
   return (
     <article className={styles.sourceRow}>
@@ -37,15 +33,28 @@ function SourceRow({ source, toggleSourceAction }: { source: StudioSource; toggl
       </div>
       <dl>
         <div><dt>Last collection</dt><dd>{time(source.lastPolledAt)}</dd></div>
+        <div><dt>Usage review</dt><dd>{source.usageReviewed ? "Recorded" : "Required before collection"}</dd></div>
         <div><dt>Failures</dt><dd>{source.failureCount === 1 ? "1 unresolved failure" : `${source.failureCount} unresolved failures`}</dd></div>
       </dl>
       {toggleSourceAction && canToggle && (
         <form action={toggleSourceAction}>
           <input type="hidden" name="sourceId" value={source.id} />
           <input type="hidden" name="active" value={source.active ? "false" : "true"} />
-          <PendingButton type="submit" pendingLabel={source.active ? "Pausing…" : "Activating…"} aria-label={`${source.active ? "Pause" : "Activate"} ${source.name}`}>{source.active ? "Pause" : "Activate"}</PendingButton>
+          <PendingButton type="submit" disabled={!source.active && !source.usageReviewed} pendingLabel={source.active ? "Pausing…" : "Activating…"} aria-label={`${source.active ? "Pause" : "Activate"} ${source.name}`}>{source.active ? "Pause" : "Activate"}</PendingButton>
         </form>
       )}
+      {reviewSourceAction && canToggle && <details className={styles.reviewPanel}>
+        <summary>Review source usage</summary>
+        <p>{source.usageNotes ?? "Record the permitted collection method and restrictions."}</p>
+        {source.locator && <a href={source.locator} target="_blank" rel="noreferrer">Open source</a>}
+        <form action={reviewSourceAction} aria-label={`Review usage for ${source.name}`}>
+          <input type="hidden" name="sourceId" value={source.id} />
+          <label>Terms or permission URL<input name="termsUrl" type="url" required defaultValue={source.usageReview?.termsUrl ?? ""} /></label>
+          <label>Permission basis<textarea name="basis" required defaultValue={source.usageReview?.basis ?? ""} /></label>
+          <label>Permitted usage and restrictions<textarea name="notes" required defaultValue={source.usageReview?.notes ?? ""} /></label>
+          <PendingButton type="submit" pendingLabel="Recording review…">Record usage review</PendingButton>
+        </form>
+      </details>}
     </article>
   );
 }
@@ -59,14 +68,14 @@ function SourceForm({ action }: { action?: (form: FormData) => void | Promise<vo
       <form action={action} aria-label="Add a source">
         <label>Source name<input name="name" required /></label>
         <div className={styles.formPair}>
-          <label>Beat<select name="watchlistBeat" defaultValue="f1"><option value="f1">F1</option><option value="books">Books</option><option value="music">Music</option><option value="tech-gaming">Tech + gaming</option><option value="screen-culture">Screen culture</option></select></label>
-          <label>Adapter<select name="adapterType" defaultValue="rss"><option value="rss">RSS / Atom</option><option value="youtube">YouTube</option></select></label>
+          <label>Beat<select name="watchlistBeat" defaultValue="music">{beats.map((beat) => <option key={beat.id} value={beat.id}>{beat.label}</option>)}</select></label>
+          <label>Adapter<select name="adapterType" defaultValue="rss"><option value="rss">RSS / Atom</option><option value="youtube">YouTube</option><option value="manual">Manual publisher reference</option></select></label>
         </div>
         <label>Trust tier<select name="trustTier" defaultValue="publication"><option value="publication">Publication</option><option value="primary">Primary</option><option value="community">Community</option><option value="watchlist">Watchlist</option></select></label>
         <label>Feed URL, channel ID, or search query<input name="locator" required /></label>
         <div className={styles.formPair}>
-          <label>Locale<input name="locale" defaultValue="en-IN" required /></label>
-          <label>Region<input name="region" defaultValue="india" required /></label>
+          <label>Locale<input name="locale" defaultValue="en" required /></label>
+          <label>Region<input name="region" defaultValue="global" required /></label>
         </div>
         <label className={styles.checkbox}><input name="allowlisted" type="checkbox" /> Allow for brief corroboration</label>
         <PendingButton type="submit" pendingLabel="Adding source…">Add paused source</PendingButton>
@@ -79,12 +88,16 @@ export function SourceManager({
   data,
   createSourceAction,
   toggleSourceAction,
+  reviewSourceAction,
+  registerPresetsAction,
   notice,
   error,
 }: {
   data: StudioSourcesData;
   createSourceAction?: (form: FormData) => void | Promise<void>;
   toggleSourceAction?: (form: FormData) => void | Promise<void>;
+  reviewSourceAction?: Action;
+  registerPresetsAction?: Action;
   notice?: string;
   error?: string;
 }) {
@@ -95,6 +108,10 @@ export function SourceManager({
         <Link href="/studio">Back to Studio</Link>
       </header>
       <StatusNotice notice={notice} error={error} />
+      {registerPresetsAction && <form action={registerPresetsAction} className={styles.configPanel}>
+        <p>Register 21 feed presets and four manual references across these seven lanes. Existing source settings are preserved.</p>
+        <PendingButton type="submit" pendingLabel="Registering sources…">Register seven-lane sources</PendingButton>
+      </form>}
 
       <div className={styles.workspace}>
         <div className={styles.beatList}>
@@ -103,12 +120,16 @@ export function SourceManager({
             return (
               <section key={beat.id} className={styles.beat} role="region" aria-labelledby={`${beat.id}-heading`} aria-label={`${beat.label} sources`}>
                 <header><div><h2 id={`${beat.id}-heading`}>{beat.label}</h2><p>{beat.description}</p></div><span>{sources.length}</span></header>
-                {sources.map((source) => <SourceRow key={source.id} source={source} toggleSourceAction={toggleSourceAction} />)}
+                {sources.map((source) => <SourceRow key={source.id} source={source} toggleSourceAction={toggleSourceAction} reviewSourceAction={reviewSourceAction} />)}
                 {sources.length === 0 && <p className={styles.empty}>No source is assigned to this beat yet.</p>}
-                {beat.id === "internet-culture" && <div className={styles.manualCallout}><p>Instagram, TikTok, Reddit, style, and places stay human-led. Add public evidence without unsupported scraping.</p><Link href="/studio#signal-composer">Capture an internet signal</Link></div>}
+                {beat.id === "internet-culture" && <div className={styles.manualCallout}><p>Original creator links stay human-led. Add public evidence without unsupported scraping.</p><Link href="/studio#signal-composer">Capture an internet signal</Link></div>}
               </section>
             );
           })}
+          {data.sources.some((source) => !beats.some((beat) => beat.id === source.watchlistBeat)) && <section className={styles.beat} aria-label="Other registered sources">
+            <h2>Other registered sources</h2><p>Existing registry history outside these seven lanes.</p>
+            {data.sources.filter((source) => !beats.some((beat) => beat.id === source.watchlistBeat)).map((source) => <SourceRow key={source.id} source={source} toggleSourceAction={toggleSourceAction} reviewSourceAction={reviewSourceAction} />)}
+          </section>}
         </div>
         <aside><SourceForm action={createSourceAction} /></aside>
       </div>

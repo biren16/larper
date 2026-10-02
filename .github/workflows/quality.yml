@@ -51,3 +51,13 @@ jobs:
             echo "Running $fixture"
             psql -v ON_ERROR_STOP=1 -f "$fixture"
           done
+
+  edge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno test supabase/functions/ingest/feed-parity.test.ts
+      - run: deno check supabase/functions/ingest/index.ts

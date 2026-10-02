@@ -1,0 +1,548 @@
+{
+  "checkedAt": "2026-10-02T07:29:49.156Z",
+  "runtime": "Node shared normalization; not deployed Edge verification",
+  "usageApproval": "Not implied by availability",
+  "sources": [
+    {
+      "key": "bandcamp-daily",
+      "name": "Bandcamp Daily",
+      "beat": "music",
+      "url": "https://daily.bandcamp.com/feed",
+      "checkedAt": "2026-10-02T07:29:36.814Z",
+      "status": "parsed",
+      "entryCount": 37,
+      "sample": [
+        {
+          "title": "The Best Metal on Bandcamp, September 2026",
+          "canonicalUrl": "https://daily.bandcamp.com/best-metal/the-best-metal-on-bandcamp-september-2026",
+          "publishedAt": "2026-10-01T16:07:41.000Z"
+        },
+        {
+          "title": "Kaitlyn Aurelia Smith, “Ruin: It’s Not Just Music”",
+          "canonicalUrl": "https://daily.bandcamp.com/album-of-the-day/kaitlyn-aurelia-smith-ruin-its-not-just-music-review",
+          "publishedAt": "2026-10-01T16:07:08.000Z"
+        },
+        {
+          "title": "The Best Field Recordings on Bandcamp, September 2026",
+          "canonicalUrl": "https://daily.bandcamp.com/best-field-recordings/the-best-field-recordings-on-bandcamp-september-2026",
+          "publishedAt": "2026-09-30T18:09:23.000Z"
+        }
+      ]
+    },
+    {
+      "key": "rolling-stone-india",
+      "name": "Rolling Stone India",
+      "beat": "music",
+      "url": "https://rollingstoneindia.com/feed/",
+      "checkedAt": "2026-10-02T07:29:36.835Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "Welcome to Wall Street: FX Fighter Kurumi-Chan Review",
+          "canonicalUrl": "https://rollingstoneindia.com/fx-fighter-kurumi-chan-anime-fx-trading-finance-big-short-review",
+          "publishedAt": "2026-10-01T13:46:24.000Z"
+        },
+        {
+          "title": "Taba Chake Never Thought His Music Would Go Global. Now He’s Touring Europe",
+          "canonicalUrl": "https://rollingstoneindia.com/taba-chake-europe-uk-tour-interview",
+          "publishedAt": "2026-10-01T12:23:41.000Z"
+        },
+        {
+          "title": "Inside The Making of The Indian Version of the Premier League Anthem",
+          "canonicalUrl": "https://rollingstoneindia.com/premier-league-anthem-indian-version-dhruv-visvanath",
+          "publishedAt": "2026-10-01T11:50:23.000Z"
+        }
+      ]
+    },
+    {
+      "key": "pitchfork-news",
+      "name": "Pitchfork News",
+      "beat": "music",
+      "url": "https://pitchfork.com/feed/feed-news/rss",
+      "checkedAt": "2026-10-02T07:29:36.835Z",
+      "status": "parsed",
+      "entryCount": 30,
+      "sample": [
+        {
+          "title": "Drake and Don Toliver’s “Choosin’ Texas” Remix Is Officially Here",
+          "canonicalUrl": "https://pitchfork.com/story/drake-and-don-tolivers-choosin-texas-remix-is-officially-here",
+          "publishedAt": "2026-10-02T04:10:25.000Z"
+        },
+        {
+          "title": "Talking Heads Set Fear of Music Super Deluxe Edition",
+          "canonicalUrl": "https://pitchfork.com/story/talking-heads-set-fear-of-music-super-deluxe-edition",
+          "publishedAt": "2026-10-01T21:56:11.000Z"
+        },
+        {
+          "title": "How to Live Stream Austin City Limits Festival 2026",
+          "canonicalUrl": "https://pitchfork.com/story/how-to-live-stream-austin-city-limits-festival-2026",
+          "publishedAt": "2026-10-01T20:39:58.000Z"
+        }
+      ]
+    },
+    {
+      "key": "letterboxd-journal",
+      "name": "Letterboxd Journal",
+      "beat": "screen-culture",
+      "url": "https://letterboxd.com/journal/rss/",
+      "checkedAt": "2026-10-02T07:29:37.430Z",
+      "status": "parsed",
+      "entryCount": 50,
+      "sample": [
+        {
+          "title": "Monster Mash: legendary special-effects makeup creator Rick Baker on making decades of movie magic",
+          "canonicalUrl": "https://letterboxd.com/journal/monster-mash-rick-baker-career-interview",
+          "publishedAt": "2026-10-01T19:40:28.000Z"
+        },
+        {
+          "title": "Playing with Fire: twenty criminally underseen erotic thrillers",
+          "canonicalUrl": "https://letterboxd.com/journal/deep-cut-erotic-thrillers-starter-pack",
+          "publishedAt": "2026-09-30T16:00:38.000Z"
+        },
+        {
+          "title": "A Connoisseur of Roads: the lost youth of Gus Van Sant’s My Own Private Idaho at 35",
+          "canonicalUrl": "https://letterboxd.com/journal/my-own-private-idaho-35th-anniversary",
+          "publishedAt": "2026-09-29T16:32:35.000Z"
+        }
+      ]
+    },
+    {
+      "key": "rogerebert",
+      "name": "RogerEbert",
+      "beat": "screen-culture",
+      "url": "https://www.rogerebert.com/feed",
+      "checkedAt": "2026-10-02T07:29:39.484Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "Formative Action Series Comes Roaring Back with &#8220;Gears of War: E-Day&#8221;",
+          "canonicalUrl": "https://www.rogerebert.com/video-games/gears-of-war-e-day-video-game-review",
+          "publishedAt": "2026-10-01T13:00:00.000Z"
+        },
+        {
+          "title": "The Unloved, Part 154: No Pets",
+          "canonicalUrl": "https://www.rogerebert.com/the-unloved/the-unloved-part-154-no-pets",
+          "publishedAt": "2026-10-01T13:00:00.000Z"
+        },
+        {
+          "title": "Home Entertainment Guide September 2026: Disclosure Day, The Secret Agent, Backrooms, Toy Story 5, More",
+          "canonicalUrl": "https://www.rogerebert.com/dvd-blu-ray/home-entertainment-guide-september-2026-disclosure-day-the-secret-agent-backrooms-toy-story-5-more",
+          "publishedAt": "2026-09-30T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "key": "dazed",
+      "name": "Dazed",
+      "beat": "style",
+      "url": "https://www.dazeddigital.com/rss",
+      "checkedAt": "2026-10-02T07:29:39.522Z",
+      "status": "parsed",
+      "entryCount": 15,
+      "sample": [
+        {
+          "title": "The nominees for the UK Music Video Awards 2026 have been announced",
+          "canonicalUrl": "https://www.dazeddigital.com/music/article/71088/1/the-nominees-for-the-uk-music-video-awards-2026-have-been-announced",
+          "publishedAt": "2026-10-01T19:02:00.000Z"
+        },
+        {
+          "title": "Balenciaga is stealth-selling couture to its ready-to-wear customers",
+          "canonicalUrl": "https://www.dazeddigital.com/fashion/article/71094/1/balenciaga-ss27-paris-fashion-week-pfw-pierpaolo-piccioli",
+          "publishedAt": "2026-10-01T18:39:00.000Z"
+        },
+        {
+          "title": "Imogen Heap: ‘We’re on the edge of a very chaotic period in our story’",
+          "canonicalUrl": "https://www.dazeddigital.com/music/article/71095/1/imogen-heap-interview-chapter-4-how-to-live-on-earth-youtube-technology",
+          "publishedAt": "2026-10-01T15:44:00.000Z"
+        }
+      ]
+    },
+    {
+      "key": "hypebae",
+      "name": "Hypebae",
+      "beat": "style",
+      "url": "https://hypebae.com/feed",
+      "checkedAt": "2026-10-02T07:29:39.539Z",
+      "status": "parsed",
+      "entryCount": 20,
+      "sample": [
+        {
+          "title": "Balenciaga SS27 Brings Its Couture Techniques to Ready-To-Wear",
+          "canonicalUrl": "https://hypebae.com/2026/10/balenciaga-ss27-paris-fashion-week-collection-ready-to-wear",
+          "publishedAt": "2026-10-01T20:08:49.000Z"
+        },
+        {
+          "title": "Our Favorite Shows of Paris Fashion Week SS27, So Far",
+          "canonicalUrl": "https://hypebae.com/2026/9/paris-fashion-week-ss27-runways-collections-recap-saint-laurent-maison-margiela-matieres-fecales",
+          "publishedAt": "2026-10-01T16:33:47.000Z"
+        },
+        {
+          "title": "Leah Kateb Is Using What She Learned on 'Love Island Usa' to Make Skylar Cooler",
+          "canonicalUrl": "https://hypebae.com/2026/10/skylar-fragrance-leah-kateb-love-island-usa-fated-flame-eau-de-parfum-interview",
+          "publishedAt": "2026-10-01T16:09:46.000Z"
+        }
+      ]
+    },
+    {
+      "key": "highsnobiety",
+      "name": "Highsnobiety",
+      "beat": "style",
+      "url": "https://www.highsnobiety.com/feeds/rss",
+      "checkedAt": "2026-10-02T07:29:40.151Z",
+      "status": "parsed",
+      "entryCount": 14,
+      "sample": [
+        {
+          "title": "One Designer, Two Collabs, Three Perfect Leather Shoes",
+          "canonicalUrl": "https://www.highsnobiety.com/p/ymc-sage-nation",
+          "publishedAt": "2026-10-01T20:33:01.000Z"
+        },
+        {
+          "title": "Pusha T Needs Four Hours of Alone Time Every Day",
+          "canonicalUrl": "https://www.highsnobiety.com/p/pusha-t-pharrell-grindin-lavazza-coffee-interview",
+          "publishedAt": "2026-10-01T17:53:43.000Z"
+        },
+        {
+          "title": "Only Junya Could Make Stüssy, Levi’s, and Spiewak Pop Off Like This",
+          "canonicalUrl": "https://www.highsnobiety.com/p/junya-watanabe-stussy-fw26",
+          "publishedAt": "2026-10-01T16:39:51.000Z"
+        }
+      ]
+    },
+    {
+      "key": "sneaker-news",
+      "name": "Sneaker News",
+      "beat": "style",
+      "url": "https://sneakernews.com/feed/",
+      "checkedAt": "2026-10-02T07:29:40.327Z",
+      "status": "parsed",
+      "entryCount": 7,
+      "sample": [
+        {
+          "title": "Air Jordan Retro Releases Will Decrease In 2027",
+          "canonicalUrl": "https://sneakernews.com/2026/10/01/air-jordan-retro-decrease-2027",
+          "publishedAt": "2026-10-02T02:36:51.000Z"
+        },
+        {
+          "title": "Spooky Stitching Preps The Air Jordan 1 Mid For Halloween",
+          "canonicalUrl": "https://sneakernews.com/2026/10/01/air-jordan-1-mid-halloween-iq5492-001",
+          "publishedAt": "2026-10-01T22:00:02.000Z"
+        },
+        {
+          "title": "The Nike Zoom Vomero 5 Takes Its First Stab At Cordura Materials",
+          "canonicalUrl": "https://sneakernews.com/2026/10/01/nike-zoom-vomero-5-cordura-camo-green-neutral-olive-anthracite-black-iq0380-300",
+          "publishedAt": "2026-10-01T21:30:00.000Z"
+        }
+      ]
+    },
+    {
+      "key": "nice-kicks",
+      "name": "Nice Kicks",
+      "beat": "style",
+      "url": "https://www.nicekicks.com/feed/",
+      "checkedAt": "2026-10-02T07:29:41.128Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "Oregon Ducks x Nike Air Force 1 Low Luxe SE &#8220;Triple Black&#8221;",
+          "canonicalUrl": "https://www.nicekicks.com/oregon-ducks-nike-air-force-1-low-luxe-se-triple-black-jf5453-001",
+          "publishedAt": "2026-10-01T19:38:32.000Z"
+        },
+        {
+          "title": "Air Jordan 3 WMNS &#8220;Fireside&#8221; October 2026 Release Date &#038; Info",
+          "canonicalUrl": "https://www.nicekicks.com/air-jordan-3-wmns-fireside-ck9246-200",
+          "publishedAt": "2026-10-01T19:14:09.000Z"
+        },
+        {
+          "title": "Marvel x adidas Superstar &#8220;Doctor Doom&#8221;",
+          "canonicalUrl": "https://www.nicekicks.com/marvel-adidas-superstar-doctor-doom-la8469",
+          "publishedAt": "2026-10-01T18:27:18.000Z"
+        }
+      ]
+    },
+    {
+      "key": "eurogamer",
+      "name": "Eurogamer",
+      "beat": "tech-gaming",
+      "url": "https://www.eurogamer.net/feed",
+      "checkedAt": "2026-10-02T07:29:41.313Z",
+      "status": "parsed",
+      "entryCount": 100,
+      "sample": [
+        {
+          "title": "Aion 2's imminent worldwide release could be huge as early access founders' packs outsell major games, and player numbers soar",
+          "canonicalUrl": "https://www.eurogamer.net/aion-2-western-release-steam-player-numbers",
+          "publishedAt": "2026-10-01T15:11:16.000Z"
+        },
+        {
+          "title": "007 First Light gets free new DLC today, adding New Game Plus and Photo modes, new TacSim missions and more",
+          "canonicalUrl": "https://www.eurogamer.net/007-james-bond-first-light-free-dlc",
+          "publishedAt": "2026-10-01T14:28:56.000Z"
+        },
+        {
+          "title": "Ace Combat 8 developer apologises for Belkan War pre-order backlash, explains why it happened and vows to explore possible solutions",
+          "canonicalUrl": "https://www.eurogamer.net/ace-combat-8-the-belkan-war-pre-order-bonus-backlash-response",
+          "publishedAt": "2026-10-01T13:55:47.000Z"
+        }
+      ]
+    },
+    {
+      "key": "polygon",
+      "name": "Polygon",
+      "beat": "tech-gaming",
+      "url": "https://www.polygon.com/feed/",
+      "checkedAt": "2026-10-02T07:29:42.013Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "Buffy Meets Hannibal In the Cult Classic Detective Series Streaming Free on YouTube",
+          "canonicalUrl": "https://www.polygon.com/izombie-streaming-free-youtube-october-2026",
+          "publishedAt": "2026-10-02T05:45:15.000Z"
+        },
+        {
+          "title": "'Digger' Ending Explained: A Spoiler-Filled Breakdown of Tom Cruise's Wild New Movie",
+          "canonicalUrl": "https://www.polygon.com/digger-ending-explained-spoilers",
+          "publishedAt": "2026-10-02T01:01:25.000Z"
+        },
+        {
+          "title": "'Verity' Ending Explained: How That Bonkers Final Twist Reshapes the Entire Movie",
+          "canonicalUrl": "https://www.polygon.com/verity-ending-explained-spoilers",
+          "publishedAt": "2026-10-02T00:00:15.000Z"
+        }
+      ]
+    },
+    {
+      "key": "playstation-blog",
+      "name": "PlayStation Blog",
+      "beat": "tech-gaming",
+      "url": "https://blog.playstation.com/feed/",
+      "checkedAt": "2026-10-02T07:29:42.175Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "AI upscaling is coming to PS5",
+          "canonicalUrl": "https://blog.playstation.com/2026/10/01/ai-upscaling-is-coming-to-ps5",
+          "publishedAt": "2026-10-01T16:00:09.000Z"
+        },
+        {
+          "title": "Martial arts meet fluid platforming in Elta: Defy All Gods, with a free PS5 demo out today",
+          "canonicalUrl": "https://blog.playstation.com/2026/10/01/martial-arts-meet-fluid-platforming-in-elta-defy-all-gods-with-a-free-ps5-demo-out-today",
+          "publishedAt": "2026-10-01T15:00:44.000Z"
+        },
+        {
+          "title": "Return to Fabletown with The Wolf Among Us Remastered, out October 29",
+          "canonicalUrl": "https://blog.playstation.com/2026/10/01/return-to-fabletown-with-the-wolf-among-us-remastered-out-october-29",
+          "publishedAt": "2026-10-01T13:00:49.000Z"
+        }
+      ]
+    },
+    {
+      "key": "xbox-wire",
+      "name": "Xbox Wire",
+      "beat": "tech-gaming",
+      "url": "https://news.xbox.com/en-us/feed/",
+      "checkedAt": "2026-10-02T07:29:43.279Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "Invincible VS Open Beta Begins October 13: What You Need to Know",
+          "canonicalUrl": "https://news.xbox.com/en-us/2026/10/01/invincible-vs-open-beta-begins-october-13",
+          "publishedAt": "2026-10-01T23:00:00.000Z"
+        },
+        {
+          "title": "IKEA and XBOX YXSTABY Collection: How the Collaboration Came Together &#124; Official XBOX Podcast",
+          "canonicalUrl": "https://news.xbox.com/en-us/2026/10/01/ikea-and-xbox-yxstaby-collection-how-the-collaboration-came-together-official-xbox-podcast",
+          "publishedAt": "2026-10-01T16:05:00.000Z"
+        },
+        {
+          "title": "IKEA and XBOX Team Up on YXSTABY, a New Collection Made for Gaming at Home",
+          "canonicalUrl": "https://news.xbox.com/en-us/2026/10/01/ikea-xbox-gaming-collection-yxstaby",
+          "publishedAt": "2026-10-01T16:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "key": "know-your-meme",
+      "name": "Know Your Meme",
+      "beat": "internet-culture",
+      "url": "https://knowyourmeme.com/newsfeed.rss",
+      "checkedAt": "2026-10-02T07:29:43.788Z",
+      "status": "parsed",
+      "entryCount": 2,
+      "sample": [
+        {
+          "title": "Why Are They Doing The 'Bird Hands' Thing?",
+          "canonicalUrl": "https://knowyourmeme.com/videos/440688-bird-hands",
+          "publishedAt": "2026-10-01T14:54:06.000Z"
+        },
+        {
+          "title": "University Student's 'Relax, Bro' Response To Reporter Becomes A Meme Amidst Hazing Scandal",
+          "canonicalUrl": "https://knowyourmeme.com/memes/relax-pal",
+          "publishedAt": "2026-09-30T20:28:10.000Z"
+        }
+      ]
+    },
+    {
+      "key": "daily-dot",
+      "name": "Daily Dot",
+      "beat": "internet-culture",
+      "url": "https://dailydot.com/feed",
+      "checkedAt": "2026-10-02T07:29:44.354Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "TikToker Shares the Questions She’s Tired of Hearing About Her Long-Distance Relationship: ‘When Are You Guys Gonna Move?’",
+          "canonicalUrl": "https://dailydot.com/tiktoker-shares-the-questions-shes-tired-of-hearing-about-her-long-distance-relationship-when-are-you-guys-gonna-move",
+          "publishedAt": "2026-10-02T00:45:00.000Z"
+        },
+        {
+          "title": "Redditor Says Job Seekers Should Skip One-Way Video Interviews: ‘It Was One of the Best Decisions I Made’",
+          "canonicalUrl": "https://dailydot.com/redditor-says-job-seekers-should-skip-one-way-video-interviews-it-was-one-of-the-best-decisions-i-made",
+          "publishedAt": "2026-10-01T23:52:00.000Z"
+        },
+        {
+          "title": "Woman Says She Left Her Husband After 18 Months of Marriage and Realized She Had Overlooked ‘Narcissistic’ Behavior",
+          "canonicalUrl": "https://dailydot.com/woman-says-she-left-her-husband-after-18-months-of-marriage-and-realized-she-had-overlooked-narcissistic-behavior",
+          "publishedAt": "2026-10-01T23:01:00.000Z"
+        }
+      ]
+    },
+    {
+      "key": "book-riot",
+      "name": "Book Riot",
+      "beat": "books",
+      "url": "https://bookriot.com/feed/",
+      "checkedAt": "2026-10-02T07:29:44.860Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "Book Riot&#8217;s Deals of the Day for October 1, 2026",
+          "canonicalUrl": "https://bookriot.com/book-riots-deals-of-the-day-for-october-1-2026",
+          "publishedAt": "2026-10-01T15:12:45.000Z"
+        },
+        {
+          "title": "The Bestselling Books of the Week, According to All the Lists",
+          "canonicalUrl": "https://bookriot.com/bestselling-books-october-1-2026",
+          "publishedAt": "2026-10-01T10:11:00.000Z"
+        },
+        {
+          "title": "A New SUNRISE ON THE REAPING Trailer, The BSC at 40, and More YA Book Talk",
+          "canonicalUrl": "https://bookriot.com/ya-book-news-october-2026",
+          "publishedAt": "2026-10-01T10:01:00.000Z"
+        }
+      ]
+    },
+    {
+      "key": "reactor",
+      "name": "Reactor",
+      "beat": "books",
+      "url": "https://reactormag.com/feed/",
+      "checkedAt": "2026-10-02T07:29:45.017Z",
+      "status": "parsed",
+      "entryCount": 30,
+      "sample": [
+        {
+          "title": "The Transformers/G.I. Joe Crossover Movie Is Dead, and Danny McBride and Bradley Cooper&#8217;s G.I. Joe Movie Is Replacing It",
+          "canonicalUrl": "https://reactormag.com/transformers-gi-joe-movie-dead-bradley-cooper",
+          "publishedAt": "2026-10-01T19:55:58.000Z"
+        },
+        {
+          "title": "Roller Coaster — Star Trek: Strange New Worlds Fourth Season Overview",
+          "canonicalUrl": "https://reactormag.com/tv-review-star-trek-strange-new-worlds-fourth-season-overview",
+          "publishedAt": "2026-10-01T18:30:00.000Z"
+        },
+        {
+          "title": "Strange New Worlds Showrunners Reveal Season 4 Finale Was Designed as a Possible Series Finale",
+          "canonicalUrl": "https://reactormag.com/strange-new-worlds-season-4-finale-last-episode",
+          "publishedAt": "2026-10-01T15:52:07.000Z"
+        }
+      ]
+    },
+    {
+      "key": "literary-hub",
+      "name": "Literary Hub",
+      "beat": "books",
+      "url": "https://lithub.com/feed/",
+      "checkedAt": "2026-10-02T07:29:45.784Z",
+      "status": "parsed",
+      "entryCount": 10,
+      "sample": [
+        {
+          "title": "Russia has destroyed “one third of all the books printed in Ukraine this year.”",
+          "canonicalUrl": "https://lithub.com/russia-has-destroyed-one-third-of-all-the-books-printed-in-ukraine-this-year",
+          "publishedAt": "2026-10-01T16:59:33.000Z"
+        },
+        {
+          "title": "9 books to read if you, a fully grown adult, have never read a book.",
+          "canonicalUrl": "https://lithub.com/9-books-to-read-if-you-a-fully-grown-adult-have-never-read-a-book",
+          "publishedAt": "2026-10-01T16:53:40.000Z"
+        },
+        {
+          "title": "Dolly Parton’s Imagination Library is expanding to serve more kids.",
+          "canonicalUrl": "https://lithub.com/dolly-partons-imagination-library-is-expanding-to-serve-more-kids",
+          "publishedAt": "2026-10-01T16:46:48.000Z"
+        }
+      ]
+    },
+    {
+      "key": "racefans",
+      "name": "RaceFans",
+      "beat": "f1",
+      "url": "https://www.racefans.net/feed/",
+      "checkedAt": "2026-10-02T07:29:46.500Z",
+      "status": "parsed",
+      "entryCount": 20,
+      "sample": [
+        {
+          "title": "Verstappen quickest in first session as drivers encounter &#8220;insane&#8221; tyre degradation | Formula 1",
+          "canonicalUrl": "https://www.racefans.net/2026/10/02/verstappen-quickest-in-first-session-as-drivers-encounter-insane-tyre-degradation-at-sepang",
+          "publishedAt": "2026-10-02T05:37:22.000Z"
+        },
+        {
+          "title": "On This Day: Hamilton suffers title blow as Ricciardo wins Malaysian GP | Brief",
+          "canonicalUrl": "https://www.racefans.net/2026/10/02/on-this-day-malaysian-grand-prix",
+          "publishedAt": "2026-10-01T23:01:00.000Z"
+        },
+        {
+          "title": "Norris calls for &#8220;respect and humility&#8221; after &#8220;death threats&#8221; on social media | Formula 1",
+          "canonicalUrl": "https://www.racefans.net/2026/10/01/norris-calls-for-respect-and-humility-after-death-threats-on-social-media",
+          "publishedAt": "2026-10-01T14:04:55.000Z"
+        }
+      ]
+    },
+    {
+      "key": "the-race",
+      "name": "The Race",
+      "beat": "f1",
+      "url": "https://www.the-race.com/rss/",
+      "checkedAt": "2026-10-02T07:29:47.360Z",
+      "status": "parsed",
+      "entryCount": 15,
+      "sample": [
+        {
+          "title": "What happened in Motegi MotoGP practice",
+          "canonicalUrl": "https://www.the-race.com/motogp/what-happened-in-motegi-motogp-practice",
+          "publishedAt": "2026-10-02T07:26:45.000Z"
+        },
+        {
+          "title": "Verstappen beats upgraded Mercedes in Sepang practice one",
+          "canonicalUrl": "https://www.the-race.com/formula-1/bahrain-grand-prix-practice-one-2026",
+          "publishedAt": "2026-10-02T05:38:27.000Z"
+        },
+        {
+          "title": "F1 2026 Bahrain Grand Prix in Malaysia practice results",
+          "canonicalUrl": "https://www.the-race.com/formula-1/f1-2026-bahrain-grand-prix-in-malaysia-practice-results",
+          "publishedAt": "2026-10-02T05:35:15.000Z"
+        }
+      ]
+    }
+  ]
+}

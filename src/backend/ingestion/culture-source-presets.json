@@ -1,0 +1,458 @@
+[
+  {
+    "key": "bandcamp-daily",
+    "name": "Bandcamp Daily",
+    "beat": "music",
+    "adapterType": "rss",
+    "url": "https://daily.bandcamp.com/feed",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Bandcamp Daily",
+    "originKey": "publisher:daily.bandcamp.com",
+    "domains": [
+      "daily.bandcamp.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "rolling-stone-india",
+    "name": "Rolling Stone India",
+    "beat": "music",
+    "adapterType": "rss",
+    "url": "https://rollingstoneindia.com/feed/",
+    "trustTier": "publication",
+    "locale": "en-IN",
+    "region": "india",
+    "pollMinutes": 180,
+    "owner": "Rolling Stone India",
+    "originKey": "publisher:rollingstoneindia.com",
+    "domains": [
+      "rollingstoneindia.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "pitchfork-news",
+    "name": "Pitchfork News",
+    "beat": "music",
+    "adapterType": "rss",
+    "url": "https://pitchfork.com/feed/feed-news/rss",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Pitchfork News",
+    "originKey": "publisher:pitchfork.com",
+    "domains": [
+      "pitchfork.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "letterboxd-journal",
+    "name": "Letterboxd Journal",
+    "beat": "screen-culture",
+    "adapterType": "rss",
+    "url": "https://letterboxd.com/journal/rss/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Letterboxd Journal",
+    "originKey": "publisher:letterboxd.com",
+    "domains": [
+      "letterboxd.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "rogerebert",
+    "name": "RogerEbert",
+    "beat": "screen-culture",
+    "adapterType": "rss",
+    "url": "https://www.rogerebert.com/feed",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "RogerEbert",
+    "originKey": "publisher:rogerebert.com",
+    "domains": [
+      "rogerebert.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "crunchyroll",
+    "name": "Crunchyroll News",
+    "beat": "screen-culture",
+    "adapterType": "manual",
+    "url": "https://www.crunchyroll.com/news",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Crunchyroll News",
+    "originKey": "publisher:crunchyroll.com",
+    "domains": [
+      "crunchyroll.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "thr-india",
+    "name": "THR India",
+    "beat": "screen-culture",
+    "adapterType": "manual",
+    "url": "https://www.hollywoodreporterindia.com/",
+    "trustTier": "publication",
+    "locale": "en-IN",
+    "region": "india",
+    "pollMinutes": 180,
+    "owner": "THR India",
+    "originKey": "publisher:hollywoodreporterindia.com",
+    "domains": [
+      "hollywoodreporterindia.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "dazed",
+    "name": "Dazed",
+    "beat": "style",
+    "adapterType": "rss",
+    "url": "https://www.dazeddigital.com/rss",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Dazed",
+    "originKey": "publisher:dazeddigital.com",
+    "domains": [
+      "dazeddigital.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "hypebae",
+    "name": "Hypebae",
+    "beat": "style",
+    "adapterType": "rss",
+    "url": "https://hypebae.com/feed",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Hypebae",
+    "originKey": "publisher:hypebae.com",
+    "domains": [
+      "hypebae.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "highsnobiety",
+    "name": "Highsnobiety",
+    "beat": "style",
+    "adapterType": "rss",
+    "url": "https://www.highsnobiety.com/feeds/rss",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Highsnobiety",
+    "originKey": "publisher:highsnobiety.com",
+    "domains": [
+      "highsnobiety.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": [
+      "https://www.highsnobiety.com/feed/",
+      "https://www.highsnobiety.com/feed"
+    ]
+  },
+  {
+    "key": "sneaker-news",
+    "name": "Sneaker News",
+    "beat": "style",
+    "adapterType": "rss",
+    "url": "https://sneakernews.com/feed/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Sneaker News",
+    "originKey": "publisher:sneakernews.com",
+    "domains": [
+      "sneakernews.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "nice-kicks",
+    "name": "Nice Kicks",
+    "beat": "style",
+    "adapterType": "rss",
+    "url": "https://www.nicekicks.com/feed/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Nice Kicks",
+    "originKey": "publisher:nicekicks.com",
+    "domains": [
+      "nicekicks.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "homegrown",
+    "name": "Homegrown",
+    "beat": "style",
+    "adapterType": "manual",
+    "url": "https://homegrown.co.in/",
+    "trustTier": "publication",
+    "locale": "en-IN",
+    "region": "india",
+    "pollMinutes": 180,
+    "owner": "Homegrown",
+    "originKey": "publisher:homegrown.co.in",
+    "domains": [
+      "homegrown.co.in"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "eurogamer",
+    "name": "Eurogamer",
+    "beat": "tech-gaming",
+    "adapterType": "rss",
+    "url": "https://www.eurogamer.net/feed",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Eurogamer",
+    "originKey": "publisher:eurogamer.net",
+    "domains": [
+      "eurogamer.net"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "polygon",
+    "name": "Polygon",
+    "beat": "tech-gaming",
+    "adapterType": "rss",
+    "url": "https://www.polygon.com/feed/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Polygon",
+    "originKey": "publisher:polygon.com",
+    "domains": [
+      "polygon.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "playstation-blog",
+    "name": "PlayStation Blog",
+    "beat": "tech-gaming",
+    "adapterType": "rss",
+    "url": "https://blog.playstation.com/feed/",
+    "trustTier": "primary",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "PlayStation Blog",
+    "originKey": "publisher:blog.playstation.com",
+    "domains": [
+      "blog.playstation.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "xbox-wire",
+    "name": "Xbox Wire",
+    "beat": "tech-gaming",
+    "adapterType": "rss",
+    "url": "https://news.xbox.com/en-us/feed/",
+    "trustTier": "primary",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Xbox Wire",
+    "originKey": "publisher:news.xbox.com",
+    "domains": [
+      "news.xbox.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "know-your-meme",
+    "name": "Know Your Meme",
+    "beat": "internet-culture",
+    "adapterType": "rss",
+    "url": "https://knowyourmeme.com/newsfeed.rss",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Know Your Meme",
+    "originKey": "publisher:knowyourmeme.com",
+    "domains": [
+      "knowyourmeme.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "daily-dot",
+    "name": "Daily Dot",
+    "beat": "internet-culture",
+    "adapterType": "rss",
+    "url": "https://dailydot.com/feed",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Daily Dot",
+    "originKey": "publisher:dailydot.com",
+    "domains": [
+      "dailydot.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": [
+      "https://www.dailydot.com/feed",
+      "https://www.dailydot.com/feed/"
+    ]
+  },
+  {
+    "key": "book-riot",
+    "name": "Book Riot",
+    "beat": "books",
+    "adapterType": "rss",
+    "url": "https://bookriot.com/feed/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Book Riot",
+    "originKey": "publisher:bookriot.com",
+    "domains": [
+      "bookriot.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "reactor",
+    "name": "Reactor",
+    "beat": "books",
+    "adapterType": "rss",
+    "url": "https://reactormag.com/feed/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Reactor",
+    "originKey": "publisher:reactormag.com",
+    "domains": [
+      "reactormag.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "literary-hub",
+    "name": "Literary Hub",
+    "beat": "books",
+    "adapterType": "rss",
+    "url": "https://lithub.com/feed/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "Literary Hub",
+    "originKey": "publisher:lithub.com",
+    "domains": [
+      "lithub.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "racefans",
+    "name": "RaceFans",
+    "beat": "f1",
+    "adapterType": "rss",
+    "url": "https://www.racefans.net/feed/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "RaceFans",
+    "originKey": "publisher:racefans.net",
+    "domains": [
+      "racefans.net"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "the-race",
+    "name": "The Race",
+    "beat": "f1",
+    "adapterType": "rss",
+    "url": "https://www.the-race.com/rss/",
+    "trustTier": "publication",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "The Race",
+    "originKey": "publisher:the-race.com",
+    "domains": [
+      "the-race.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  },
+  {
+    "key": "fia",
+    "name": "FIA documents",
+    "beat": "f1",
+    "adapterType": "manual",
+    "url": "https://www.fia.com/media-center/press_release/name/name/F1",
+    "trustTier": "primary",
+    "locale": "en",
+    "region": "global",
+    "pollMinutes": 180,
+    "owner": "FIA documents",
+    "originKey": "publisher:fia.com",
+    "domains": [
+      "fia.com"
+    ],
+    "usageNotes": "Links, feed metadata and original editorial summaries only; no article bodies or publisher media. Review current terms before automated collection.",
+    "aliases": []
+  }
+]
