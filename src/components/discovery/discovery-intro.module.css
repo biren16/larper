@@ -22,7 +22,7 @@
 }
 
 .wordmark {
-  font: 700 clamp(7.5rem, 19vw, 19rem)/0.94 var(--font-shell);
+  font: var(--weight-heading) clamp(7.5rem, 19vw, 19rem)/0.94 var(--font-shell);
   left: 0;
   letter-spacing: -0.055em;
   position: absolute;
@@ -42,7 +42,7 @@
 .wordmarkText {
   clip-path: inset(-0.14em 100% -0.18em 0);
   display: block;
-  font-weight: 540;
+  font-weight: var(--weight-medium);
   left: 50%;
   letter-spacing: 0.18em;
   opacity: 0;
@@ -74,19 +74,19 @@
 @keyframes wordmarkResolve {
   0%, 10% {
     clip-path: inset(-0.14em 100% -0.18em 0);
-    font-weight: 540;
+    font-weight: var(--weight-medium);
     letter-spacing: 0.18em;
     opacity: 0;
   }
   48% {
     clip-path: inset(-0.14em -0.04em -0.18em);
-    font-weight: 600;
+    font-weight: var(--weight-label);
     letter-spacing: 0.015em;
     opacity: 1;
   }
   72%, 100% {
     clip-path: inset(-0.14em -0.04em -0.18em);
-    font-weight: 700;
+    font-weight: var(--weight-heading);
     letter-spacing: -0.055em;
     opacity: 1;
   }
