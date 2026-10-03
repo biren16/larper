@@ -82,3 +82,13 @@ Final round-one commands/results:
 - `git diff --check`: exit 0.
 
 No deployment, push or subagent used. Unrelated audit and plan remain excluded. Next action: controller re-reviews these changed persistence paths before real staging acceptance.
+
+## Staging acceptance UI label fix (2026-10-03, base 0aec117)
+
+Controller's real staging exercise identified that a post with an existing approved schedule still called its time-change action Schedule. The editor now displays Reschedule / Rescheduling… when `candidate.scheduledFor` exists, preserving the underlying `schedule` intent and separate Update scheduled version / Cancel schedule controls. Unscheduled candidates still display Schedule. No SQL, deployed migration, shared dev process, push or deployment was changed.
+
+Observed focused red: `npm test -- src/app/studio/candidates/story-editor.test.tsx` initially reported 1 failed / 7 passed because Reschedule was missing. After the contextual label change, it passed all 8 tests. The first type/build checks found an unsupported Testing Library `exact` option in the new assertion; removed that option (role-name strings already match exactly), then typecheck and build passed.
+
+Final commands: focused editor tests 8/8; full `npm test` 70 files / 325 tests passed; `npm run lint` exit 0; `npm run typecheck` exit 0; `npm run build` exit 0; `git diff --check` exit 0. Controller owns continuing upload/mobile/deployed checks.
+
+Carry for release two (controller-provided staging observation): candidate headers/queues can remain Untitled/Unassigned after working title/niche changes. Reader projections for Overview/Posts need private working metadata while public content continues using approved snapshots. This is recorded pending release-two work, not silently treated as completed by the label fix.

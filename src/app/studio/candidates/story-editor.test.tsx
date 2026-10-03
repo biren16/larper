@@ -92,3 +92,11 @@ it("links a published story and hides evidence editing and scheduling until unpu
   expect(screen.queryByRole("button", { name: "Merge into this cluster" })).not.toBeInTheDocument();
   expect(screen.queryByRole("button", { name: "Split evidence" })).not.toBeInTheDocument();
 });
+
+it("names an existing schedule's time change explicitly", () => {
+  render(<StoryEditor candidate={{ ...candidate, scheduledFor: "2050-01-01T00:00:00Z" }} scheduleAction={() => undefined} />);
+  expect(screen.getByRole("button", { name: "Reschedule" })).toHaveAttribute("value", "schedule");
+  expect(screen.queryByRole("button", { name: "Schedule" })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Update scheduled version" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Cancel schedule" })).toBeInTheDocument();
+});
