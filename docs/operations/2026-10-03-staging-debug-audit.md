@@ -4,13 +4,13 @@ Scope: existing seven-lane branch and isolated staging; production integration f
 
 ## Audit checklist
 
-- [ ] Login: provider availability, errors retain destination, expired links, authorization.
-- [ ] Studio: starter instructions and controls, status notices, mobile editor, published-story navigation.
-- [ ] Editorial: draft/save/reload, brief subtopics, schedule, transitions, merge/split evidence integrity.
-- [ ] Discovery: published lore, empty states, Style filters, covers, navigation, follows/saves.
-- [ ] Database: all migrations on a fresh schema and regression fixtures.
-- [ ] Ingestion: deployed authorization, source usage gates, health, schedule prerequisites.
-- [ ] Release: lint, types, unit suite, build, desktop/mobile browser suite, deployed checks.
+- [x] Login (code regressions and hosted provider availability): provider availability, errors retain destination, expired links, authorization.
+- [x] Studio (code and hosted desktop; hosted mobile limitation below): starter instructions and controls, status notices, mobile editor, published-story navigation.
+- [x] Editorial (full schema, concurrency, and hosted Music): draft/save/reload, brief subtopics, schedule, transitions, merge/split evidence integrity.
+- [x] Discovery (fixture browsers and hosted public dataset): published lore, empty states, Style filters, covers, navigation, follows/saves.
+- [x] Database: all migrations on a fresh schema and regression fixtures.
+- [ ] Ingestion (reviewed real feeds still outstanding): deployed authorization, source usage gates, health, schedule prerequisites.
+- [x] Release checks for this debug patch: lint, types, unit suite, build, desktop/mobile browser suite, deployed checks.
 
 ## Baseline
 
@@ -62,7 +62,7 @@ Staging migration `202610030001` applied through the authenticated Supabase SQL 
 - Remaining hosted journeys: the other six starter lanes and an approved image upload.
 - Record actual permission/usage review before enabling the 21 automated presets. Never mark permission based on feed reachability.
 - Exercise reviewed feeds through the deployed Edge runtime and resolve/report publisher restrictions.
-- Configure staging scheduled-ingestion prerequisites and observe a real scheduled cycle plus health reporting.
+- Scheduled-ingestion prerequisites and the real cycle are verified below; successful collection/source-failure handling still requires approved feeds.
 - Complete hosted journeys for remaining starter lanes; local fixture journeys are not substitutes.
 - Google remains disabled in staging; email delivery quota still applies. UI accurately reflects configured providers but does not create OAuth credentials or bypass delivery limits.
 
@@ -78,3 +78,11 @@ This audit is not a production merge approval or a claim that every possible bug
 - Scheduler diagnostics showed the real 03:00 UTC cycle failed. Both expected Vault entries were absent. Configured the staging destination and the already supplied staging ingestion key through the installed Vault interface; no credential value placed in SQL snippets, logs, or this report. Await an actual later scheduled cycle before claiming success.
 - Browser viewport override did not change the actual Chrome viewport (DOM remained 1470px); hosted mobile Studio is not claimed as verified. Automated desktop/mobile public browser regressions passed.
 - Added a direct View public story link in the published editor; schedule and evidence-edit controls are hidden until unpublication. Covered by a new component regression.
+
+## Final observed scheduler result and release status
+
+The real 06:00 UTC cycle on 3 October succeeded after the Vault repair. Cron `startedAt=2026-10-03T06:00:00.0974Z`, `finishedAt=2026-10-03T06:00:00.144681Z`; Edge ingestion run `trigger=supabase_cron`, `started_at=2026-10-03T06:00:01.433Z`, `status=succeeded`, `source_count=0`, `inserted_count=0`, `error_count=0`. This proves dispatch and execution under the original three-hour schedule; it does not prove approved-feed collection.
+
+Final code deployment `5c5b9c3` reached Ready and displayed View public story, with scheduling and merge/split controls absent for the live story. Hosted anonymous REST access returned one published story, no private lifecycle; the anonymous evidence-edit RPC returned 401.
+
+Production integration remains pending reviewed feed collection, remaining hosted lane journeys and approved image upload, and hosted mobile Studio verification. Google OAuth/production email delivery configuration remain external setup choices. Backup recovery stays with the separate task.
