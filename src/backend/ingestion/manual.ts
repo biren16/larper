@@ -37,6 +37,7 @@ function sourceType(platform: ManualPlatform, url: URL): SourceType {
 
 function metrics(input: ManualSignalInput["visibleMetrics"]): Record<string, number> {
   return Object.fromEntries(Object.entries(input ?? {}).flatMap(([key, value]) => {
+    if (typeof value !== "string" || !value.trim()) return [];
     const parsed = Number(value);
     return Number.isFinite(parsed) && parsed >= 0 ? [[key, parsed]] : [];
   }));

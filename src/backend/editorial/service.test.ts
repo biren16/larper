@@ -135,7 +135,7 @@ describe("EditorialService", () => {
 
   it("supports auditable merge, split, and manual intake operations", async () => {
     await service.merge(actor, "cluster-1", "cluster-duplicate");
-    await expect(service.split(actor, "cluster-1", ["signal-b"])).resolves.toBe("cluster-2");
+    await expect(service.split(actor, "cluster-1", ["b"])).resolves.toBe("cluster-2");
     await service.addManualSignal(actor, {
       url: "https://www.instagram.com/reel/abc/?igsh=tracking", creatorOwnershipConfirmed: true,
       title: "F1 book edit",
@@ -144,7 +144,7 @@ describe("EditorialService", () => {
       region: "india",
     }, "manual-source", "2026-09-20T10:00:00.000Z");
     expect(store.merges).toEqual([["cluster-1", "cluster-duplicate"]]);
-    expect(store.splits).toEqual([["cluster-1", ["signal-b"]]]);
+    expect(store.splits).toEqual([["cluster-1", ["b"]]]);
     expect(store.manuals).toHaveLength(1);
   });
 
@@ -202,4 +202,25 @@ it("imports only reviewed starter receipts for an authenticated editorial actor"
   expect(store.starters).toHaveLength(0);
   await expect(service.prepareStarterDraft(actor, "music", true)).resolves.toBe("starter-cluster");
   expect(store.starters[0]).toMatchObject({ reviewerId: actor.id, starter: { key: "music", draft: { independentSourcesConfirmed: false } } });
+});
+
+describe("evidence editing guards", () => {
+  it("refuses to split a published story's evidence", async () => {
+    const store = new MemoryStore(); store.current.state = "published_story";
+    const service = new EditorialService(store, new Set([actor.email]));
+    await expect(service.split(actor, "cluster-1", ["a"])).rejects.toThrow(/unpublished/);
+    expect(store.splits).toHaveLength(0);
+  });
+  it("refuses to merge into a published story", async () => {
+    const store = new MemoryStore(); store.current.state = "published_story";
+    const service = new EditorialService(store, new Set([actor.email]));
+    await expect(service.merge(actor, "cluster-1", "other")).rejects.toThrow(/unpublished/);
+    expect(store.merges).toHaveLength(0);
+  });
+  it("refuses a split containing evidence from another candidate", async () => {
+    const store = new MemoryStore();
+    const service = new EditorialService(store, new Set([actor.email]));
+    await expect(service.split(actor, "cluster-1", ["not-linked"])).rejects.toThrow(/belong/);
+    expect(store.splits).toHaveLength(0);
+  });
 });

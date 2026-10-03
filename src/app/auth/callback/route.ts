@@ -20,7 +20,9 @@ export async function GET(request: Request) {
       return privateRedirect(destination.origin === url.origin ? destination : new URL("/", url.origin));
     }
   }
-  return privateRedirect(new URL("/auth?error=That+sign-in+link+could+not+be+verified", url.origin));
+  const failure = new URL("/auth?error=That+sign-in+link+could+not+be+verified", url.origin);
+  if (next !== "/") failure.searchParams.set("next", next);
+  return privateRedirect(failure);
 }
 
 function privateRedirect(destination: URL) {

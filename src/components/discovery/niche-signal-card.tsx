@@ -23,7 +23,7 @@ export function NicheSignalCard({
   const action = getCuriosityAction(item.topic);
 
   return (
-    <article className={`${styles.card} ${styles[layout]}`} data-niche-layout={layout}>
+    <article className={`${styles.card} ${styles[layout]}`} data-niche-layout={layout} data-cover={item.media ? "image" : "graphic"}>
       <Link
         className={styles.media}
         href={`/discover/${item.topic.slug}`}

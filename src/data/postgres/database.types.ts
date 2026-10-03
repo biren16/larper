@@ -30,6 +30,8 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      merge_editorial_clusters: { Args: { p_target_id: string; p_source_id: string; p_reviewer_id: string }; Returns: undefined };
+      split_editorial_cluster: { Args: { p_cluster_id: string; p_signal_ids: string[]; p_reviewer_id: string }; Returns: string };
       ingestion_schedule_evidence: { Args: Record<string, never>; Returns: Json };
       prepare_starter_draft: { Args: { p_reviewer_id: string; p_starter: Json }; Returns: string };
       save_editorial_draft: { Args: { p_candidate_id: string; p_reviewer_id: string; p_draft: Json }; Returns: Array<{ story_id: string; revision: number }> };

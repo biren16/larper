@@ -66,3 +66,9 @@ describe("authentication callback", () => {
     }
   });
 });
+
+it("retains Studio destination when a sign-in link fails", async () => {
+  createClient.mockResolvedValue({ auth }); auth.verifyOtp.mockResolvedValue({ error: { message: "Expired" } });
+  const response = await GET(new Request(`${origin}/auth/callback?token_hash=expired&type=email&next=/studio/starters`));
+  expect(new URL(response.headers.get("location")!).searchParams.get("next")).toBe("/studio/starters");
+});

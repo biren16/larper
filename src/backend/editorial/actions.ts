@@ -18,6 +18,13 @@ function message(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong";
 }
 
+function storyTagsFromForm(form: FormData): string[] {
+  return [...new Set([
+      ...list(form, "tags").filter((tag) => !(form.get("nicheId") === "style" && form.get("styleSubtopicsPresent") === "true" && ["sneakers", "streetwear"].includes(tag.toLowerCase()))),
+      ...(form.get("nicheId") === "style" ? form.getAll("styleSubtopics").map(String).filter((tag) => ["sneakers", "streetwear"].includes(tag)) : []),
+    ])];
+}
+
 export function storyDraftFromForm(form: FormData): StoryDraft {
   const discoveryType = required(form, "discoveryType") as DiscoveryType;
   const mode = required(form, "mode") as TopicMode;
@@ -40,10 +47,7 @@ export function storyDraftFromForm(form: FormData): StoryDraft {
     freshnessLabel: required(form, "freshnessLabel"),
     evidenceSummary: required(form, "evidenceSummary"),
     independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on",
-    tags: [...new Set([
-      ...list(form, "tags").filter((tag) => !(form.get("nicheId") === "style" && form.get("styleSubtopicsPresent") === "true" && ["sneakers", "streetwear"].includes(tag.toLowerCase()))),
-      ...(form.get("nicheId") === "style" ? form.getAll("styleSubtopics").map(String).filter((tag) => ["sneakers", "streetwear"].includes(tag)) : []),
-    ])],
+    tags: storyTagsFromForm(form),
   };
 }
 
@@ -86,7 +90,7 @@ export function createEditorialActions(dependencies: {
           freshnessLabel: required(form, "freshnessLabel"),
           evidenceSummary: required(form, "evidenceSummary"),
           independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on",
-          tags: list(form, "tags"),
+          tags: storyTagsFromForm(form),
         });
         await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });
         return { ok: true as const, storyId: result.storyId };

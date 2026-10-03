@@ -9,3 +9,7 @@ describe("safeNextPath", () => {
     expect(safeNextPath(null)).toBe("/");
   });
 });
+
+it.each(["/\\evil.example", "/\n/evil.example", "/\t/evil.example"])("rejects browser-normalized unsafe destination %s", (value) => {
+  expect(safeNextPath(value)).toBe("/");
+});

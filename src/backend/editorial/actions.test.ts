@@ -66,3 +66,15 @@ describe("editorial action factory", () => {
     expect(addManualSignal).toHaveBeenCalledWith(expect.objectContaining({ id: "editor-1" }), expect.objectContaining({ platform: "instagram", suggestedNicheId: "f1", observationNote: "Crossing feeds", visibleMetrics: expect.objectContaining({ likes: "1200" }) }), "manual-1", "2026-09-21T10:00:00.000Z");
   });
 });
+
+describe("Style briefs", () => {
+  it("keeps overlapping Sneakers and Streetwear filters when publishing a brief", async () => {
+    const publishBrief = vi.fn(async () => ({ storyId: "style-brief", revision: 1 }));
+    const actions = createEditorialActions({ getActor: async () => null, now: () => "2026-10-03T00:00:00Z", service: { publishBrief } as never });
+    const form = new FormData();
+    for (const [key, value] of Object.entries({candidateId:"style-cluster", nicheId:"style", slug:"style-brief", title:"A collaboration", regions:"global", freshnessLabel:"Archive", evidenceSummary:"Independent sources", tags:"archive", styleSubtopicsPresent:"true", independentSourcesConfirmed:"on"})) form.set(key,value);
+    form.append("styleSubtopics", "sneakers"); form.append("styleSubtopics", "streetwear");
+    expect(await actions.publishBrief(form)).toEqual({ok:true, storyId:"style-brief"});
+    expect(publishBrief).toHaveBeenCalledWith(null,"style-cluster",expect.objectContaining({tags:["archive","sneakers","streetwear"]}));
+  });
+});

@@ -1,3 +1,4 @@
+import { getAuthProviders } from "@/backend/accounts/providers";
 import { Suspense } from "react";
 import { safeNextPath } from "@/backend/accounts/redirect";
 import { AuthForm } from "./auth-form";
@@ -5,7 +6,8 @@ import styles from "./page.module.css";
 
 async function AuthContent({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const values = await searchParams;
-  return <AuthForm next={safeNextPath(values.next)} error={values.error} />;
+  const providers = await getAuthProviders();
+  return <AuthForm next={safeNextPath(values.next)} error={values.error} providers={providers} />;
 }
 
 export default function AuthPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {

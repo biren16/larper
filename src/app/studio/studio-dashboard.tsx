@@ -1,3 +1,4 @@
+import { CULTURE_BEATS } from "@/backend/ingestion/source-catalog";
 import Link from "next/link";
 import { SignalComposer, SignalComposerLink } from "./signal-composer";
 import { StatusNotice } from "./status-notice";
@@ -100,18 +101,10 @@ function RecentEvidence({ signals }: { signals: StudioDashboardData["recentSigna
 }
 
 function WatchlistSummary({ sources }: Pick<StudioDashboardData, "sources">) {
-  const beats = [
-    ["F1", "f1"],
-    ["Books", "books"],
-    ["Music", "music"],
-    ["Tech + gaming", "tech-gaming"],
-    ["Screen culture", "screen-culture"],
-    ["Internet culture", "internet-culture"],
-  ] as const;
   return (
     <section className={styles.watchlist} aria-labelledby="watchlist-heading">
-      <div><p className={styles.kicker}>Watchlist</p><h2 id="watchlist-heading">Coverage at a glance</h2></div>
-      <ul>{beats.map(([label, beat]) => <li key={beat}><span>{label}</span><strong>{sources.filter((source) => source.watchlistBeat === beat && source.active).length}</strong></li>)}</ul>
+      <div><p className={styles.kicker}>Watchlist</p><h2 id="watchlist-heading">Coverage at a glance</h2><p className={styles.meta}>Live feeds after successful collection</p></div>
+      <ul>{CULTURE_BEATS.map((beat) => <li key={beat.id}><span>{beat.label}</span><strong>{sources.filter((source) => source.watchlistBeat === beat.id && source.status === "live").length}</strong></li>)}</ul>
       <Link href="/studio/sources">Manage sources</Link>
     </section>
   );

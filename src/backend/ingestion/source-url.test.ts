@@ -10,6 +10,8 @@ describe("source URL safety", () => {
     expect(isPublicSourceUrl("http://10.0.0.8/feed")).toBe(false);
     expect(isPublicSourceUrl("http://169.254.169.254/latest/meta-data")).toBe(false);
     expect(isPublicSourceUrl("file:///etc/passwd")).toBe(false);
+    expect(isPublicSourceUrl("https://user:secret@culture.example/feed")).toBe(false);
+    expect(isPublicSourceUrl("http://feed.localhost/rss")).toBe(false);
   });
 });
 

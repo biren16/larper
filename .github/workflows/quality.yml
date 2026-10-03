@@ -44,6 +44,13 @@ jobs:
       PGDATABASE: postgres
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fresh migration and editorial journey
+        run: node scripts/test-fresh-schema.mjs
+      - name: Concurrent editorial edits
+        run: node scripts/test-editorial-concurrency.mjs
       - name: SQL regressions
         run: |
           set -euo pipefail

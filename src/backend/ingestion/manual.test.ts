@@ -58,3 +58,8 @@ it("rejects a legacy social reference without a registered creator profile", () 
   const source = { id: "legacy", name: "Generic creator", adapterType: "manual" as const, trustTier: "primary" as const, locale: "en", region: "global", allowlisted: true, config: { domains: ["instagram.com"] } };
   expect(() => normalizeManualSignal({ url: "https://instagram.com/reel/abc", title: "Creator reel", sourceName: "Creator", publishedAt: "2026-10-02T08:00:00Z", region: "global" }, source, "2026-10-02T10:00:00Z")).toThrow("creator profile");
 });
+
+it("does not turn missing engagement measurements into reported zeroes", () => {
+  const signal = normalizeManualSignal({url:"https://example.com/story",title:"A story",sourceName:"Publisher",publishedAt:"2026-10-02T00:00:00Z",region:"global",visibleMetrics:{views:"",likes:"  ",comments:"0"}},"source","2026-10-03T00:00:00Z");
+  expect(signal.metrics).toEqual({comments:0});
+});

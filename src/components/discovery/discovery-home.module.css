@@ -171,3 +171,13 @@
   .heroSignal img { transition: none; }
   .heroSignal:hover img { transform: none; }
 }
+
+/* Graphic covers already contain their title; keep the reading copy in normal flow. */
+.lead[data-cover="graphic"] .signalCopy { position: relative; background: var(--surface); color: var(--ink); }
+.lead[data-cover="graphic"] .signalMeta, .lead[data-cover="graphic"] p { color: var(--muted); }
+.lead[data-cover="graphic"] .signalMeta a { color: var(--ink); }
+
+.heroCaption { position: relative; }
+.lead[data-cover="image"] .signalCopy { position: relative; background: var(--surface); color: var(--ink); }
+.lead[data-cover="image"] .signalMeta, .lead[data-cover="image"] p { color: var(--muted); }
+.lead[data-cover="image"] .signalMeta a { color: var(--ink); }

@@ -30,7 +30,8 @@ describe("StudioDashboard", () => {
     expect(screen.getByText("Grid reading lists are spreading")).toBeInTheDocument();
     expect(screen.getByText(/Culture Desk/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Manage sources" })).toHaveAttribute("href", "/studio/sources");
-    expect(screen.getByText("Screen culture")).toBeInTheDocument();
+    expect(screen.getByText("Screen Culture")).toBeInTheDocument();
+    expect(screen.getByText("Style")).toBeInTheDocument();
   });
 
   it("turns an empty queue into a direct capture action", async () => {
@@ -93,4 +94,13 @@ describe("StatusNotice", () => {
     rerender(<StatusNotice notice="story-published" />);
     expect(screen.getByRole("status")).toHaveTextContent("Story published to discovery.");
   });
+});
+
+it("does not count an active unreviewed feed as live coverage", () => {
+  const {rerender} = render(<StudioDashboard data={{...data, sources:[{...data.sources[0],watchlistBeat:"style", status:"review", healthy:false}]}} />);
+  const row = screen.getByText("Style").closest("li")!;
+  expect(row.querySelector("strong")).toHaveTextContent("0");
+  rerender(<StudioDashboard data={{...data,sources:[{...data.sources[0],watchlistBeat:"style",status:"live"}]}} />);
+  expect(screen.getByText("Style").closest("li")!.querySelector("strong")).toHaveTextContent("1");
+  expect(screen.getByText("Live feeds after successful collection")).toBeInTheDocument();
 });

@@ -3,7 +3,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { XMLParser } from "npm:fast-xml-parser@5.11.1";
 import { FEED_PARSER_OPTIONS, normalizeFeedDocument, feedDate as iso } from "../../../src/backend/ingestion/feed-normalizer.ts";
 import { hasUsageReview } from "../../../src/backend/ingestion/source-review.ts";
-import { suggestedNicheForWatchlistBeat } from "../../../src/backend/ingestion/source-url.ts";
+import { isPublicSourceUrl, suggestedNicheForWatchlistBeat } from "../../../src/backend/ingestion/source-url.ts";
 import { persistObservation } from "../../../src/backend/ingestion/store-observation.ts";
 import { completeSourcePoll } from "../../../src/backend/ingestion/source-health.ts";
 
@@ -33,10 +33,8 @@ function sameSecret(actual: string, expected: string) {
 }
 
 function publicHttpUrl(value: string) {
-  const url = new URL(value);
-  const host = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
-  if (!new Set(["http:", "https:"]).has(url.protocol) || host === "localhost" || host === "::1" || host === "0.0.0.0" || /^(?:127\.|10\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(host)) throw new Error("Source URL must be public");
-  return url;
+  if (!isPublicSourceUrl(value)) throw new Error("Source URL must be public");
+  return new URL(value);
 }
 
 function sensitiveFlags(value: string): string[] {

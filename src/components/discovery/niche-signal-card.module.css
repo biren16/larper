@@ -78,3 +78,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) { .media > div { transition: none; } }
+
+/* Keep the headline and image credit separate from the artwork. */
+.lead { background: var(--surface); color: var(--ink); }
+.lead .media { position: relative; min-height: 24rem; }
+.lead .media::after { display: none; }
+.lead .copy { position: relative; }
+.lead .meta, .lead .sources, .lead .hook { color: var(--muted); }
+.lead .meta .status, .lead .action { color: var(--ink); }

@@ -23,7 +23,7 @@ function HomeSignalCard({ item, layout }: { item: TopicViewModel; layout: HomeSi
   const cue = buildSignalCue(item.topic, item.sources);
   const action = getCuriosityAction(item.topic);
   return (
-    <article className={`${styles.signalCard} ${styles[layout]}`}>
+    <article className={`${styles.signalCard} ${styles[layout]}`} data-cover={item.media ? "image" : "graphic"}>
       {layout !== "strip" && <Link className={styles.signalMedia} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`}><Artwork media={item.media} context={coverContextForTopic(item)} priority={layout === "lead"} /></Link>}
       <div className={styles.signalCopy}>
         <div className={styles.signalMeta}><Link href={`/niches/${item.niche.slug}`}>{item.niche.name}</Link><span>{cue.status}</span><span>{item.sourceCount} signals</span></div>
@@ -66,7 +66,7 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
           <a className={styles.nowLink} href={currentTopics.length > 0 ? "#larping-now" : "#deep-lore"}>{currentTopics.length > 0 ? "See what's peaking" : "Explore deep lore"} <ArrowDown aria-hidden /></a>
         </div>
         <div className={styles.heroCollage} aria-label={currentTopics.length > 0 ? "Current ranked culture signals" : "Featured deep lore"}>
-          {featuredTopics.slice(0, 3).map((item, index) => <Link className={`${styles.heroSignal} ${index === 0 ? styles.heroPrimary : index === 1 ? styles.heroSecondary : styles.heroTertiary}`} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`} key={item.topic.id}><Artwork media={item.media} context={coverContextForTopic(item)} priority={index === 0} /><span className={styles.heroCaption}><small>{item.niche.name} / {item.topic.freshnessLabel}</small><strong>{item.topic.title}</strong></span></Link>)}
+          {featuredTopics.slice(0, 3).map((item, index) => <Link className={`${styles.heroSignal} ${index === 0 ? styles.heroPrimary : index === 1 ? styles.heroSecondary : styles.heroTertiary}`} href={`/discover/${item.topic.slug}`} aria-label={`Open ${item.topic.title}`} key={item.topic.id}><Artwork media={item.media} context={coverContextForTopic(item)} priority={index === 0} />{item.media && <span className={styles.heroCaption}><small>{item.niche.name} / {item.topic.freshnessLabel}</small><strong>{item.topic.title}</strong></span>}</Link>)}
         </div>
       </header>
 

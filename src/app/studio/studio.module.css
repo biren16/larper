@@ -306,3 +306,18 @@
 }
 
 .signalForm input[type="checkbox"] { width: auto; min-height: 24px; margin-right: .5rem; }
+
+.starterIntro { color: var(--muted); line-height: 1.55; margin: 1.5rem 0 .75rem; max-width: 48rem; }
+.starterCard { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 1.5rem; max-width: 60rem; }
+.starterCard h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); letter-spacing: -.03em; line-height: 1.1; margin: .5rem 0; }
+.starterCard > p:not(.kicker) { line-height: 1.5; max-width: 52rem; }
+.starterHook { color: var(--muted); margin-bottom: 1rem; }
+.receipts { display: grid; gap: 1rem; list-style: none; padding: 0; margin: 1.5rem 0; }
+.receipts li { border-left: 2px solid var(--line); padding-left: 1rem; }
+.receipts a { color: var(--cobalt); font-weight: 650; text-decoration: underline; text-underline-offset: .2rem; }
+.receipts p { color: var(--muted); font-size: .85rem; line-height: 1.5; margin-top: .4rem; }
+.starterForm { display: grid; gap: 1rem; }
+.starterForm label { display: flex; gap: .6rem; align-items: flex-start; font-size: .85rem; line-height: 1.5; }
+.starterForm input[type="checkbox"] { flex: 0 0 1.25rem; height: 1.25rem; margin: 0; accent-color: var(--cobalt); }
+.starterButton { background: var(--ink); border: 1px solid var(--ink); color: var(--paper); display: inline-flex; align-items: center; justify-content: center; min-height: 3rem; padding: .8rem 1.2rem; font: 650 .85rem/1.2 var(--font-sans); justify-self: start; cursor: pointer; }
+.starterButton:disabled { opacity: .65; cursor: wait; }

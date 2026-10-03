@@ -12,4 +12,10 @@ describe("AuthForm", () => {
     expect(screen.getByRole("button", { name: "Email me a sign-in link" })).toBeInTheDocument();
     expect(screen.getByText(/browsing stays free and open/i)).toBeInTheDocument();
   });
+  it("offers email only when Google is disabled", () => {
+    render(<AuthForm next="/studio" providers={{google:false,email:true}} />);
+    expect(screen.queryByRole("button", {name:"Continue with Google"})).not.toBeInTheDocument();
+    expect(screen.getByRole("button", {name:"Email me a sign-in link"})).toBeInTheDocument();
+    expect(screen.queryByText("or")).not.toBeInTheDocument();
+  });
 });

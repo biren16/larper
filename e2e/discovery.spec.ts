@@ -155,6 +155,7 @@ test("site header keeps its menu trigger accessible at 320px", async ({ page, is
   await page.goto("/");
 
   const header = page.getByRole("banner");
+  await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
   const menuTarget = await page.getByRole("button", { name: "Open menu" }).evaluate((element) => {
     const box = element.getBoundingClientRect();
     return { width: box.width, height: box.height };

@@ -81,27 +81,15 @@ export class PostgresEditorialStore implements EditorialStore {
     });
     failure("Transition candidate", result.error);
   }
-  async mergeClusters(targetId: string, sourceId: string) {
-    const links = await this.client.from("cluster_signals").select("raw_signal_id, match_score, match_reasons").eq("cluster_id", sourceId);
-    failure("Load merge evidence", links.error);
-    if (links.data?.length) {
-      const merged = await this.client.from("cluster_signals").upsert(links.data.map((row) => ({ ...row, cluster_id: targetId })), { onConflict: "cluster_id,raw_signal_id" });
-      failure("Merge evidence", merged.error);
-      const removed = await this.client.from("cluster_signals").delete().eq("cluster_id", sourceId);
-      failure("Remove duplicate links", removed.error);
-    }
-    await this.setCandidateState(sourceId, "rejected");
+  async mergeClusters(targetId: string, sourceId: string, reviewerId: string) {
+    const result = await this.client.rpc("merge_editorial_clusters", { p_target_id: targetId, p_source_id: sourceId, p_reviewer_id: reviewerId });
+    failure("Merge evidence", result.error);
   }
-  async splitCluster(clusterId: string, signalIds: string[]) {
-    const source = await this.client.from("topic_clusters").select("*").eq("id", clusterId).single();
-    failure("Load split candidate", source.error);
-    const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...copy } = source.data!;
-    void _id; void _createdAt; void _updatedAt;
-    const created = await this.client.from("topic_clusters").insert({ ...copy, title: `${copy.title} (split)`, state: "reviewing" }).select("id").single();
-    failure("Create split candidate", created.error);
-    const moved = await this.client.from("cluster_signals").update({ cluster_id: created.data!.id }).eq("cluster_id", clusterId).in("raw_signal_id", signalIds);
-    failure("Move split evidence", moved.error);
-    return created.data!.id;
+  async splitCluster(clusterId: string, signalIds: string[], reviewerId: string) {
+    const result = await this.client.rpc("split_editorial_cluster", { p_cluster_id: clusterId, p_signal_ids: signalIds, p_reviewer_id: reviewerId });
+    failure("Split evidence", result.error);
+    if (!result.data) throw new Error("Split evidence: no candidate returned");
+    return result.data;
   }
   async getSourceDefinition(id: string): Promise<SourceDefinition | null> {
     const result = await this.client.from("source_definitions").select("*").eq("id", id).maybeSingle();

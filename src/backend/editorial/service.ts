@@ -32,8 +32,8 @@ export interface EditorialStore {
   recordReview(event: ReviewEvent): Promise<void>;
   setCandidateState(id: string, state: TopicLifecycle): Promise<void>;
   commitTransition(event: ReviewEvent & { state: TopicLifecycle }): Promise<void>;
-  mergeClusters(targetId: string, sourceId: string): Promise<void>;
-  splitCluster(clusterId: string, signalIds: string[]): Promise<string>;
+  mergeClusters(targetId: string, sourceId: string, reviewerId: string): Promise<void>;
+  splitCluster(clusterId: string, signalIds: string[], reviewerId: string): Promise<string>;
   addManualSignal(signal: NormalizedSignal): Promise<string>;
   schedulePublication(command: PublicationCommand & { scheduledFor: string }): Promise<{ storyId: string; revision: number }>;
 }
@@ -129,6 +129,7 @@ export class EditorialService {
 
   async scheduleStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft, scheduledFor: string, now: string) {
     const context = await this.candidate(actor, candidateId);
+    if (!["detected", "reviewing"].includes(context.candidate.state)) throw new Error("Scheduling requires an unpublished candidate; unpublish first");
     validateStory(draft);
     confirmIndependentOrigins(draft.independentSourcesConfirmed);
     const evidence = [...independentEvidence(context.candidate)];
@@ -177,20 +178,22 @@ export class EditorialService {
   unpublish(actor: EditorialActor | null, candidateId: string, notes: string) { return this.transition(actor, candidateId, "reviewing", "unpublish", notes); }
 
   async merge(actor: EditorialActor | null, targetId: string, sourceId: string) {
-    await this.candidate(actor, targetId);
+    const target = await this.candidate(actor, targetId);
+    const source = await this.candidate(actor, sourceId);
+    if (![target.candidate, source.candidate].every((item) => ["detected", "reviewing"].includes(item.state))) throw new Error("Evidence edits require unpublished candidates; unpublish first");
     if (targetId === sourceId) throw new Error("A cluster cannot merge into itself");
-    await this.store.mergeClusters(targetId, sourceId);
-    await this.store.recordReview({ candidateId: targetId, reviewerId: actor!.id, action: "merge", notes: sourceId });
+    await this.store.mergeClusters(targetId, sourceId, target.actor.id);
   }
 
   async split(actor: EditorialActor | null, clusterId: string, signalIds: string[]) {
     const context = await this.candidate(actor, clusterId);
+    if (!["detected", "reviewing"].includes(context.candidate.state)) throw new Error("Evidence edits require an unpublished candidate; unpublish first");
     const uniqueIds = [...new Set(signalIds)];
+    if (uniqueIds.some((id) => !context.candidate.evidence.some((item) => item.id === id))) throw new Error("Selected evidence must belong to this candidate");
     if (uniqueIds.length === 0 || uniqueIds.length >= context.candidate.evidence.length) {
       throw new Error("A split must move some, but not all, evidence");
     }
-    const newClusterId = await this.store.splitCluster(clusterId, uniqueIds);
-    await this.store.recordReview({ candidateId: clusterId, reviewerId: context.actor.id, action: "split", notes: newClusterId });
+    const newClusterId = await this.store.splitCluster(clusterId, uniqueIds, context.actor.id);
     return newClusterId;
   }
 
