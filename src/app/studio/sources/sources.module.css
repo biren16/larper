@@ -62,3 +62,7 @@
 
 .reviewPanel summary { font-size: var(--text-label); font-weight: var(--weight-label); }
 .reviewPanel input, .reviewPanel textarea { background: var(--surface); border: 1px solid var(--line); color: var(--ink); padding: .65rem; }
+
+/* Native field intrinsic widths must not stretch narrow form columns. */
+.main label { min-width: 0; }
+.main input:not([type="checkbox"]):not([type="hidden"]), .main select, .main textarea { min-width: 0; width: 100%; }

@@ -74,3 +74,7 @@
 .editor input, .editor select, .editor textarea, .moreActions input, .moreActions textarea, .uploadForm input { font: var(--weight-body) var(--text-body)/var(--leading-body) var(--font-sans); }
 
 .main label { font-size: var(--text-label); line-height: 1.4; font-weight: var(--weight-label); }
+
+/* Native field intrinsic widths must not stretch narrow form columns. */
+.main label { min-width: 0; }
+.main input:not([type="checkbox"]):not([type="hidden"]), .main select, .main textarea { min-width: 0; width: 100%; }
