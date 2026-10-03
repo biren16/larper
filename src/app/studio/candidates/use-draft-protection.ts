@@ -1,5 +1,6 @@
 "use client";
 
+import { flushSync } from "react-dom";
 import { startTransition, useEffect, useRef, useState } from "react";
 
 export type EditorResult = {
@@ -17,7 +18,7 @@ export type EditorResult = {
 };
 export type EditorAction = (data: FormData) => void | EditorResult | Promise<void | EditorResult>;
 
-export function useDraftProtection(key: string, initialVersion: number, action?: EditorAction) {
+export function useDraftProtection(key: string, initialVersion: number, action?: EditorAction, prepareRecovery?: (values: Record<string,string[]>) => void) {
   const form = useRef<HTMLFormElement>(null);
   const version = useRef(initialVersion);
   const sequence = useRef(0);
@@ -124,6 +125,8 @@ export function useDraftProtection(key: string, initialVersion: number, action?:
   };
   const restore = () => {
     if (!recovery || !form.current) return;
+    // Mount classification-dependent controls before applying their recovered values.
+    if (prepareRecovery) flushSync(() => prepareRecovery(recovery));
     for (const [name, values] of Object.entries(recovery)) {
       const controls = form.current.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[name="${name.replace(/[^a-zA-Z0-9]/g, "")}"]`);
       controls.forEach(control => {

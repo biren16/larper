@@ -1,4 +1,5 @@
 "use client";
+import { flushSync } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import type { StudioCandidateDetail } from "./story-editor";
 
@@ -16,13 +17,13 @@ export function useCurrentForm() {
   return { host, values };
 }
 
-export function TagControls({ initial }: { initial: string[] }) {
+export function TagControls({ initial, onDraftChange }: { initial: string[]; onDraftChange: () => void }) {
   const input = useRef<HTMLInputElement>(null);
   const [tags, setTags] = useState(initial);
   const [entry, setEntry] = useState('');
   const apply = (next: string[]) => {
-    setTags(next);
-    if (input.current) { input.current.value = next.join(','); input.current.dispatchEvent(new Event('change',{bubbles:true})); }
+    flushSync(() => setTags(next));
+    if (input.current) { input.current.value = next.join(','); input.current.dispatchEvent(new Event('change',{bubbles:true})); onDraftChange(); }
   };
   useEffect(() => {
     const form = input.current?.form;
@@ -31,7 +32,7 @@ export function TagControls({ initial }: { initial: string[] }) {
     return () => form?.removeEventListener('draftchange',update);
   }, []);
   const add = () => { const tag=entry.trim().replaceAll(',', '').slice(0,80); if(tag && !tags.includes(tag)) apply([...tags,tag]); setEntry(''); };
-  return <div><input ref={input} type="hidden" name="tags" defaultValue={initial.join(',')} /><label>Add tag<input value={entry} onChange={event => setEntry(event.target.value)} onKeyDown={event => { if(event.key === 'Enter'){event.preventDefault();add();} }} /></label><button type="button" onClick={add}>Add tag</button><ul aria-label="Tags">{tags.map(tag=><li key={tag}>{tag} <button type="button" aria-label={`Remove tag ${tag}`} onClick={()=>apply(tags.filter(value=>value!==tag))}>Remove</button></li>)}</ul></div>;
+  return <div><input ref={input} type="hidden" name="tags" value={tags.join(',')} readOnly /><label>Add tag<input value={entry} onChange={event => setEntry(event.target.value)} onKeyDown={event => { if(event.key === 'Enter'){event.preventDefault();add();} }} /></label><button type="button" onClick={add}>Add tag</button><ul aria-label="Tags">{tags.map(tag=><li key={tag}>{tag} <button type="button" aria-label={`Remove tag ${tag}`} onClick={()=>apply(tags.filter(value=>value!==tag))}>Remove</button></li>)}</ul></div>;
 }
 
 const fields: Array<[string,string]> = [['nicheId','Choose a niche'],['slug','Add a valid slug'],['title','Add a title'],['hook','Write a hook'],['summary','Explain what happened'],['whyItMatters','Explain why people care'],['lore','Write the lore'],['beginnerContext','Add beginner context'],['conversationLine','Add a conversation line'],['regions','Choose at least one region'],['freshnessLabel','Add a freshness label'],['evidenceSummary','Summarise the evidence'],['independentSourcesConfirmed','Confirm independent original sources']];

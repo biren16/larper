@@ -32,6 +32,7 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      search_editorial_merge_candidates: { Args: {p_query?:string;p_exclude_id?:string;p_limit?:number}; Returns:Array<{id:string;title:string}> };
       manage_editorial_post: { Args: {p_candidate_id:string;p_reviewer_id:string;p_expected_version:number;p_operation:string;p_payload?:Json}; Returns:Array<{candidate_id:string;revision:number}> };
       list_editorial_posts: {Args:{p_query?:Json}; Returns:Json};
       create_editorial_working_story: { Args: {p_reviewer_id: string}; Returns: string };

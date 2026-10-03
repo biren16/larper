@@ -121,7 +121,7 @@ export class StudioReader {
     const origins = new Map((definitions.data ?? []).map(row=>[row.id,sourceOriginKey(row)]));
     const niches = await this.client.from("niches").select("id, name").order("name");
     check("Load niche choices", niches.error);
-    const mergeCandidates = await this.client.from("topic_clusters").select("id, title").is("trashed_at",null).in("state",["detected","reviewing"]).neq("id",id).order("last_checked_at", {ascending:false}).limit(100);
+    const mergeCandidates = await this.client.rpc("search_editorial_merge_candidates",{p_query:"",p_exclude_id:id,p_limit:50});
     check("Load merge candidates",mergeCandidates.error);
     const story = await this.client.from("stories").select("*").eq("cluster_id", id).maybeSingle();
     check("Load candidate story", story.error);

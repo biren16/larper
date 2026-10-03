@@ -94,3 +94,47 @@ it('attaches an uploaded cover and autosaves current writing with the same edito
  await waitFor(()=>expect(save).toHaveBeenCalled(),{timeout:2000});
  await waitFor(()=>expect(screen.getByRole('status')).toHaveTextContent('Saved'));
 });
+
+it('autosaves tag-only commits and removals and reloads their persisted state',async()=>{
+ const {storyDraftFromForm}=await import('@/backend/editorial/actions');
+ let persisted=storyDraftFromForm(new FormData(),true);
+ const save=vi.fn(async(data:FormData)=>{persisted=storyDraftFromForm(data,true);return {ok:true,revision:4,workingPersisted:true};});
+ const props={...candidate,id:'tag-only',draft:persisted};
+ let view=render(<StoryEditor candidate={props} saveDraftAction={save} />);
+ fireEvent.change(screen.getByRole('textbox',{name:'Add tag'}),{target:{value:'archive'}});
+ await waitFor(()=>expect(save).toHaveBeenCalled(),{timeout:2000});
+ await waitFor(()=>expect(screen.getByRole('status')).toHaveTextContent('Saved'));
+ expect(persisted.tags).toEqual([]);
+ // Commit after tag-entry typing itself has already saved. Only the hidden tag changes now.
+ fireEvent.click(screen.getByRole('button',{name:'Add tag'}));
+ expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+ expect(sessionStorage.getItem('larper-draft:test:founder-1:tag-only')).toContain('archive');
+ await waitFor(()=>expect(persisted.tags).toEqual(['archive']),{timeout:2000});
+ await waitFor(()=>expect(screen.getByRole('status')).toHaveTextContent('Saved'));
+ view.unmount();
+ view=render(<StoryEditor candidate={{...props,draft:persisted}} saveDraftAction={save} />);
+ expect(screen.getByRole('button',{name:'Remove tag archive'})).toBeInTheDocument();
+ fireEvent.click(screen.getByRole('button',{name:'Remove tag archive'}));
+ expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+ await waitFor(()=>expect(persisted.tags).toEqual([]),{timeout:2000});
+ await waitFor(()=>expect(screen.getByRole('status')).toHaveTextContent('Saved'));
+ view.unmount();
+ render(<StoryEditor candidate={{...props,draft:persisted}} saveDraftAction={save} />);
+ expect(screen.queryByRole('button',{name:'Remove tag archive'})).not.toBeInTheDocument();
+});
+
+it('recovers Music to Style with both newly mounted subtopics and writing intact',async()=>{
+ const {storyDraftFromForm}=await import('@/backend/editorial/actions');
+ sessionStorage.setItem('larper-draft:test:founder-1:recover-style',JSON.stringify({nicheId:['style'],tags:['archive'],styleSubtopicsPresent:['true'],styleSubtopics:['sneakers','streetwear'],hook:['Recovered writing']}));
+ let persisted=storyDraftFromForm(new FormData(),true);
+ const save=vi.fn(async(data:FormData)=>{persisted=storyDraftFromForm(data,true);return {ok:true,revision:4,workingPersisted:true};});
+ render(<StoryEditor candidate={{...candidate,id:'recover-style',nicheId:'music',niches:[{id:'music',name:'Music'},{id:'style',name:'Style'}]}} saveDraftAction={save} />);
+ await waitFor(()=>expect(screen.getByRole('button',{name:'Recover writing'})).toBeInTheDocument());
+ fireEvent.click(screen.getByRole('button',{name:'Recover writing'}));
+ expect(screen.getByRole('combobox',{name:'Niche'})).toHaveValue('style');
+ expect(screen.getByRole('checkbox',{name:'Sneakers'})).toBeChecked();
+ expect(screen.getByRole('checkbox',{name:'Streetwear'})).toBeChecked();
+ expect(screen.getByLabelText('Hook')).toHaveValue('Recovered writing');
+ await waitFor(()=>expect(save).toHaveBeenCalled(),{timeout:2000});
+ expect(persisted).toMatchObject({nicheId:'style',tags:['archive','sneakers','streetwear'],hook:'Recovered writing'});
+});

@@ -8,15 +8,10 @@ describe('private Studio registry search',()=>{
   await expect(searchCandidatesAction('draft','current')).rejects.toThrow('Forbidden');
   await expect(searchMediaAction('cover')).rejects.toThrow('Forbidden');
  });
- it('searches registry titles with literal wildcard escaping and excludes trash/current candidate',async()=>{
-  const query={select:vi.fn(),is:vi.fn(),in:vi.fn(),neq:vi.fn(),ilike:vi.fn(),order:vi.fn(),limit:vi.fn()};
-  for(const method of ['select','is','in','neq','ilike','order'] as const)query[method].mockReturnValue(query);
-  query.limit.mockResolvedValue({data:[{id:'other',title:'A 50% draft'}],error:null});
-  runtime.mockResolvedValue({client:{from:()=>query}});
-  expect(await searchCandidatesAction('50%','current')).toEqual([{id:'other',title:'A 50% draft'}]);
-  expect(query.ilike).toHaveBeenCalledWith('title','%50\\%%');
-  expect(query.is).toHaveBeenCalledWith('trashed_at',null);
-  expect(query.neq).toHaveBeenCalledWith('id','current');
-  expect(query.limit).toHaveBeenCalledWith(50);
+ it('searches the current working title across the full registry with a literal query and exclusions',async()=>{
+  const rpc=vi.fn(async()=>({data:[{id:'other',title:'Renamed 50% working story'}],error:null}));
+  runtime.mockResolvedValue({client:{rpc}});
+  expect(await searchCandidatesAction('Renamed 50%','current')).toEqual([{id:'other',title:'Renamed 50% working story'}]);
+  expect(rpc).toHaveBeenCalledWith('search_editorial_merge_candidates',{p_query:'Renamed 50%',p_exclude_id:'current',p_limit:50});
  });
 });

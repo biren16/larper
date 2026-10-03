@@ -22,7 +22,7 @@ class Query {
 }
 
 function clientFor(fixtures: Record<string, Row[]>) {
-  return { from: (table: string) => new Query(fixtures[table] ?? []) } as never;
+  return { from: (table: string) => new Query(fixtures[table] ?? []), rpc: () => Promise.resolve({data: fixtures.merge_candidates ?? [],error:null}) } as never;
 }
 
 const fixtures = {
@@ -114,4 +114,9 @@ it('reports publisher origins, stored failure diagnostics and expected polling w
  expect(sources.sources[0]).toMatchObject({expectedNextPollAt:'2026-09-21T11:00:00.000Z',failures:[{message:'HTTP 403 from publisher',code:'HTTP_403',occurredAt:'2026-09-21T09:00:00Z'}]});
  const candidate=await reader.candidate('cluster-1');
  expect(candidate?.evidence[0].originKey).toBe('publisher:news.example.com');
+});
+
+it('loads initial merge choices with current working titles from the same search interface',async()=>{
+ const data=await new StudioReader(clientFor({...fixtures,merge_candidates:[{id:'renamed',title:'Current private writing title'}]})).candidate('cluster-1');
+ expect(data?.mergeCandidates).toEqual([{id:'renamed',title:'Current private writing title'}]);
 });

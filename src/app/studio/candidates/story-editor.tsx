@@ -80,11 +80,11 @@ export function StoryEditor({
   searchCandidatesAction?: (query:string,excludeId:string)=>Promise<Array<{id:string;title:string}>>;
   searchMediaAction?: (query:string)=>Promise<LibraryAsset[]>;
 }) {
-  const protection = useDraftProtection(`larper-draft:${candidate.environment ?? "local"}:${candidate.accountId ?? "unknown"}:${candidate.id}`, candidate.editorialVersion ?? 0, saveDraftAction);
-  const [selectedMedia,setSelectedMedia]=useState<LibraryAsset[]>([]);
-  const mediaOptions=Array.from(new Map([...candidate.mediaOptions ?? [],...protection.uploadedMedia,...selectedMedia.map(asset=>({...asset,creditLine:asset.creditLine ?? null}))].map(asset=>[asset.id,asset])).values());
   const draft = candidate.draft;
   const [selectedNiche,setSelectedNiche]=useState(draft?.nicheId ?? candidate.nicheId ?? "");
+  const protection = useDraftProtection(`larper-draft:${candidate.environment ?? "local"}:${candidate.accountId ?? "unknown"}:${candidate.id}`, candidate.editorialVersion ?? 0, saveDraftAction, values => setSelectedNiche(values.nicheId?.[0] ?? selectedNiche));
+  const [selectedMedia,setSelectedMedia]=useState<LibraryAsset[]>([]);
+  const mediaOptions=Array.from(new Map([...candidate.mediaOptions ?? [],...protection.uploadedMedia,...selectedMedia.map(asset=>({...asset,creditLine:asset.creditLine ?? null}))].map(asset=>[asset.id,asset])).values());
   const published = ["published_story", "published_brief"].includes(candidate.storyLifecycle ?? "");
   return (
     <main id="main-content" className={styles.main}>
@@ -163,7 +163,7 @@ export function StoryEditor({
               <label className={styles.independenceCheck}><input type="checkbox" name="styleSubtopics" value="sneakers" defaultChecked={draft?.tags.some((tag) => tag.toLowerCase() === "sneakers")} />Sneakers</label>
               <label className={styles.independenceCheck}><input type="checkbox" name="styleSubtopics" value="streetwear" defaultChecked={draft?.tags.some((tag) => tag.toLowerCase() === "streetwear")} />Streetwear</label>
             </fieldset>}
-            <TagControls initial={draft?.tags.filter(tag=>draft.nicheId!=="style" || !["sneakers","streetwear"].includes(tag.toLowerCase())) ?? []} />
+            <TagControls onDraftChange={protection.changed} initial={draft?.tags.filter(tag=>draft.nicheId!=="style" || !["sneakers","streetwear"].includes(tag.toLowerCase())) ?? []} />
           </fieldset>
 
           <fieldset>

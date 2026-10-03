@@ -143,3 +143,29 @@ do $$ begin
  if exists(select 1 from stories where id=(select id from management_ids where kind='published')) then raise exception 'Account Trash leak';end if;end $$;
 reset role;
 rollback;
+
+-- Merge choices/search use the current private title, with a fallback for legacy clusters.
+do $$
+declare actor uuid:='00000000-0000-0000-0000-000000000091'; c uuid; legacy uuid; v integer;
+begin
+ c:=create_editorial_working_story(actor);
+ select editorial_version into v from topic_clusters where id=c;
+ update topic_clusters set title='Historical cluster title' where id=c;
+ perform * from save_editorial_working_draft(c,actor,'{"title":"Renamed 50% working story"}',v);
+ if not exists(select 1 from search_editorial_merge_candidates('Renamed 50%',null,50) x where x.id=c and x.title='Renamed 50% working story') then raise exception 'Current working title not searchable'; end if;
+ if exists(select 1 from search_editorial_merge_candidates('Historical cluster',null,50) x where x.id=c) then raise exception 'Historical title incorrectly searched'; end if;
+ if exists(select 1 from search_editorial_merge_candidates('Renamed',c,50) x where x.id=c) then raise exception 'Current candidate not excluded'; end if;
+ if not exists(select 1 from search_editorial_merge_candidates('',null,50) x where x.id=c and x.title='Renamed 50% working story') then raise exception 'Initial choices use stale title'; end if;
+ insert into topic_clusters(title,state) values('Legacy title fallback','reviewing') returning id into legacy;
+ if not exists(select 1 from search_editorial_merge_candidates('Legacy title fallback',null,50) x where x.id=legacy) then raise exception 'Legacy title fallback not searchable'; end if;
+ update topic_clusters set trashed_at=now() where id=c;
+ if exists(select 1 from search_editorial_merge_candidates('Renamed',null,50) x where x.id=c) then raise exception 'Trash leaked into search'; end if;
+ if has_function_privilege('anon','public.search_editorial_merge_candidates(text,uuid,integer)','EXECUTE') or has_function_privilege('authenticated','public.search_editorial_merge_candidates(text,uuid,integer)','EXECUTE') then raise exception 'Private merge search exposed to readers'; end if;
+ if not has_function_privilege('service_role','public.search_editorial_merge_candidates(text,uuid,integer)','EXECUTE') then raise exception 'Editorial service search unavailable'; end if;
+end $$;
+
+set role service_role;
+do $$ begin
+ if not exists(select 1 from public.search_editorial_merge_candidates('Legacy title fallback',null,50)) then raise exception 'Service role cannot execute private merge search'; end if;
+end $$;
+reset role;

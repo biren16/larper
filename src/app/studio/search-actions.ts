@@ -3,7 +3,7 @@ import {authorizedStudioRuntime} from './runtime';
 function pattern(value:string) {return `%${value.trim().slice(0,100).replace(/[\\%_]/g,'\\$&')}%`;}
 export async function searchCandidatesAction(query:string,excludeId:string) {
  const runtime=await authorizedStudioRuntime('/studio/posts');
- const result=await runtime.client.from('topic_clusters').select('id,title').is('trashed_at',null).in('state',['detected','reviewing']).neq('id',excludeId).ilike('title',pattern(query)).order('last_checked_at',{ascending:false}).limit(50);
+ const result=await runtime.client.rpc('search_editorial_merge_candidates',{p_query:query.trim().slice(0,100),p_exclude_id:excludeId,p_limit:50});
  if(result.error) throw new Error('Candidate search failed. Please try again.');
  return result.data;
 }
