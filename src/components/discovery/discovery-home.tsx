@@ -42,22 +42,19 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
   const followed = followedNicheIds.map((id) => home.niches.find((niche) => niche.id === id)).filter((niche): niche is DiscoveryHomeViewModel["niches"][number] => Boolean(niche));
   const recommended = home.niches.filter((niche) => !followedNicheIds.includes(niche.id));
 
-  if (currentTopics.length === 0 && home.deepLore.length === 0) {
-    return (
-      <main id="main-content" className={styles.main}>
-        <section className={styles.emptyRadar} aria-labelledby="empty-radar-heading">
-          <div className={styles.emptyCopy}>
-            <h1 id="empty-radar-heading">The radar is recalibrating.</h1>
-            <p>No verified stories are ready yet. We’ll publish when independent evidence clears the bar—not just because a post is loud.</p>
-            {home.verifiedAt && <small>Latest verified check: {new Date(home.verifiedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</small>}
-          </div>
-        </section>
-      </main>
-    );
-  }
+  const hasStories = currentTopics.length > 0 || home.deepLore.length > 0;
 
   return (
     <main id="main-content" className={styles.main}>
+      {!hasStories ? (
+        <section id="larping-now" className={styles.emptyRadar} aria-labelledby="empty-radar-heading">
+          <div className={styles.emptyCopy}>
+            <h1 id="empty-radar-heading">The radar is recalibrating.</h1>
+            <p>No verified stories are ready yet. Explore a niche while the next stories are being reviewed.</p>
+            {home.verifiedAt && <small>Latest verified check: {new Date(home.verifiedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</small>}
+          </div>
+        </section>
+      ) : <>
       <header className={styles.intro}>
         <div className={styles.introCopy}>
           <p className={styles.kicker}>Find new shit to get obsessed with.</p>
@@ -78,6 +75,8 @@ export function DiscoveryHome({ home }: { home: DiscoveryHomeViewModel }) {
         </div>
         <div className={styles.signalStrips}>{currentTopics.slice(5, 7).map((item) => <HomeSignalCard key={item.topic.id} item={item} layout="strip" />)}</div></> : <p>No verified current stories yet. Explore the deep lore below.</p>}
       </section>
+
+      </>}
 
       <section className={styles.yours} aria-labelledby="your-larps">
         <div className={styles.stickyHeading}><span>Your active worlds</span><h2 id="your-larps">Your Niches</h2><p>The tabs you never really close.</p></div>

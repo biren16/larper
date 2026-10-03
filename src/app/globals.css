@@ -22,17 +22,6 @@
   --font-shell: var(--font-instrument-sans), "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--font-schibsted-grotesk), "Helvetica Neue", Arial, sans-serif;
   --font-serif: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
-  /* Shared reading and interface roles; editorial display sizes stay contextual. */
-  --text-caption: .75rem;
-  --text-label: .875rem;
-  --text-body: 1rem;
-  --weight-body: 400;
-  --weight-medium: 500;
-  --weight-label: 600;
-  --weight-heading: 700;
-  --leading-body: 1.55;
-  --title-interface: clamp(2.8rem, 6vw, 4rem);
-  --heading-interface: clamp(1.75rem, 3vw, 2.65rem);
   --content: 92rem;
   --gutter: clamp(1rem, 3vw, 2.75rem);
   --radius-control: 0.35rem;
@@ -40,7 +29,7 @@
 
 * { box-sizing: border-box; }
 html { background: var(--paper); color: var(--ink); scroll-behavior: smooth; }
-body { background: var(--paper); color: var(--ink); font-family: var(--font-sans); font-optical-sizing: auto; font-synthesis: none; font-weight: var(--weight-body); line-height: var(--leading-body); margin: 0; min-height: 100dvh; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-sans); font-optical-sizing: auto; font-synthesis: none; margin: 0; min-height: 100dvh; }
 h1, h2, h3, p { margin: 0; }
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea, optgroup { font: inherit; }
@@ -61,7 +50,7 @@ img { display: block; max-width: 100%; }
 .skipLink {
   background: var(--acid);
   color: var(--acid-ink);
-  font-weight: var(--weight-label);
+  font-weight: 650;
   left: 1rem;
   padding: 0.75rem 1rem;
   position: fixed;

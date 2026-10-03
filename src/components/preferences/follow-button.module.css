@@ -6,7 +6,7 @@
   color: var(--paper);
   cursor: pointer;
   display: inline-flex;
-  font: var(--weight-label) 0.82rem/1 var(--font-sans);
+  font: 650 0.82rem/1 var(--font-sans);
   gap: 0.5rem;
   justify-content: center;
   min-height: 2.75rem;

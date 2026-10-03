@@ -2,6 +2,7 @@
 
 import { List, X } from "@phosphor-icons/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type PointerEvent, type SyntheticEvent, useEffect, useRef, useState } from "react";
 
 import { ThemeSelector } from "@/components/theme/theme-toggle";
@@ -19,17 +20,37 @@ type HeaderMenuProps = {
 };
 
 export function HeaderMenu({ account, signOutAction }: HeaderMenuProps) {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeTimerRef = useRef<number | undefined>(undefined);
 
-  useEffect(() => () => window.clearTimeout(closeTimerRef.current), []);
+  useEffect(() => {
+    function dismissOnNavigation() {
+      window.clearTimeout(closeTimerRef.current);
+      const dialog = dialogRef.current;
+      if (!dialog?.open) return;
+      if (typeof dialog.close === "function") dialog.close();
+      else dialog.removeAttribute("open");
+      setIsOpen(false);
+      setIsClosing(false);
+    }
+    dismissOnNavigation();
+    window.addEventListener("popstate", dismissOnNavigation);
+    window.addEventListener("hashchange", dismissOnNavigation);
+    return () => {
+      window.clearTimeout(closeTimerRef.current);
+      window.removeEventListener("popstate", dismissOnNavigation);
+      window.removeEventListener("hashchange", dismissOnNavigation);
+    };
+  }, [pathname]);
 
   function openMenu() {
     const dialog = dialogRef.current;
     if (!dialog) return;
+    window.clearTimeout(closeTimerRef.current);
     if (typeof dialog.showModal === "function") dialog.showModal();
     else dialog.setAttribute("open", "");
     setIsOpen(true);
@@ -44,7 +65,7 @@ export function HeaderMenu({ account, signOutAction }: HeaderMenuProps) {
     }
     setIsOpen(false);
     setIsClosing(false);
-    triggerRef.current?.focus();
+    triggerRef.current?.focus({ preventScroll: true });
   }
 
   function closeMenu() {

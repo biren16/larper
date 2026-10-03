@@ -62,6 +62,21 @@ describe("DiscoveryHome", () => {
     expect(screen.queryByRole("link", { name: "See what's peaking" })).not.toBeInTheDocument();
   });
 
+  it("keeps niche browsing and menu anchors available without published stories", async () => {
+    const home = await buildDiscoveryHome(seedRepository, DEFAULT_FOLLOWED_NICHE_IDS);
+    const { container } = render(
+      <FollowedNichesProvider knownNicheIds={home.niches.map(niche => niche.id)}>
+        <DiscoveryHome home={{ ...home, currentTopics: [], deepLore: [], verifiedAt: null }} />
+      </FollowedNichesProvider>,
+    );
+    expect(screen.getByRole("heading", { name: "Your Niches" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Go larp something new" })).toBeInTheDocument();
+    expect(container.querySelector("#larping-now")).toBeInTheDocument();
+    expect(container.querySelector("#your-larps")).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /^Open / }).length).toBeGreaterThan(0);
+    expect(container.querySelector('a[href^="/discover/"]')).not.toBeInTheDocument();
+  });
+
   it("renders an honest verified-edition state when no publishable signals exist", () => {
     const { container } = render(
       <FollowedNichesProvider knownNicheIds={[]}>

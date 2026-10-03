@@ -63,6 +63,25 @@ describe("HeaderMenu", () => {
     expect(trigger).toHaveFocus();
   });
 
+  it("dismisses the menu immediately when browser history changes", () => {
+    render(<HeaderMenu />);
+    const trigger = screen.getByRole("button", { name: "Open menu" });
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole("dialog", { name: "Site menu" });
+    act(() => window.dispatchEvent(new PopStateEvent("popstate")));
+    expect(dialog).not.toHaveAttribute("open");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("does not leave the menu blocking a changed route", () => {
+    const view = render(<HeaderMenu />);
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    const dialog = screen.getByRole("dialog", { name: "Site menu" });
+    pathname = "/niches/music";
+    view.rerender(<HeaderMenu />);
+    expect(dialog).not.toHaveAttribute("open");
+  });
+
   it("marks the current destination inside the menu", () => {
     window.history.replaceState({}, "", "/#your-larps");
     render(<HeaderMenu />);
