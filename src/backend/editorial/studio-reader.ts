@@ -127,8 +127,14 @@ export class StudioReader {
     check("Load candidate story", story.error);
     const working = await this.client.from("editorial_working_drafts").select("content, revision").eq("candidate_id", id).maybeSingle();
     check("Load private working draft", working.error);
+    const selectedMediaId = working.data ? (working.data.content as unknown as StoryDraft).mediaId : story.data?.media_id;
     const media = await this.client.from("media_assets").select("id, alt, src, width, height, credit_line, kind, commercial_use_allowed, modification_allowed, source_url, license_code").order("created_at", { ascending: false }).limit(100);
     check("Load approved media", media.error);
+    if (selectedMediaId && !media.data?.some(asset => asset.id === selectedMediaId)) {
+      const selected = await this.client.from("media_assets").select("id, alt, src, width, height, credit_line, kind, commercial_use_allowed, modification_allowed, source_url, license_code").eq("id", selectedMediaId).maybeSingle();
+      check("Load selected media", selected.error);
+      if (selected.data) (media.data ??= []).push(selected.data);
+    }
     const revisions = story.data
       ? await this.client.from("story_revisions").select("revision, created_at, editor_id").eq("story_id", story.data.id).order("revision", { ascending: false })
       : { data: [], error: null };

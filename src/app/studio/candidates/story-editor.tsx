@@ -170,7 +170,7 @@ export function StoryEditor({
             <legend>Cover</legend>
             <label>Story image<select name="mediaId" defaultValue={candidate.mediaId ?? ""}>
               <option value="">Use a LARPer cover</option>
-              {(candidate.mediaOptions ?? []).map((asset) => <option key={asset.id} value={asset.id}>{asset.alt}{asset.creditLine ? ` · ${asset.creditLine}` : ""}</option>)}
+              {mediaOptions.map((asset) => <option key={asset.id} value={asset.id}>{asset.alt}{asset.creditLine ? ` · ${asset.creditLine}` : ""}</option>)}
             </select></label>
             <MediaLibrary assets={mediaOptions} selectable search={searchMediaAction} onSelect={asset=>setSelectedMedia(previous=>[asset,...previous.filter(item=>item.id!==asset.id)])} />
             <p className={styles.mediaHint}>Only uploaded images with recorded commercial-use permission appear here. LARPer covers work without an upload.</p>

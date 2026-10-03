@@ -5,15 +5,16 @@ type Row = Record<string, unknown>;
 
 class Query {
   private maximum: number | null = null;
+  private filters: [string, unknown][] = [];
 
-  constructor(private readonly rows: Row[]) {}
+  constructor(private readonly rows: Row[], private readonly table:string) {}
 
-  maybeSingle() { return Promise.resolve({ data: this.rows[0] ?? null, error: null }); }
+  maybeSingle() { return Promise.resolve({ data: this.rows.find(row => this.filters.every(([key,value])=>row[key]===value)) ?? null, error: null }); }
   select() { return this; }
   in() { return this; }
   neq() { return this; }
   is() { return this; }
-  eq() { return this; }
+  eq(key:string,value:unknown) { if(this.table === "media_assets") this.filters.push([key,value]); return this; }
   order() { return this; }
   limit(value: number) { this.maximum = value; return this; }
   then(resolve: (value: { data: Row[]; error: null }) => unknown) {
@@ -22,7 +23,7 @@ class Query {
 }
 
 function clientFor(fixtures: Record<string, Row[]>) {
-  return { from: (table: string) => new Query(fixtures[table] ?? []), rpc: () => Promise.resolve({data: fixtures.merge_candidates ?? [],error:null}) } as never;
+  return { from: (table: string) => new Query(fixtures[table] ?? [],table), rpc: () => Promise.resolve({data: fixtures.merge_candidates ?? [],error:null}) } as never;
 }
 
 const fixtures = {
@@ -119,4 +120,11 @@ it('reports publisher origins, stored failure diagnostics and expected polling w
 it('loads initial merge choices with current working titles from the same search interface',async()=>{
  const data=await new StudioReader(clientFor({...fixtures,merge_candidates:[{id:'renamed',title:'Current private writing title'}]})).candidate('cluster-1');
  expect(data?.mergeCandidates).toEqual([{id:'renamed',title:'Current private writing title'}]);
+});
+it('retains the current working cover outside the latest hundred assets on reload',async()=>{
+ const assets=Array.from({length:101},(_,index)=>({id:`cover-${index}`,alt:`Cover ${index}`,src:`/cover-${index}.jpg`,kind:'upload',commercial_use_allowed:true}));
+ const reader=new StudioReader(clientFor({...fixtures,media_assets:assets,editorial_working_drafts:[{content:{mediaId:'cover-100',title:'Working'},revision:3}]}));
+ const reloaded=await reader.candidate('cluster-1');
+ expect(reloaded?.mediaId).toBe('cover-100');
+ expect(reloaded?.mediaOptions?.find(asset=>asset.id==='cover-100')).toMatchObject({src:'/cover-100.jpg'});
 });

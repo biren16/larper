@@ -41,6 +41,9 @@ export function useDraftProtection(key: string, initialVersion: number, action?:
         (values[name] ??= []).push(value);
       }
     }
+    for (const control of form.current.querySelectorAll<HTMLInputElement>('input[type="checkbox"], input[type="radio"]')) {
+      if (control.name && control.name !== "independentSourcesConfirmed" && !control.disabled) values[control.name] ??= [];
+    }
     try { sessionStorage.setItem(key, JSON.stringify(values)); }
     catch { /* Writing stays in the form if storage is unavailable. */ }
   };
