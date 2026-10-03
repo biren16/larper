@@ -33,8 +33,8 @@ function storyTagsFromForm(form: FormData): string[] {
 
 export function storyDraftFromForm(form: FormData, working = false): StoryDraft {
  const text = (key: string) => working ? String(form.get(key) ?? "") : required(form, key);
-  const discoveryType = required(form, "discoveryType") as DiscoveryType;
-  const mode = required(form, "mode") as TopicMode;
+  const discoveryType = (working ? String(form.get("discoveryType") ?? "TREND") : required(form, "discoveryType")) as DiscoveryType;
+  const mode = (working ? String(form.get("mode") ?? "current") : required(form, "mode")) as TopicMode;
   if (!DISCOVERY_TYPES.has(discoveryType)) throw new Error("discoveryType is invalid");
   if (mode !== "current" && mode !== "deep-lore") throw new Error("mode is invalid");
   return {
@@ -81,7 +81,7 @@ export function createEditorialActions(dependencies: {
     saveDraft: async (form: FormData) => {
       try {
         const result = await dependencies.service.saveDraft(await dependencies.getActor(), required(form, "candidateId"), storyDraftFromForm(form, true), editorialVersionFromForm(form));
-        return { ok: true as const, storyId: result.storyId, revision: result.revision };
+        return { ok: true as const, storyId: result.storyId, revision: result.revision, workingPersisted: true as const };
       } catch (error) { return { ok: false as const, ...failureDetails(error) }; }
     },
     publishStory: async (form: FormData) => {
@@ -89,7 +89,7 @@ export function createEditorialActions(dependencies: {
         const candidateId = required(form, "candidateId");
         const result = await dependencies.service.publishStory(await dependencies.getActor(), candidateId, storyDraftFromForm(form), editorialVersionFromForm(form));
         await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });
-        return { ok: true as const, storyId: result.storyId, revision: result.revision };
+        return { ok: true as const, storyId: result.storyId, revision: result.revision, workingPersisted: true as const };
       } catch (error) {
         return { ok: false as const, ...failureDetails(error) };
       }
@@ -106,9 +106,9 @@ export function createEditorialActions(dependencies: {
           evidenceSummary: required(form, "evidenceSummary"),
           independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on",
           tags: storyTagsFromForm(form),
-        }, editorialVersionFromForm(form));
+        }, editorialVersionFromForm(form), storyDraftFromForm(form, true));
         await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });
-        return { ok: true as const, storyId: result.storyId, revision: result.revision };
+        return { ok: true as const, storyId: result.storyId, revision: result.revision, workingPersisted: true as const };
       } catch (error) {
         return { ok: false as const, ...failureDetails(error) };
       }

@@ -34,7 +34,7 @@ export interface Database {
       create_editorial_working_story: { Args: {p_reviewer_id: string}; Returns: string };
       transition_editorial_version: { Args: { p_candidate_id: string; p_reviewer_id: string; p_state: string; p_action: string; p_notes: string; p_expected_version: number }; Returns: undefined };
       save_editorial_working_draft: { Args: { p_candidate_id: string; p_reviewer_id: string; p_draft: Json; p_expected_version: number }; Returns: Array<{story_id: string; revision: number}> };
-      approve_editorial_version: { Args: { p_candidate_id: string; p_reviewer_id: string; p_draft: Json; p_expected_version: number; p_format: string; p_scheduled_for?: string; p_operation?: string }; Returns: Array<{story_id: string; revision: number}> };
+      approve_editorial_version: { Args: { p_candidate_id: string; p_reviewer_id: string; p_draft: Json; p_expected_version: number; p_format: string; p_scheduled_for?: string; p_operation?: string; p_working_draft?: Json }; Returns: Array<{story_id: string; revision: number}> };
       merge_editorial_clusters: { Args: { p_target_id: string; p_source_id: string; p_reviewer_id: string }; Returns: undefined };
       split_editorial_cluster: { Args: { p_cluster_id: string; p_signal_ids: string[]; p_reviewer_id: string }; Returns: string };
       ingestion_schedule_evidence: { Args: Record<string, never>; Returns: Json };

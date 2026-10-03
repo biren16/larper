@@ -1,6 +1,8 @@
 import styles from "./studio.module.css";
 
 const noticeMessages: Record<string, string> = {
+  "schedule-cancelled": "Schedule cancelled. Your writing remains saved privately.",
+  "scheduled-version-updated": "Scheduled version updated. The release time is unchanged.",
   "image-uploaded": "Cover uploaded. Select it under Story image, then save or publish to attach it.",
   "draft-saved": "Draft saved privately. Review and publication approval are still required.",
   "sources-registered": "Seven-lane sources registered. New feeds are paused for usage review.",

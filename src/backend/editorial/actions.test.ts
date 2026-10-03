@@ -4,7 +4,7 @@ import { createEditorialActions } from "./actions";
 describe("editorial action factory", () => {
   it("re-resolves the actor and validates form input before publishing", async () => {
     const getActor = vi.fn(async () => ({ id: "editor-1", email: "founder@example.com", role: "founder" as const }));
-    const publishStory = vi.fn(async () => ({ storyId: "story-1", revision: 1 }));
+    const publishStory = vi.fn(async () => ({ storyId: "story-1", revision: 1, workingPersisted: true }));
     const invalidatePublicContent = vi.fn();
     const actions = createEditorialActions({
       getActor,
@@ -19,7 +19,7 @@ describe("editorial action factory", () => {
       conversationLine: "Mention the crossover, not just the headline.", freshnessLabel: "Moving", evidenceSummary: "Two sources", tags: "books,f1", independentSourcesConfirmed: "on",
     }).forEach(([key, value]) => form.set(key, value));
 
-    await expect(actions.publishStory(form)).resolves.toEqual({ ok: true, storyId: "story-1", revision: 1 });
+    await expect(actions.publishStory(form)).resolves.toEqual({ ok: true, storyId: "story-1", revision: 1, workingPersisted: true });
     expect(getActor).toHaveBeenCalledOnce();
     expect(publishStory).toHaveBeenCalledWith(expect.objectContaining({ id: "editor-1" }), "cluster-1", expect.objectContaining({ regions: ["india", "global"], tags: ["books", "f1"], independentSourcesConfirmed: true }), 0);
     expect(invalidatePublicContent).toHaveBeenCalledWith({ slug: "f1-books" });
@@ -74,7 +74,16 @@ describe("Style briefs", () => {
     const form = new FormData(); form.set("editorialVersion", "0");
     for (const [key, value] of Object.entries({candidateId:"style-cluster", nicheId:"style", slug:"style-brief", title:"A collaboration", regions:"global", freshnessLabel:"Archive", evidenceSummary:"Independent sources", tags:"archive", styleSubtopicsPresent:"true", independentSourcesConfirmed:"on"})) form.set(key,value);
     form.append("styleSubtopics", "sneakers"); form.append("styleSubtopics", "streetwear");
-    expect(await actions.publishBrief(form)).toEqual({ok:true, storyId:"style-brief", revision:1});
-    expect(publishBrief).toHaveBeenCalledWith(null,"style-cluster",expect.objectContaining({tags:["archive","sneakers","streetwear"]}), 0);
+    expect(await actions.publishBrief(form)).toEqual({ok:true, storyId:"style-brief", revision:1, workingPersisted:true});
+    expect(publishBrief).toHaveBeenCalledWith(null,"style-cluster",expect.objectContaining({tags:["archive","sneakers","streetwear"]}), 0, expect.objectContaining({discoveryType:"TREND",mode:"current"}));
   });
+});
+it("passes newly typed full working writing independently from a brief projection", async () => {
+ const publishBrief=vi.fn<(...args: unknown[]) => Promise<{storyId:string;revision:number}>>(async()=>({storyId:"brief",revision:8}));
+ const actions=createEditorialActions({service:{publishBrief} as never,getActor:async()=>null,now:()=>"2026-10-03T00:00:00Z"});
+ const form=new FormData();
+ Object.entries({candidateId:"candidate",editorialVersion:"7",nicheId:"books",slug:"brief",title:"Brief",regions:"global",freshnessLabel:"Now",evidenceSummary:"Evidence",independentSourcesConfirmed:"on",discoveryType:"LORE",mode:"deep-lore",hook:"Typed just now",summary:"Full summary",lore:"Full lore",whyItMatters:"Context",beginnerContext:"Intro",conversationLine:"Chat line"}).forEach(([key,value])=>form.set(key,value));
+ await actions.publishBrief(form);
+ expect(publishBrief.mock.calls[0]?.[4]).toMatchObject({hook:"Typed just now",summary:"Full summary",lore:"Full lore",mode:"deep-lore",discoveryType:"LORE"});
+ expect(publishBrief.mock.calls[0]?.[2]).not.toHaveProperty("hook");
 });

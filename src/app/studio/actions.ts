@@ -74,7 +74,8 @@ export async function scheduleCandidateAction(form: FormData) {
     const result = operation === "cancel_schedule" || operation === "update_schedule"
       ? await runtime.service.changeSchedule(runtime.actor, candidateId, draft, version, operation)
       : await runtime.service.scheduleStory(runtime.actor, candidateId, draft, editorialDate(String(form.get("scheduledFor") ?? "")), new Date().toISOString(), version);
-    return { ok: true as const, revision: result.revision, destination: "/studio?notice=story-scheduled" };
+    const notice = operation === "cancel_schedule" ? "schedule-cancelled" : operation === "update_schedule" ? "scheduled-version-updated" : "story-scheduled";
+    return { ok: true as const, revision: result.revision, workingPersisted: true as const, destination: `/studio?notice=${notice}` };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not schedule story";
     return { ok: false as const, error: message, conflict: message.includes("EDITORIAL_CONFLICT") };

@@ -72,6 +72,7 @@ export class PostgresEditorialStore implements EditorialStore {
     const result = await this.client.rpc("approve_editorial_version", {
       p_candidate_id: command.candidateId, p_reviewer_id: command.reviewerId, p_draft: command.draft as unknown as Json,
       p_expected_version: command.expectedVersion!, p_format: command.publicationFormat,
+      ...(command.workingDraft ? {p_working_draft: command.workingDraft as unknown as Json} : {}),
       ...(scheduledFor ? { p_scheduled_for: scheduledFor, p_operation: "schedule" } : {}),
     });
     failure("Approve version", result.error);

@@ -7,6 +7,7 @@ import { assertEditorialAccess } from "./authorization";
 import type { BriefDraft, CandidateRecord, EditorialActor, StoryDraft } from "./types";
 
 export interface PublicationCommand {
+  workingDraft?: StoryDraft;
   candidateId: string;
   expectedVersion?: number;
   reviewerId: string;
@@ -171,8 +172,9 @@ export class EditorialService {
     return this.store.changeSchedule({ candidateId, reviewerId: context.actor.id, draft, expectedVersion, operation });
   }
 
-  async publishBrief(actor: EditorialActor | null, candidateId: string, draft: BriefDraft, expectedVersion?: number) {
+  async publishBrief(actor: EditorialActor | null, candidateId: string, draft: BriefDraft, expectedVersion?: number, workingDraft?: StoryDraft) {
     const context = await this.candidate(actor, candidateId);
+    if (workingDraft) validateWorkingDraft(workingDraft);
     validateBrief(draft);
     confirmIndependentOrigins(draft.independentSourcesConfirmed);
     const evidence = [...independentEvidence(context.candidate)];
@@ -189,7 +191,7 @@ export class EditorialService {
       reviewerId: context.actor.id,
       lifecycle: "published_brief",
       publicationFormat: "brief",
-      draft,
+      draft, workingDraft,
     });
     return result;
   }

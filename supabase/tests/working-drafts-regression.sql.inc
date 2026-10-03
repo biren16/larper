@@ -71,3 +71,29 @@ begin
  if not blocked then raise exception 'Approval bypass allowed'; end if;
  if (select to_jsonb(s) from public.stories s where cluster_id=c)<>snapshot or (select editorial_version from public.topic_clusters where id=c)<>result.revision then raise exception 'Failed approval partially committed'; end if;
 end; $$;
+-- Cancellation and brief publication persist current submitted writing, not only stored text.
+do $$
+declare c uuid; reviewer uuid := '00000000-0000-0000-0000-000000000401'; draft jsonb; working jsonb; v integer; result record;
+begin
+ select cluster_id into c from public.stories where starter_key='books';
+ select value->'draft' into draft from test_starters,jsonb_array_elements(content) where value->>'key'='books';
+ draft:=draft || '{"independentSourcesConfirmed":true}'::jsonb;
+ perform public.transition_editorial_candidate(c,reviewer,'reviewing','unpublish','Isolated regression');
+ select editorial_version into v from public.topic_clusters where id=c;
+ select * into result from public.approve_editorial_version(c,reviewer,draft,v,'story',now()+interval '1 day','schedule');
+ working:=draft || '{"hook":"New unsaved cancellation hook","lore":"New unsaved cancellation lore"}'::jsonb;
+ select * into result from public.approve_editorial_version(c,reviewer,working,result.revision,'story',null,'cancel_schedule');
+ if not exists(select 1 from public.editorial_working_drafts where candidate_id=c and content->>'hook'='New unsaved cancellation hook' and content->>'lore'='New unsaved cancellation lore') then raise exception 'Cancellation lost current writing'; end if;
+ update public.topic_clusters set heat=85,confidence=90,sensitive_flags='{}' where id=c;
+ update public.source_definitions set allowlisted=true where id in (select raw.source_definition_id from public.cluster_signals links join public.raw_signals raw on raw.id=links.raw_signal_id where links.cluster_id=c);
+ select editorial_version into v from public.topic_clusters where id=c;
+ working:=draft || '{"hook":"New unsaved brief hook","summary":"New full summary","lore":"New unsaved brief lore","mode":"deep-lore","discoveryType":"LORE"}'::jsonb;
+ select * into result from public.approve_editorial_version(c,reviewer,
+  draft - array['hook','summary','lore','whyItMatters','beginnerContext','conversationLine','mode','discoveryType'],v,'brief',null,'publish',working);
+ if not exists(select 1 from public.editorial_working_drafts where candidate_id=c and content->>'hook'='New unsaved brief hook' and content->>'lore'='New unsaved brief lore' and content->>'summary'='New full summary' and content->>'mode'='deep-lore' and content->>'discoveryType'='LORE') then raise exception 'Brief replaced full current working copy'; end if;
+ if not exists(select 1 from public.stories where cluster_id=c and publication_format='brief' and hook='') then raise exception 'Brief projection was not separate from working content'; end if;
+ -- A reduced internal brief request still preserves previously saved long-form fields.
+ select * into result from public.approve_editorial_version(c,reviewer,
+  draft - array['hook','summary','lore','whyItMatters','beginnerContext','conversationLine','mode','discoveryType'],result.revision,'brief');
+ if (select content->>'hook' from public.editorial_working_drafts where candidate_id=c)<>'New unsaved brief hook' then raise exception 'Reduced brief lost stored working text'; end if;
+end; $$;

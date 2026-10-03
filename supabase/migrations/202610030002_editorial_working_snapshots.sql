@@ -43,9 +43,9 @@ end; $$;
 
 -- Versioned approval wrapper delegates all existing source/brief/media guards.
 create function public.approve_editorial_version(p_candidate_id uuid,p_reviewer_id uuid,p_draft jsonb,p_expected_version integer,
- p_format text,p_scheduled_for timestamptz default null,p_operation text default 'publish')
+ p_format text,p_scheduled_for timestamptz default null,p_operation text default 'publish',p_working_draft jsonb default null)
 returns table(story_id uuid,revision integer) language plpgsql security definer set search_path='' as $$
-declare candidate public.topic_clusters; existing public.stories; result record; target timestamptz; effective jsonb;
+declare candidate public.topic_clusters; existing public.stories; result record; target timestamptz; effective jsonb; working_content jsonb;
 begin
  select * into candidate from public.topic_clusters where id=p_candidate_id for update;
  if candidate.id is null then raise exception 'Candidate not found'; end if;
@@ -53,6 +53,7 @@ begin
  select * into existing from public.stories where cluster_id=p_candidate_id for update;
  if p_operation='cancel_schedule' then
   if existing.scheduled_for is null then raise exception 'No pending schedule'; end if;
+  perform * from public.save_editorial_working_draft(p_candidate_id,p_reviewer_id,p_draft,p_expected_version);
   update public.stories set scheduled_for=null where id=existing.id;
   insert into public.review_events(cluster_id,story_id,reviewer_id,action,notes) values(p_candidate_id,existing.id,p_reviewer_id,'cancel_schedule','Explicit schedule cancellation');
   return query select existing.id,(select editorial_version from public.topic_clusters where id=p_candidate_id); return;
@@ -73,12 +74,24 @@ begin
   update public.story_revisions set snapshot=(select to_jsonb(s) from public.stories s where s.id=result.story_id)
    where story_revisions.story_id=result.story_id and story_revisions.revision=result.revision;
  end if;
- insert into public.editorial_working_drafts(candidate_id,content,editor_id) values(p_candidate_id,effective || '{"independentSourcesConfirmed":false}'::jsonb,p_reviewer_id)
+ -- The brief publication projection is intentionally smaller than the editor.
+ -- Current submitted writing takes priority; legacy reduced requests merge stored fields.
+ if p_working_draft is not null then
+   working_content := p_working_draft;
+ elsif p_format = 'brief' then
+   select content into working_content from public.editorial_working_drafts
+     where candidate_id = p_candidate_id;
+   working_content := coalesce(working_content, '{}'::jsonb) || effective;
+ else
+   working_content := effective;
+ end if;
+ insert into public.editorial_working_drafts(candidate_id,content,editor_id)
+ values(p_candidate_id,working_content || '{"independentSourcesConfirmed":false}'::jsonb,p_reviewer_id)
  on conflict(candidate_id) do update set content=excluded.content,editor_id=excluded.editor_id,revision=editorial_working_drafts.revision+1,updated_at=now();
  return query select result.story_id,(select editorial_version from public.topic_clusters where id=p_candidate_id);
 end; $$;
-revoke all on function public.save_editorial_working_draft(uuid,uuid,jsonb,integer), public.approve_editorial_version(uuid,uuid,jsonb,integer,text,timestamptz,text) from public,anon,authenticated;
-grant execute on function public.save_editorial_working_draft(uuid,uuid,jsonb,integer), public.approve_editorial_version(uuid,uuid,jsonb,integer,text,timestamptz,text) to service_role;
+revoke all on function public.save_editorial_working_draft(uuid,uuid,jsonb,integer), public.approve_editorial_version(uuid,uuid,jsonb,integer,text,timestamptz,text,jsonb) from public,anon,authenticated;
+grant execute on function public.save_editorial_working_draft(uuid,uuid,jsonb,integer), public.approve_editorial_version(uuid,uuid,jsonb,integer,text,timestamptz,text,jsonb) to service_role;
 create function public.transition_editorial_version(p_candidate_id uuid,p_reviewer_id uuid,p_state text,p_action text,p_notes text,p_expected_version integer)
 returns void language plpgsql security definer set search_path='' as $$
 declare version integer;
