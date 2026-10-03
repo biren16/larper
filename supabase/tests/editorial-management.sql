@@ -27,7 +27,7 @@ commit;
 begin;
 create temporary table management_ids(kind text,id uuid);
 do $$
-declare actor uuid:='00000000-0000-0000-0000-000000000091'; c uuid; c2 uuid; source1 uuid;source2 uuid;signal1 uuid;signal2 uuid;s public.stories;v integer;r record;content jsonb;original_date timestamptz;earliest timestamptz:=now()-interval '14 days';
+declare actor uuid:='00000000-0000-0000-0000-000000000091'; c uuid; c2 uuid; source1 uuid;source2 uuid;signal1 uuid;signal2 uuid;s public.stories;v integer;r record;content jsonb;original_date timestamptz;earliest timestamptz:=now()-interval '14 days';field_name text;changed jsonb;approved jsonb;
 begin
  insert into source_definitions(name,adapter_type,trust_tier,config,allowlisted) values('One','manual','primary','{"originKey":"publisher:one.example"}',true) returning id into source1;
  insert into source_definitions(name,adapter_type,trust_tier,config,allowlisted) values('Two','manual','publication','{"originKey":"publisher:two.example"}',true) returning id into source2;
@@ -48,6 +48,19 @@ begin
  if s.original_slug<>s.slug or s.original_published_at<>s.published_at then raise exception 'Public identity not captured'; end if;
  insert into management_ids values('published',s.id);
  insert into saves(user_id,story_id) values(actor,s.id);
+ -- A change in any previously omitted publishable field must mark private edits.
+ approved:=to_jsonb(s);
+ foreach field_name in array array['discoveryType','mode','regions','freshnessLabel','evidenceSummary'] loop
+  changed:=case field_name when 'discoveryType' then '"LORE"'::jsonb when 'mode' then '"deep-lore"'::jsonb when 'regions' then '["india"]'::jsonb when 'freshnessLabel' then '"Private freshness"'::jsonb else '"Private evidence assessment"'::jsonb end;
+  select editorial_version into v from topic_clusters where id=c;
+  perform * from save_editorial_working_draft(c,actor,jsonb_set(content,array[field_name],changed),v);
+  if not exists(select 1 from jsonb_array_elements(list_editorial_posts('{}')->'items') p where p->>'id'=c::text and p->>'privateEdits'='true') then raise exception 'Private edit marker omitted field %',field_name;end if;
+  if (select to_jsonb(story) from stories story where id=s.id)<>approved then raise exception 'Working-only % change modified approved snapshot',field_name;end if;
+  select editorial_version into v from topic_clusters where id=c;
+  perform * from save_editorial_working_draft(c,actor,content,v);
+  if not exists(select 1 from jsonb_array_elements(list_editorial_posts('{}')->'items') p where p->>'id'=c::text and p->>'privateEdits'='false') then raise exception 'Private edit marker did not reset after % matched approval',field_name;end if;
+ end loop;
+
  select editorial_version into v from topic_clusters where id=c;
  perform * from manage_editorial_post(c,actor,v,'change_niche','{"nicheId":"music"}');
  if (select niche_id from stories where id=s.id)<>'books' then raise exception 'Private niche mutated public snapshot'; end if;
@@ -101,6 +114,13 @@ begin
  select editorial_version into v from topic_clusters where id=c;
  perform * from manage_editorial_post(c,actor,v,'trash','{}');
  if exists(select 1 from stories where cluster_id=c and scheduled_for is not null) or publish_due_stories()<>0 then raise exception 'Trash schedule retained'; end if;
+ approved:=(select to_jsonb(cluster) from topic_clusters cluster where id=c);
+ insert into raw_signals(source_definition_id,canonical_url,source_type,source_name,title,published_at,observed_at,trust_tier,suggested_niche_id)
+ values(source1,'https://one.example/after-trash','rss','One',(select title from topic_clusters where id=c),now(),now(),'primary','books') returning id into signal1;
+ perform process_unclustered_signals();
+ if exists(select 1 from cluster_signals where cluster_id=c and raw_signal_id=signal1) then raise exception 'Ingestion reused Trash candidate';end if;
+ if (select to_jsonb(cluster) from topic_clusters cluster where id=c)<>approved then raise exception 'Ingestion rescored or changed Trash';end if;
+
 end $$;
 -- PostgreSQL API-role evidence: only the deep-lore published detail remains visible.
 grant usage on schema public to anon,authenticated;
