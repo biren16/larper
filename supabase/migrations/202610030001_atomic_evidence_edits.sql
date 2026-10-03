@@ -71,7 +71,7 @@ declare
   published_count integer := 0;
   block_reason text;
 begin
-  for due in select * from public.stories where lifecycle = 'reviewing' and scheduled_for <= now() 
+  for due in select * from public.stories where lifecycle = 'reviewing' and scheduled_for <= now()
   loop
     -- All editorial writers lock cluster before story; skip an edit already in progress.
     perform id from public.topic_clusters where id=due.cluster_id for update skip locked;

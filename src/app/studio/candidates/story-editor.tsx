@@ -24,13 +24,14 @@ export interface StudioCandidateDetail {
 type Action = (formData: FormData) => void | Promise<void>;
 
 function MoreActions({ candidate, transitionAction, mergeAction, splitAction }: { candidate: StudioCandidateDetail; transitionAction?: Action; mergeAction?: Action; splitAction?: Action }) {
-  if (!transitionAction && !mergeAction && !splitAction) return null;
+  const published = ["published_story", "published_brief"].includes(candidate.storyLifecycle ?? "");
+  if (!transitionAction && (!mergeAction || published) && (!splitAction || published)) return null;
   return (
     <details className={styles.moreActions} role="group" aria-label="More actions">
       <summary>More actions</summary>
       <p>These actions change the cluster or remove it from the editorial flow.</p>
-      {mergeAction && <form action={mergeAction}><input type="hidden" name="targetId" value={candidate.id} /><label>Duplicate cluster ID<input name="sourceId" required /></label><PendingButton type="submit" pendingLabel="Merging…">Merge into this cluster</PendingButton></form>}
-      {splitAction && <form action={splitAction}><input type="hidden" name="clusterId" value={candidate.id} /><label>Signal IDs to move<input name="signalIds" required placeholder="id-1,id-2" /></label><PendingButton type="submit" pendingLabel="Splitting…">Split evidence</PendingButton></form>}
+      {mergeAction && !published && <form action={mergeAction}><input type="hidden" name="targetId" value={candidate.id} /><label>Duplicate cluster ID<input name="sourceId" required /></label><PendingButton type="submit" pendingLabel="Merging…">Merge into this cluster</PendingButton></form>}
+      {splitAction && !published && <form action={splitAction}><input type="hidden" name="clusterId" value={candidate.id} /><label>Signal IDs to move<input name="signalIds" required placeholder="id-1,id-2" /></label><PendingButton type="submit" pendingLabel="Splitting…">Split evidence</PendingButton></form>}
       {transitionAction && <form action={transitionAction}><input type="hidden" name="candidateId" value={candidate.id} /><label>Review note<textarea name="notes" required rows={3} /></label><div className={styles.secondaryActions}><PendingButton type="submit" name="action" value="reject" intentField="action" intentValue="reject" pendingLabel="Rejecting…">Reject</PendingButton><PendingButton type="submit" name="action" value="expire" intentField="action" intentValue="expire" pendingLabel="Expiring…">Expire</PendingButton><PendingButton type="submit" name="action" value="unpublish" intentField="action" intentValue="unpublish" pendingLabel="Unpublishing…">Unpublish</PendingButton></div></form>}
     </details>
   );
@@ -60,6 +61,7 @@ export function StoryEditor({
   uploadMediaAction?: Action;
 }) {
   const draft = candidate.draft;
+  const published = ["published_story", "published_brief"].includes(candidate.storyLifecycle ?? "");
   return (
     <main id="main-content" className={styles.main}>
       <nav className={styles.breadcrumb} aria-label="Studio breadcrumb"><Link href="/studio">Studio</Link><span>/</span><span>Candidate</span></nav>
@@ -74,6 +76,7 @@ export function StoryEditor({
       </header>
 
       {candidate.sensitiveFlags.length > 0 && <div className={styles.alert} role="alert"><strong>Mandatory review</strong><span>{candidate.sensitiveFlags.join(", ")}</span></div>}
+      {published && draft?.slug && <p><Link href={`/discover/${draft.slug}`}>View public story</Link> · Unpublish under More actions before changing evidence or scheduling.</p>}
       <StatusNotice notice={notice} />
       {error && <div className={styles.alert} role="alert"><strong>Could not complete that action</strong><span>{error}</span></div>}
 
@@ -134,13 +137,13 @@ export function StoryEditor({
           <StoryPreview />
 
           <div className={styles.actionBar} role="group" aria-label="Publication actions">
-            {scheduleAction && <label>Schedule for (IST)<input name="scheduledFor" type="datetime-local" /></label>}
+            {scheduleAction && !published && <label>Schedule for (IST)<input name="scheduledFor" type="datetime-local" /></label>}
             {candidate.scheduledFor && <p>Saving a draft cancels its pending publication schedule.</p>}
             <div>
               {saveDraftAction && !["published_story", "published_brief"].includes(candidate.storyLifecycle ?? "") && <PendingButton type="submit" name="intent" value="draft" intentValue="draft" pendingLabel="Saving draft…" formAction={saveDraftAction} formNoValidate className={styles.secondary}>Save draft</PendingButton>}
               <PendingButton type="submit" name="intent" value="story" intentValue="story" pendingLabel="Publishing…">Publish story</PendingButton>
               <PendingButton type="submit" name="format" value="brief" intentField="format" intentValue="brief" pendingLabel="Publishing brief…" formNoValidate className={styles.secondary}>Publish brief</PendingButton>
-              {scheduleAction && <PendingButton type="submit" name="intent" value="schedule" intentValue="schedule" pendingLabel="Scheduling…" formAction={scheduleAction} className={styles.secondary}>Schedule</PendingButton>}
+              {scheduleAction && !published && <PendingButton type="submit" name="intent" value="schedule" intentValue="schedule" pendingLabel="Scheduling…" formAction={scheduleAction} className={styles.secondary}>Schedule</PendingButton>}
             </div>
           </div>
         </form>

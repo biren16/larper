@@ -84,3 +84,11 @@ it("does not offer draft saving for a published story", () => {
   render(<StoryEditor candidate={{ ...candidate, storyLifecycle: "published_story" }} saveDraftAction={() => undefined} />);
   expect(screen.queryByRole("button", { name: "Save draft" })).not.toBeInTheDocument();
 });
+
+it("links a published story and hides evidence editing and scheduling until unpublish", () => {
+  render(<StoryEditor candidate={{ ...candidate, storyLifecycle: "published_story", draft: { nicheId: "music", slug: "live-story", title: "Live story", hook: "Hook", summary: "Summary", whyItMatters: "Context", lore: "Lore", beginnerContext: "Beginner", conversationLine: "Line", discoveryType: "LORE", mode: "deep-lore", regions: ["global"], freshnessLabel: "Archive", evidenceSummary: "Receipts", independentSourcesConfirmed: false, tags: [] } }} scheduleAction={() => undefined} mergeAction={() => undefined} splitAction={() => undefined} />);
+  expect(screen.getByRole("link", { name: "View public story" })).toHaveAttribute("href", "/discover/live-story");
+  expect(screen.queryByRole("button", { name: /^Schedule$/ })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Merge into this cluster" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Split evidence" })).not.toBeInTheDocument();
+});
