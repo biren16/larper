@@ -11,6 +11,7 @@ class Query {
   maybeSingle() { return Promise.resolve({ data: this.rows[0] ?? null, error: null }); }
   select() { return this; }
   in() { return this; }
+  neq() { return this; }
   is() { return this; }
   eq() { return this; }
   order() { return this; }
@@ -105,4 +106,12 @@ it("shows private working title and niche in dashboard and candidate header", as
  const data={...fixtures,editorial_working_drafts:[{candidate_id:"cluster-1",revision:2,content:{title:"Working title",nicheId:"books"}}]};
  expect((await new StudioReader(clientFor(data)).dashboard()).candidates[0]).toMatchObject({title:"Working title",nicheName:"Books"});
  expect(await new StudioReader(clientFor(data)).candidate("cluster-1")).toMatchObject({title:"Working title",nicheId:"books"});
+});
+it('reports publisher origins, stored failure diagnostics and expected polling without guessing',async()=>{
+ const fixture={...fixtures,source_definitions:[{id:'same-publisher',name:'Publisher feed',adapter_type:'rss',active:true,config:{...reviewed,url:'https://news.example.com/rss'},poll_minutes:180,last_polled_at:'2026-09-21T08:00:00Z'}],source_failures:[{source_definition_id:'same-publisher',message:'HTTP 403 from publisher',error_code:'HTTP_403',occurred_at:'2026-09-21T09:00:00Z'}],raw_signals:[{id:'signal-1',source_definition_id:'same-publisher',title:'Receipt',availability:'available'}]};
+ const reader=new StudioReader(clientFor(fixture));
+ const sources=await reader.sources();
+ expect(sources.sources[0]).toMatchObject({expectedNextPollAt:'2026-09-21T11:00:00.000Z',failures:[{message:'HTTP 403 from publisher',code:'HTTP_403',occurredAt:'2026-09-21T09:00:00Z'}]});
+ const candidate=await reader.candidate('cluster-1');
+ expect(candidate?.evidence[0].originKey).toBe('publisher:news.example.com');
 });

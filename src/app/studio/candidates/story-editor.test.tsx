@@ -61,9 +61,9 @@ describe("StoryEditor", () => {
   it("offers an approved cover with credit and an upload form", () => {
     render(<StoryEditor candidate={{ ...candidate, mediaId: "asset-1", mediaOptions: [{ id: "asset-1", alt: "Race car", creditLine: "Photo by Artist" }] }} uploadMediaAction={() => undefined} />);
     expect(screen.getByRole("combobox", { name: "Story image" })).toHaveValue("asset-1");
-    expect(screen.getByText(/Photo by Artist/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Photo by Artist/).length).toBeGreaterThan(0);
     expect(screen.getByRole("form", { name: "Upload approved image" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Image file (WebP, under 400 KB)")).toBeInTheDocument();
+    expect(screen.getByLabelText("Image file (JPEG, PNG or WebP, up to 10 MB)")).toBeInTheDocument();
   });
 });
 
@@ -99,4 +99,29 @@ it("names an existing schedule's time change explicitly", () => {
   expect(screen.queryByRole("button", { name: "Schedule" })).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Update scheduled version" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Cancel schedule" })).toBeInTheDocument();
+});
+
+it("uses named classification, editable tag controls and selectable cluster evidence", async () => {
+  render(<StoryEditor candidate={{ ...candidate, niches: [{id:'books',name:'Books'}], mergeCandidates:[{id:'other',title:'A matching reading list'}] }} mergeAction={() => undefined} splitAction={() => undefined} />);
+  expect(screen.getByRole('combobox',{name:'Niche'})).toHaveValue('books');
+  expect(screen.getByRole('option',{name:'Books'})).toBeInTheDocument();
+  expect(screen.getByRole('textbox',{name:'Add tag'})).toBeInTheDocument();
+  expect(screen.getByRole('searchbox',{name:'Search candidates'})).toBeInTheDocument();
+  expect(screen.getByRole('checkbox',{name:'Reading list spreads · Culture Desk'})).toHaveAttribute('value','signal-1');
+  expect(screen.getByRole('heading',{name:'Publication checklist'})).toBeInTheDocument();
+  expect(screen.getByRole('link',{name:'Choose a niche'})).toHaveAttribute('href','#field-nicheId');
+});
+
+it('keeps shared public preview current and offers a real mobile viewport',async()=>{
+ const {fireEvent,waitFor}=await import('@testing-library/react');
+ render(<StoryEditor candidate={candidate} />);
+ fireEvent.click(screen.getByRole('button',{name:'Preview public story'}));
+ const frame=screen.getByTitle('Public story preview') as HTMLIFrameElement;
+ fireEvent.load(frame);
+ fireEvent.change(screen.getByLabelText('Hook'),{target:{value:'Current unsaved hook'}});
+ await waitFor(()=>expect(within(frame.contentDocument!.body).getByText('Current unsaved hook')).toBeInTheDocument());
+ expect(within(frame.contentDocument!.body).getByRole('heading',{name:'Source signals'})).toBeInTheDocument();
+ expect(within(frame.contentDocument!.body).getByRole('link',{name:/Culture Desk/})).toHaveAttribute('href','https://example.com/a');
+ fireEvent.click(screen.getByRole('button',{name:'Mobile'}));
+ expect(frame).toHaveStyle({width:'390px'});
 });

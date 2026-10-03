@@ -1,0 +1,13 @@
+"use client";
+import Image from 'next/image';
+import {useEffect,useRef,useState} from 'react';
+import styles from './media-library.module.css';
+export interface LibraryAsset {id:string;src?:string;alt:string;creditLine?:string|null;sourceUrl?:string;licenseCode?:string;modificationAllowed?:boolean;commercialUseAllowed?:boolean;socialUseAllowed?:boolean;width?:number;height?:number}
+export function MediaLibrary({assets,selectable=false,search,onSelect}:{assets:LibraryAsset[];selectable?:boolean;search?:(query:string)=>Promise<LibraryAsset[]>;onSelect?:(asset:LibraryAsset)=>void}) {
+ const [query,setQuery]=useState('');const root=useRef<HTMLDivElement>(null);
+ const [results,setResults]=useState<LibraryAsset[]>([]);const [error,setError]=useState('');
+ useEffect(()=>{if(!search || !query.trim())return;let active=true;const timer=setTimeout(()=>{void search(query).then(items=>{if(active){setResults(items);setError('');}}).catch(()=>{if(active)setError('Media search failed. Try again.');});},300);return()=>{active=false;clearTimeout(timer);};},[query,search]);
+ const choose=(id:string)=>{const select=root.current?.closest('form')?.elements.namedItem('mediaId') as HTMLSelectElement|null;if(select){const asset=[...assets,...results].find(item=>item.id===id);if(asset){if(![...select.options].some(option=>option.value===id))select.add(new Option(asset.alt,id));onSelect?.(asset);}select.value=id;select.dispatchEvent(new Event('change',{bubbles:true}));}};
+ const matches=(query.trim() && search ? results : assets).filter(asset=>[asset.alt,asset.creditLine,asset.licenseCode].join(' ').toLowerCase().includes(query.toLowerCase()));
+ return <div ref={root}>{error && <p>{error}</p>}<p>Search all approved media by description, credit or licence; up to 50 matches.</p><p>A generated LARPer cover is available without uploading media.</p>{selectable && <button type="button" onClick={()=>choose('')}>Use a LARPer cover</button>}<label>Search media<input type="search" value={query} onChange={event=>setQuery(event.target.value)} /></label><div className={styles.grid}>{matches.map(asset=><article key={asset.id}>{asset.src && <Image src={asset.src} alt={asset.alt} width={240} height={160} unoptimized className={styles.thumbnail} />}<p>{asset.alt}</p><p>{asset.creditLine}</p><p>{asset.licenseCode}</p><p>{asset.modificationAllowed?'Modification permitted':'No resizing, cropping or lossy edits'}</p>{asset.sourceUrl && <a href={asset.sourceUrl} target="_blank" rel="noreferrer">Original source</a>}{selectable && <button type="button" onClick={()=>choose(asset.id)}>Select {asset.alt}</button>}</article>)}</div>{matches.length===0 && <p>No matching images. Use a generated cover or upload an approved image.</p>}</div>;
+}

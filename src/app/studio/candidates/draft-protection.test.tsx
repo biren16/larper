@@ -84,3 +84,13 @@ it.each([false,true])("persists dirty cancellation writing after prior failure %
  expect(persisted).toBe("Latest unsaved cancellation writing");
  expect(sessionStorage.getItem("larper-draft:test:founder-1:cancel-after-failure")).toBeNull();
 });
+it('attaches an uploaded cover and autosaves current writing with the same editorial version',async()=>{
+ const save=vi.fn(async(data:FormData)=>{expect(data.get('hook')).toBe('Writing beside upload');expect(data.get('mediaId')).toBe('new-cover');expect(data.get('editorialVersion')).toBe('3');return {ok:true,revision:4,workingPersisted:true};});
+ render(<StoryEditor candidate={{...candidate,id:'upload-attach'}} saveDraftAction={save} uploadMediaAction={async()=>({ok:true,mediaId:'new-cover'})} />);
+ fireEvent.change(screen.getByLabelText('Hook'),{target:{value:'Writing beside upload'}});
+ fireEvent.submit(screen.getByRole('form',{name:'Upload approved image'}));
+ await waitFor(()=>expect(screen.getByRole('combobox',{name:'Story image'})).toHaveValue('new-cover'));
+ expect(screen.getByLabelText('Hook')).toHaveValue('Writing beside upload');
+ await waitFor(()=>expect(save).toHaveBeenCalled(),{timeout:2000});
+ await waitFor(()=>expect(screen.getByRole('status')).toHaveTextContent('Saved'));
+});

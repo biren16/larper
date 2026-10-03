@@ -26,16 +26,18 @@ type Action = (form: FormData) => void | Promise<void>;
 function SourceRow({ source, toggleSourceAction, reviewSourceAction }: { source: StudioSource; toggleSourceAction?: Action; reviewSourceAction?: Action }) {
   const canToggle = source.status !== "waiting" && source.adapterType !== "manual";
   return (
-    <article className={styles.sourceRow}>
+    <article id={`source-${source.id}`} className={styles.sourceRow}>
       <div className={styles.sourceIdentity}>
         <span className={styles.status} data-status={source.status}>{statusLabels[source.status]}</span>
         <div><h3>{source.name}</h3><p>{source.adapterType} / {source.trustTier}</p></div>
       </div>
       <dl>
         <div><dt>Last collection</dt><dd>{time(source.lastPolledAt)}</dd></div>
+        <div><dt>Expected next collection</dt><dd>{source.expectedNextPollAt ? time(source.expectedNextPollAt) : source.adapterType === "manual" ? "Manual intake — no polling" : !source.active ? "Paused — no collection scheduled" : !source.usageReviewed ? "Usage review required" : "Next collector run (first collection pending)"}</dd></div>
         <div><dt>Usage review</dt><dd>{source.usageReviewed ? "Recorded" : "Required before collection"}</dd></div>
         <div><dt>Failures</dt><dd>{source.failureCount === 1 ? "1 unresolved failure" : `${source.failureCount} unresolved failures`}</dd></div>
       </dl>
+      {source.failures?.map((failure,index)=><div key={`${failure.occurredAt}-${index}`}><p>Collection failed: {failure.message}</p><details><summary>Failure diagnostics</summary><p>{failure.code} · {time(failure.occurredAt)}</p></details></div>)}
       {toggleSourceAction && canToggle && (
         <form action={toggleSourceAction}>
           <input type="hidden" name="sourceId" value={source.id} />
@@ -108,10 +110,12 @@ export function SourceManager({
         <Link href="/studio">Back to Studio</Link>
       </header>
       <StatusNotice notice={notice} error={error} />
-      {registerPresetsAction && <form action={registerPresetsAction} className={styles.configPanel}>
+      <p role="status">{data.registration ? `${data.registration.registered} of ${data.registration.expected} sources registered` : "Source registry loaded"}</p>
+      {registerPresetsAction && <details className={styles.configPanel} open={data.registration ? data.registration.registered < data.registration.expected : true}><summary>Setup controls</summary><form action={registerPresetsAction}>
         <p>Register 21 feed presets and four manual references across these seven lanes. Existing source settings are preserved.</p>
         <PendingButton type="submit" pendingLabel="Registering sources…">Register seven-lane sources</PendingButton>
-      </form>}
+      </form></details>}
+      <section role="region" aria-label="Source priorities" className={styles.configPanel}><h2>Needs attention first</h2><ul>{data.sources.filter(source=>source.failureCount>0 || (!source.usageReviewed && ["rss","youtube"].includes(source.adapterType))).sort((a,b)=>b.failureCount-a.failureCount).map(source=><li key={source.id}><a href={`#source-${source.id}`}>{source.name}</a> · {source.failureCount>0 ? `${source.failureCount} unresolved failures` : "Usage review needed"}{source.failures?.map((failure,index)=><p key={index}>{failure.message}</p>)}</li>)}</ul>{!data.sources.some(source=>source.failureCount>0 || (!source.usageReviewed && ["rss","youtube"].includes(source.adapterType))) && <p>No unresolved failures or missing usage reviews.</p>}</section>
 
       <div className={styles.workspace}>
         <div className={styles.beatList}>

@@ -1,4 +1,5 @@
 import type { DiscoveryType, TopicMode } from "@/domain/discovery/types";
+import { editorialFeedback } from "./feedback";
 import type { EditorialService } from "./service";
 import type { EditorialActor, StoryDraft } from "./types";
 
@@ -11,18 +12,10 @@ function required(form: FormData, key: string): string {
 }
 
 function list(form: FormData, key: string): string[] {
-  return String(form.get(key) ?? "").split(",").map((value) => value.trim()).filter(Boolean);
+  return form.getAll(key).map(String).join(",").split(",").map((value) => value.trim()).filter(Boolean);
 }
 
-function failureDetails(error: unknown) {
- const text = message(error);
- const field = /^([a-zA-Z]+) (?:is required|is invalid|is too long)/.exec(text)?.[1];
- return { error: text, conflict: text.includes("EDITORIAL_CONFLICT"), fieldErrors: field ? { [field]: text } : {}, blockers: [text] };
-}
-
-function message(error: unknown): string {
-  return error instanceof Error ? error.message : "Something went wrong";
-}
+const failureDetails = editorialFeedback;
 
 function storyTagsFromForm(form: FormData): string[] {
   return [...new Set([

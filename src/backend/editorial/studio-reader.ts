@@ -1,3 +1,4 @@
+import { sourceOriginKey, CULTURE_SOURCE_PRESETS } from "@/backend/ingestion/source-catalog";
 import { hasUsageReview } from "@/backend/ingestion/source-review";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { StoryDraft } from "./types";
@@ -17,7 +18,7 @@ export class StudioReader {
       this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, state, editorial_stage, last_checked_at, sensitive_flags").is("trashed_at", null).in("state", ["detected", "reviewing"]).order("heat", { ascending: false }).limit(50),
       this.client.from("niches").select("id, name"),
       this.client.from("source_definitions").select("id, name, adapter_type, watchlist_beat, active, last_polled_at, poll_minutes, trust_tier, config").order("name"),
-      this.client.from("source_failures").select("source_definition_id").is("resolved_at", null),
+      this.client.from("source_failures").select("source_definition_id, message, error_code, occurred_at").is("resolved_at", null),
       this.client.from("ingestion_runs").select("id, status, started_at, inserted_count, error_count").order("started_at", { ascending: false }).limit(20),
       this.client.from("cluster_signals").select("cluster_id, raw_signal_id"),
       this.client.from("raw_signals").select("id, title, canonical_url, source_name, source_type, suggested_niche_id, region, observed_at, availability").eq("availability", "available").order("observed_at", { ascending: false }).limit(8),
@@ -38,7 +39,7 @@ export class StudioReader {
         heat: Number(row.heat), confidence: Number(row.confidence), state: row.editorial_stage,
         sourceCount: signalCounts.get(row.id) ?? 0, lastCheckedAt: row.last_checked_at, sensitiveFlags: row.sensitive_flags,
       })),
-      sources: (sources.data ?? []).map((row) => this.mapSource(row, failureCounts)),
+      sources: (sources.data ?? []).map((row) => ({...this.mapSource(row, failureCounts), failures:(failures.data ?? []).filter(item=>item.source_definition_id===row.id).map(item=>({message:item.message,code:item.error_code,occurredAt:item.occurred_at}))})),
       runs: (runs.data ?? []).map((row) => ({ id: row.id, status: row.status, startedAt: row.started_at, insertedCount: row.inserted_count, errorCount: row.error_count })),
       recentSignals: (recentSignals.data ?? []).map((row) => ({
         id: row.id,
@@ -58,14 +59,15 @@ export class StudioReader {
   async sources(): Promise<StudioSourcesData> {
     const [sources, failures, runs] = await Promise.all([
       this.client.from("source_definitions").select("id, name, adapter_type, watchlist_beat, active, last_polled_at, poll_minutes, trust_tier, config").order("name"),
-      this.client.from("source_failures").select("source_definition_id").is("resolved_at", null),
+      this.client.from("source_failures").select("source_definition_id, message, error_code, occurred_at").is("resolved_at", null),
       this.client.from("ingestion_runs").select("id, status, started_at, inserted_count, error_count").order("started_at", { ascending: false }).limit(20),
     ]);
     [sources, failures, runs].forEach((result) => check("Load studio sources", result.error));
     const failureCounts = new Map<string, number>();
     (failures.data ?? []).forEach((row) => failureCounts.set(row.source_definition_id, (failureCounts.get(row.source_definition_id) ?? 0) + 1));
     return {
-      sources: (sources.data ?? []).map((row) => this.mapSource(row, failureCounts)),
+      registration: {registered: (sources.data ?? []).filter(row => CULTURE_SOURCE_PRESETS.some(preset=>preset.key===(row.config as Record<string,unknown> | null)?.presetKey)).length, expected: CULTURE_SOURCE_PRESETS.length},
+      sources: (sources.data ?? []).map((row) => ({...this.mapSource(row, failureCounts), failures:(failures.data ?? []).filter(item=>item.source_definition_id===row.id).map(item=>({message:item.message,code:item.error_code,occurredAt:item.occurred_at}))})),
       runs: (runs.data ?? []).map((row) => ({ id: row.id, status: row.status, startedAt: row.started_at, insertedCount: row.inserted_count, errorCount: row.error_count })),
     };
   }
@@ -92,6 +94,7 @@ export class StudioReader {
       active: row.active,
       healthy: status === "live",
       lastPolledAt: row.last_polled_at,
+      expectedNextPollAt: row.active && hasUsageReview(config) && ["rss","youtube"].includes(row.adapter_type) && Number.isFinite(row.poll_minutes) && row.last_polled_at && Number.isFinite(Date.parse(row.last_polled_at)) ? new Date(Date.parse(row.last_polled_at) + row.poll_minutes * 60_000).toISOString() : null,
       failureCount,
       trustTier: row.trust_tier,
       status, config,
@@ -103,30 +106,38 @@ export class StudioReader {
   }
 
   async candidate(id: string): Promise<StudioCandidateDetail | null> {
-    const cluster = await this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, sensitive_flags, editorial_version, trashed_at").eq("id", id).maybeSingle();
+    const cluster = await this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, sensitive_flags, editorial_version, trashed_at, last_checked_at").eq("id", id).maybeSingle();
     check("Load studio candidate", cluster.error);
     if (!cluster.data) return null;
     const links = await this.client.from("cluster_signals").select("raw_signal_id").eq("cluster_id", id);
     check("Load studio evidence links", links.error);
     const ids = (links.data ?? []).map((row) => row.raw_signal_id);
     const signals = ids.length
-      ? await this.client.from("raw_signals").select("id, title, source_name, canonical_url, trust_tier, availability").in("id", ids)
+      ? await this.client.from("raw_signals").select("id, title, source_name, canonical_url, trust_tier, availability, source_definition_id, source_type").in("id", ids)
       : { data: [], error: null };
     check("Load studio evidence", signals.error);
+    const definitions = await this.client.from("source_definitions").select("id, config, allowlisted");
+    check("Load evidence origins", definitions.error);
+    const origins = new Map((definitions.data ?? []).map(row=>[row.id,sourceOriginKey(row)]));
+    const niches = await this.client.from("niches").select("id, name").order("name");
+    check("Load niche choices", niches.error);
+    const mergeCandidates = await this.client.from("topic_clusters").select("id, title").is("trashed_at",null).in("state",["detected","reviewing"]).neq("id",id).order("last_checked_at", {ascending:false}).limit(100);
+    check("Load merge candidates",mergeCandidates.error);
     const story = await this.client.from("stories").select("*").eq("cluster_id", id).maybeSingle();
     check("Load candidate story", story.error);
     const working = await this.client.from("editorial_working_drafts").select("content, revision").eq("candidate_id", id).maybeSingle();
     check("Load private working draft", working.error);
-    const media = await this.client.from("media_assets").select("id, alt, credit_line, kind, commercial_use_allowed").order("created_at", { ascending: false }).limit(100);
+    const media = await this.client.from("media_assets").select("id, alt, src, width, height, credit_line, kind, commercial_use_allowed, modification_allowed, source_url, license_code").order("created_at", { ascending: false }).limit(100);
     check("Load approved media", media.error);
     const revisions = story.data
       ? await this.client.from("story_revisions").select("revision, created_at, editor_id").eq("story_id", story.data.id).order("revision", { ascending: false })
       : { data: [], error: null };
     check("Load revision history", revisions.error);
     return {
+      niches: niches.data ?? [], mergeCandidates: mergeCandidates.data ?? [], lastCheckedAt: cluster.data.last_checked_at,
       id: cluster.data.id, title: (working.data?.content as unknown as Partial<StoryDraft>)?.title ?? cluster.data.title, nicheId: (working.data?.content as unknown as Partial<StoryDraft>)?.nicheId ?? cluster.data.niche_id,
       heat: Number(cluster.data.heat), confidence: Number(cluster.data.confidence), sensitiveFlags: cluster.data.sensitive_flags,
-      evidence: (signals.data ?? []).map((row) => ({ id: row.id, title: row.title, sourceName: row.source_name, sourceUrl: row.canonical_url, trustTier: row.trust_tier, availability: row.availability })),
+      evidence: (signals.data ?? []).map((row) => ({ id: row.id, title: row.title, sourceName: row.source_name, sourceUrl: row.canonical_url, trustTier: row.trust_tier, availability: row.availability, originKey: origins.get(row.source_definition_id), sourceDefinitionId: row.source_definition_id, sourceType: row.source_type, allowlisted:definitions.data?.find(item=>item.id===row.source_definition_id)?.allowlisted ?? false })),
       revisions: (revisions.data ?? []).map((row) => ({ revision: row.revision, createdAt: row.created_at, editorId: row.editor_id })),
       trashedAt: cluster.data.trashed_at,
       everPublished: Boolean(story.data?.original_published_at),
@@ -143,7 +154,7 @@ export class StudioReader {
         regions: story.data.regions, freshnessLabel: story.data.freshness_label, evidenceSummary: story.data.evidence_summary,
         tags: story.data.tags, independentSourcesConfirmed: false,
       } : undefined,
-      mediaOptions: (media.data ?? []).filter((row) => row.kind === "larper" || row.commercial_use_allowed).map((row) => ({ id: row.id, alt: row.alt, creditLine: row.credit_line })),
+      mediaOptions: (media.data ?? []).filter((row) => row.kind === "larper" || row.commercial_use_allowed).map((row) => ({ id: row.id, alt: row.alt, creditLine: row.credit_line, src: row.src, width: row.width, height: row.height, modificationAllowed:row.modification_allowed, sourceUrl:row.source_url ?? undefined, licenseCode:row.license_code ?? undefined })),
     };
   }
 }

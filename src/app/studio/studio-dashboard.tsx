@@ -23,6 +23,8 @@ export interface StudioSource {
   healthy: boolean;
   lastPolledAt: string | null;
   failureCount: number;
+  expectedNextPollAt?: string | null;
+  failures?: Array<{message:string;code:string;occurredAt:string}>;
   trustTier: string;
   status: StudioSourceStatus;
   config?: Record<string, unknown>;
@@ -34,6 +36,7 @@ export interface StudioSource {
 }
 
 export interface StudioSourcesData {
+  registration?: {registered:number;expected:number};
   sources: StudioSource[];
   runs: StudioDashboardData["runs"];
 }
@@ -46,7 +49,7 @@ function ReviewQueue({ candidates }: Pick<StudioDashboardData, "candidates">) {
   return (
     <section className={styles.queue} aria-labelledby="queue-heading">
       <div className={styles.sectionHeading}>
-        <div><p className={styles.kicker}>Ranked by evidence</p><h2 id="queue-heading">Review queue</h2><p><Link href="/studio/posts?tab=draft">Drafts</Link> · <Link href="/studio/posts?tab=scheduled">Scheduled releases</Link> · <Link href="/studio/posts?tab=needs_review">Needs review</Link> · <Link href="/studio/sources">Source issues</Link></p><Link href="/studio/starters">Seven starter drafts</Link></div>
+        <div><p className={styles.kicker}>Ranked by heat</p><h2 id="queue-heading">Review queue</h2><p><Link href="/studio/posts?tab=draft">Drafts</Link> · <Link href="/studio/posts?tab=scheduled">Scheduled releases</Link> · <Link href="/studio/posts?tab=needs_review">Needs review</Link> · <Link href="/studio/sources">Source issues</Link></p><Link href="/studio/starters">Seven starter drafts</Link></div>
         <span>{candidates.length} {candidates.length === 1 ? "candidate" : "candidates"}</span>
       </div>
       <div className={styles.candidateList}>
@@ -61,7 +64,7 @@ function ReviewQueue({ candidates }: Pick<StudioDashboardData, "candidates">) {
             <dl className={styles.metrics}>
               <div><dt>Heat</dt><dd>{candidate.heat}</dd></div>
               <div><dt>Confidence</dt><dd>{candidate.confidence}</dd></div>
-              <div><dt>Sources</dt><dd>{candidate.sourceCount}</dd></div>
+              <div><dt>Linked signals</dt><dd>{candidate.sourceCount}</dd></div>
             </dl>
             <Link className={styles.reviewLink} href={`/studio/candidates/${candidate.id}`}>Review</Link>
           </article>

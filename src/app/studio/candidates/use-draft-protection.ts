@@ -5,9 +5,13 @@ import { startTransition, useEffect, useRef, useState } from "react";
 export type EditorResult = {
   ok: boolean;
   error?: string;
+  diagnostic?: string;
+  fieldErrors?: Record<string,string>;
+  blockers?: string[];
   revision?: number;
   conflict?: boolean;
   mediaId?: string;
+  media?: {id:string;src:string;alt:string;width:number;height:number;creditLine:string;modificationAllowed:boolean;sourceUrl:string;licenseCode:string};
   destination?: string;
   workingPersisted?: boolean;
 };
@@ -24,6 +28,8 @@ export function useDraftProtection(key: string, initialVersion: number, action?:
   const [currentVersion, setCurrentVersion] = useState(initialVersion);
   const [status, setStatus] = useState("Saved");
   const [failure, setFailure] = useState("");
+  const [uploadedMedia,setUploadedMedia]=useState<NonNullable<EditorResult["media"]>[]>([]);
+  const [feedback,setFeedback]=useState<EditorResult | null>(null);
   const [recovery, setRecovery] = useState<Record<string, string[]> | null>(null);
 
   const store = () => {
@@ -60,6 +66,7 @@ export function useDraftProtection(key: string, initialVersion: number, action?:
         });
       });
       if (result && !result.ok) {
+        setFeedback(result);
         setFailure(result.error ?? "Could not save");
         conflicted.current = Boolean(result.conflict);
         setStatus(result.conflict ? "Conflict" : "Save failed");
@@ -70,14 +77,17 @@ export function useDraftProtection(key: string, initialVersion: number, action?:
         version.current = result.revision;
         setCurrentVersion(result.revision);
       }
+      if (result?.media) setUploadedMedia(previous=>[result.media!,...previous]);
       if (result?.mediaId) {
         const select = form.current.elements.namedItem("mediaId") as HTMLSelectElement;
         select.add(new Option("Uploaded cover", result.mediaId));
         select.value = result.mediaId;
+        form.current.dispatchEvent(new Event("draftchange", { bubbles: true }));
         dirty.current = true;
         sequence.current++;
       }
       setFailure("");
+      setFeedback(null);
 
       // A successful action may change only a schedule, lifecycle, or media asset.
       // Clear recovery only after this specific working content was persisted.
@@ -124,6 +134,7 @@ export function useDraftProtection(key: string, initialVersion: number, action?:
         }
       });
     }
+    form.current.dispatchEvent(new Event("draftchange", { bubbles: true }));
     setRecovery(null);
     changed();
   };
@@ -163,7 +174,7 @@ export function useDraftProtection(key: string, initialVersion: number, action?:
   return {
     runExternal,
     attachForm: (element: HTMLFormElement | null) => { form.current = element; },
-    currentVersion, status, failure, recovery, restore,
+    currentVersion, status, failure, feedback, uploadedMedia, recovery, restore,
     discard: () => { clear(); setRecovery(null); },
     changed, save,
   };

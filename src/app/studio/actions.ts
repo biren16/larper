@@ -1,5 +1,6 @@
 "use server";
 
+import { editorialFeedback } from "@/backend/editorial/feedback";
 import { redirect } from "next/navigation";
 import { createEditorialActions, storyDraftFromForm, editorialDate, editorialVersionFromForm } from "@/backend/editorial/actions";
 import { getEditorialRuntime } from "@/backend/editorial/runtime";
@@ -18,7 +19,7 @@ export async function uploadEditorialMediaAction(form: FormData) {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(candidateId)) throw new Error("A valid candidate is required");
     const file = form.get("image");
     if (!(file instanceof File)) throw new Error("Image file is required");
-    const { bytes, width, height } = await validateEditorialUpload(file);
+    const { bytes, width, height } = await validateEditorialUpload(file, form.get("modificationAllowed") === "on");
     const rights = validateMediaRights({
       alt: String(form.get("alt") ?? ""), sourceUrl: String(form.get("sourceUrl") ?? ""),
       creditLine: String(form.get("creditLine") ?? ""), licenseCode: String(form.get("licenseCode") ?? ""),
@@ -43,7 +44,7 @@ export async function uploadEditorialMediaAction(form: FormData) {
       await bucket.remove([objectPath]);
       throw new Error(`Image record failed: ${recorded.error.message}`);
     }
-    return { ok: true as const, mediaId: id };
+    return { ok: true as const, mediaId: id, media: {id,src:publicUrl.publicUrl,alt:rights.alt,width,height,creditLine:rights.creditLine,modificationAllowed:rights.modificationAllowed,sourceUrl:rights.sourceUrl,licenseCode:rights.licenseCode} };
   } catch (error) {
     return { ok: false as const, error: error instanceof Error ? error.message : "Could not upload image" };
   }
@@ -60,7 +61,7 @@ export async function publishCandidateAction(form: FormData) {
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString(), invalidatePublicContent: invalidatePublicDiscovery });
   const isBrief = form.get("format") === "brief";
   const result = isBrief ? await actions.publishBrief(form) : await actions.publishStory(form);
-  return { ...result, ...(!result.ok ? { conflict: result.error.includes("EDITORIAL_CONFLICT") } : { destination: `/studio?notice=${isBrief ? "brief-published" : "story-published"}` }) };
+  return { ...result, ...(!result.ok ? { conflict: result.conflict } : { destination: `/studio?notice=${isBrief ? "brief-published" : "story-published"}` }) };
 }
 
 export async function scheduleCandidateAction(form: FormData) {
@@ -78,7 +79,7 @@ export async function scheduleCandidateAction(form: FormData) {
     return { ok: true as const, revision: result.revision, workingPersisted: true as const, destination: `/studio?notice=${notice}` };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not schedule story";
-    return { ok: false as const, error: message, conflict: message.includes("EDITORIAL_CONFLICT") };
+    return { ok: false as const, ...editorialFeedback(new Error(message)) };
   }
 }
 

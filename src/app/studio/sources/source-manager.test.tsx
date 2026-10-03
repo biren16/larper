@@ -62,3 +62,11 @@ it("offers all seven beats and usage review before paused-feed activation", () =
   expect(within(books).getByRole("button", { name: "Activate Book channel" })).toBeDisabled();
   expect(within(books).getByRole("form", { name: "Review usage for Book channel" })).toBeInTheDocument();
 });
+
+it('prioritises unresolved failures with actual reasons and records setup completion',()=>{
+ render(<SourceManager data={{...data,registration:{registered:25,expected:25},sources:data.sources.map(source=>({...source,usageReviewed:true,expectedNextPollAt:'2026-09-21T10:00:00Z',failures:source.id==='music'?[{message:'Publisher returned HTTP 403',code:'HTTP_403',occurredAt:'2026-09-21T08:00:00Z'}]:[]}))}} registerPresetsAction={()=>undefined} />);
+ expect(screen.getByRole('region',{name:'Source priorities'})).toHaveTextContent('Publisher returned HTTP 403');
+ expect(screen.getByText('25 of 25 sources registered')).toBeInTheDocument();
+ expect(screen.getByText('Setup controls')).toBeInTheDocument();
+ expect(screen.getAllByText('Expected next collection').length).toBeGreaterThan(0);
+});
