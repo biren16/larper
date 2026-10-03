@@ -35,3 +35,12 @@ describe("discovery view-model services", () => {
     expect(await buildNichePage(seedRepository, "missing", [])).toBeNull();
   });
 });
+
+it("rejects a private detail and excludes retained private references from related results",async()=>{
+ const publicTopic=(await seedRepository.listTopics())[0];
+ const privateTopic={...publicTopic,id:"private",slug:"private",status:"draft" as const};
+ const repository=Object.assign(Object.create(seedRepository),{getTopicBySlug:async()=>privateTopic});
+ expect(await buildTopicDetail(repository,"private")).toBeNull();
+ const relatedRepository=Object.assign(Object.create(seedRepository),{getTopicBySlug:async()=>({...publicTopic,relatedTopicIds:[privateTopic.id]}),listTopics:async()=>[publicTopic,privateTopic]});
+ expect((await buildTopicDetail(relatedRepository,publicTopic.slug))?.relatedTopics).toEqual([]);
+});

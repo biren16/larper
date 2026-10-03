@@ -19,3 +19,15 @@ Update live post preserves the existing published slug and publication date. Upd
 Apply `202610030002_editorial_working_snapshots.sql` before the compatible app. The previous `save_editorial_draft(uuid,uuid,jsonb)` signature remains available for unpublished drafts and mirrors its content into the private working copy. It rejects any approved live or scheduled snapshot, preventing the previous Save button from canceling an approved schedule during rollback. The renamed underlying legacy function is not executable by API roles. Existing starter routes continue through this compatibility wrapper, then the shared working-copy editor; existing reviewing story rows remain retained for rollback compatibility.
 
 Keep the migration applied when rolling the app back. Production and staging evidence is required separately from local PostgreSQL/fixture checks. Posts and Media provide working minimal entry pages; the richer management/library capabilities belong to subsequent releases.
+
+## Release two post management
+
+Apply additive `202610030003_editorial_post_management.sql` before the release-two app. `manage_editorial_post` uses expected editorial version and candidate/story locks for reversible Unpublish, Trash, Restore, Duplicate, private niche changes, schedule cancellation and private revision restoration. API roles cannot call it; the authenticated Studio runtime verifies editorial role and email allowlist. Bulk management is independently atomic per record, requires confirmation, and exposes individual stale-version failures.
+
+Trash retains evidence, story/private revisions, source history, account saves and related references. Restore makes the retained post private and requires fresh approval. `original_slug` / `original_published_at` survive withdrawal and restoration; historical published revision snapshots backfill identity. Duplicate reuses evidence/permitted media, resets publication identity/confirmation and starts privately. Private revisions group every save under a revision/editor/time; restoring writes another private version.
+
+Posts filters and pagination use working title/niche; private changes to published niche do not change approved content. Editor/history carry the exact Posts query return URL and restore browser scroll by that URL. Trashed starters and editor routes cannot bypass restoration.
+
+Ageing sets a separate Needs review flag at existing thresholds, preserving public detail and current classification while excluding current ranking. It never moves a current story into deep lore. Scheduler rechecks retained candidate, sources, brief eligibility and cover rights. Explicit management expires shared discovery tags and original topic tag; database cron retains bounded public cache revalidation.
+
+Use `scripts/test-editorial-management.mjs` for isolated local full-chain database verification and `STUDIO_RELEASE=2` with `playwright.studio-staging.config.ts` for deployed browser acceptance. Neither local SQL nor component tests prove deployed Auth/RLS/cron/storage/cache behavior. Keep migrations applied during app rollback; retained lifecycle/Trash and slug guards protect compatibility writers.

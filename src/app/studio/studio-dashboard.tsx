@@ -46,7 +46,7 @@ function ReviewQueue({ candidates }: Pick<StudioDashboardData, "candidates">) {
   return (
     <section className={styles.queue} aria-labelledby="queue-heading">
       <div className={styles.sectionHeading}>
-        <div><p className={styles.kicker}>Ranked by evidence</p><h2 id="queue-heading">Review queue</h2><Link href="/studio/starters">Seven starter drafts</Link></div>
+        <div><p className={styles.kicker}>Ranked by evidence</p><h2 id="queue-heading">Review queue</h2><p><Link href="/studio/posts?tab=draft">Drafts</Link> · <Link href="/studio/posts?tab=scheduled">Scheduled releases</Link> · <Link href="/studio/posts?tab=needs_review">Needs review</Link> · <Link href="/studio/sources">Source issues</Link></p><Link href="/studio/starters">Seven starter drafts</Link></div>
         <span>{candidates.length} {candidates.length === 1 ? "candidate" : "candidates"}</span>
       </div>
       <div className={styles.candidateList}>

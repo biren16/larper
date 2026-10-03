@@ -22,10 +22,11 @@ function readScore(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 0;
 }
 
-export function mapStoryRow(row: Omit<StoryRow, "reviewed_by" | "created_at" | "updated_at" | "scheduled_for"> & Partial<Pick<StoryRow, "reviewed_by" | "created_at" | "updated_at" | "scheduled_for">>): DiscoveryTopic {
+export function mapStoryRow(row: Omit<StoryRow, "reviewed_by" | "created_at" | "updated_at" | "scheduled_for" | "trashed_at" | "trashed_by" | "original_slug" | "original_published_at" | "needs_review_at" | "needs_review_reason"> & Partial<Pick<StoryRow, "reviewed_by" | "created_at" | "updated_at" | "scheduled_for" | "trashed_at" | "trashed_by" | "original_slug" | "original_published_at" | "needs_review_at" | "needs_review_reason">>): DiscoveryTopic {
   const scores = row.signals && !Array.isArray(row.signals) && typeof row.signals === "object" ? row.signals : {};
   const score = (camel: string, snake: string) => readScore(scores[camel] ?? scores[snake]);
   return {
+    needsReviewAt: row.needs_review_at ?? undefined,
     id: row.id, slug: row.slug, nicheId: row.niche_id, title: row.title, hook: row.hook,
     summary: row.summary, whyItMatters: row.why_it_matters, lore: row.lore, beginnerContext: row.beginner_context,
     type: row.discovery_type as DiscoveryTopic["type"], mode: row.mode as DiscoveryTopic["mode"],
@@ -40,7 +41,7 @@ export function mapStoryRow(row: Omit<StoryRow, "reviewed_by" | "created_at" | "
       crossover: score("crossover", "crossover"),
     } satisfies TopicSignals,
     mediaId: row.media_id ?? undefined, tags: row.tags, relatedTopicIds: row.related_story_ids,
-    status: publishedLifecycles.includes(row.lifecycle) ? "published" : "draft", origin: "ingested",
+    status: !row.trashed_at && publishedLifecycles.includes(row.lifecycle) ? "published" : "draft", origin: "ingested",
   };
 }
 
@@ -91,11 +92,11 @@ export class SupabaseDiscoveryReader implements DiscoveryDatabaseReader {
     return result.data ? mapNicheRow(result.data) : null;
   }
   async listTopics(): Promise<DiscoveryTopic[]> {
-    const result = await this.client.from("stories").select("*").in("lifecycle", publishedLifecycles).order("published_at", { ascending: false });
+    const result = await this.client.from("stories").select("*").is("trashed_at", null).in("lifecycle", publishedLifecycles).order("published_at", { ascending: false });
     return assertResult(result, "List stories").map(mapStoryRow);
   }
   async getTopicBySlug(slug: string): Promise<DiscoveryTopic | null> {
-    const result = await this.client.from("stories").select("*").eq("slug", slug).in("lifecycle", publishedLifecycles).maybeSingle();
+    const result = await this.client.from("stories").select("*").eq("slug", slug).is("trashed_at", null).in("lifecycle", publishedLifecycles).maybeSingle();
     if (result.error) throw new Error(`Get story: ${result.error.message}`);
     return result.data ? mapStoryRow(result.data) : null;
   }
@@ -122,7 +123,7 @@ export class SupabaseDiscoveryReader implements DiscoveryDatabaseReader {
   async listCurrentTopicsPage({ limit, cursor }: CurrentTopicPageOptions): Promise<DiscoveryTopicPage> {
     const safeLimit = Math.max(1, Math.min(100, Math.trunc(limit)));
     const offset = cursor && /^\d+$/.test(cursor) ? Number(cursor) : 0;
-    const result = await this.client.from("stories").select("*").in("lifecycle", publishedLifecycles).eq("mode", "current").order("published_at", { ascending: false }).range(offset, offset + safeLimit);
+    const result = await this.client.from("stories").select("*").is("trashed_at", null).in("lifecycle", publishedLifecycles).eq("mode", "current").is("needs_review_at", null).order("published_at", { ascending: false }).range(offset, offset + safeLimit);
     const rows = assertResult(result, "List current stories");
     const hasMore = rows.length > safeLimit;
     return { items: rows.slice(0, safeLimit).map(mapStoryRow), nextCursor: hasMore ? String(offset + safeLimit) : null };

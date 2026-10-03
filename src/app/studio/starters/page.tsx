@@ -10,7 +10,7 @@ import styles from "../studio.module.css";
 export default async function StartersPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const runtime = await authorizedStudioRuntime("/studio/starters");
   const query = await searchParams;
-  const existing = await runtime.client.from("stories").select("starter_key,slug,cluster_id,lifecycle").in("starter_key", SEVEN_LANE_STARTERS.map((item) => item.key));
+  const existing = await runtime.client.from("stories").select("starter_key,slug,cluster_id,lifecycle,trashed_at").in("starter_key", SEVEN_LANE_STARTERS.map((item) => item.key));
   if (existing.error) throw new Error("Could not load starter drafts");
   return <main id="main-content" className={styles.main}>
     <Link className={styles.reviewLink} href="/studio">← Back to Studio</Link>
@@ -20,6 +20,7 @@ export default async function StartersPage({ searchParams }: { searchParams: Pro
     <StatusNotice error={query.error} />
     {SEVEN_LANE_STARTERS.map((starter) => {
       const saved = existing.data.find((row) => row.starter_key === starter.key);
+      if (saved?.trashed_at) return null;
       return <section key={starter.key} className={styles.starterCard}>
         <p className={styles.kicker}>{CULTURE_BEATS.find((beat) => beat.id === starter.key || (beat.id === "tech-gaming" && starter.key === "gaming-tech"))?.label ?? starter.key}</p>
         <h2>{starter.draft.title}</h2><p className={styles.starterHook}>{starter.draft.hook}</p>

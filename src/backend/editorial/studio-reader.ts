@@ -13,16 +13,18 @@ export class StudioReader {
   constructor(private readonly client: SupabaseClient<Database>, private readonly now: () => number = Date.now) {}
 
   async dashboard(): Promise<StudioDashboardData> {
-    const [clusters, niches, sources, failures, runs, links, recentSignals] = await Promise.all([
-      this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, state, editorial_stage, last_checked_at, sensitive_flags").in("state", ["detected", "reviewing"]).order("heat", { ascending: false }).limit(50),
+    const [clusters, niches, sources, failures, runs, links, recentSignals, working] = await Promise.all([
+      this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, state, editorial_stage, last_checked_at, sensitive_flags").is("trashed_at", null).in("state", ["detected", "reviewing"]).order("heat", { ascending: false }).limit(50),
       this.client.from("niches").select("id, name"),
       this.client.from("source_definitions").select("id, name, adapter_type, watchlist_beat, active, last_polled_at, poll_minutes, trust_tier, config").order("name"),
       this.client.from("source_failures").select("source_definition_id").is("resolved_at", null),
       this.client.from("ingestion_runs").select("id, status, started_at, inserted_count, error_count").order("started_at", { ascending: false }).limit(20),
       this.client.from("cluster_signals").select("cluster_id, raw_signal_id"),
       this.client.from("raw_signals").select("id, title, canonical_url, source_name, source_type, suggested_niche_id, region, observed_at, availability").eq("availability", "available").order("observed_at", { ascending: false }).limit(8),
+      this.client.from("editorial_working_drafts").select("candidate_id, content"),
     ]);
-    [clusters, niches, sources, failures, runs, links, recentSignals].forEach((result) => check("Load studio dashboard", result.error));
+    [clusters, niches, sources, failures, runs, links, recentSignals, working].forEach((result) => check("Load studio dashboard", result.error));
+    const workingByCandidate = new Map((working.data ?? []).map(row => [row.candidate_id, row.content as unknown as Partial<StoryDraft>]));
     const nicheNames = new Map((niches.data ?? []).map((row) => [row.id, row.name]));
     const failureCounts = new Map<string, number>();
     (failures.data ?? []).forEach((row) => failureCounts.set(row.source_definition_id, (failureCounts.get(row.source_definition_id) ?? 0) + 1));
@@ -32,7 +34,7 @@ export class StudioReader {
     return {
       niches: (niches.data ?? []).map((row) => ({ id: row.id, name: row.name })),
       candidates: (clusters.data ?? []).map((row) => ({
-        id: row.id, title: row.title, nicheName: row.niche_id ? nicheNames.get(row.niche_id) ?? "Unassigned" : "Unassigned",
+        id: row.id, title: workingByCandidate.get(row.id)?.title ?? row.title, nicheName: nicheNames.get(workingByCandidate.get(row.id)?.nicheId ?? row.niche_id ?? "") ?? "Unassigned",
         heat: Number(row.heat), confidence: Number(row.confidence), state: row.editorial_stage,
         sourceCount: signalCounts.get(row.id) ?? 0, lastCheckedAt: row.last_checked_at, sensitiveFlags: row.sensitive_flags,
       })),
@@ -101,7 +103,7 @@ export class StudioReader {
   }
 
   async candidate(id: string): Promise<StudioCandidateDetail | null> {
-    const cluster = await this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, sensitive_flags, editorial_version").eq("id", id).maybeSingle();
+    const cluster = await this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, sensitive_flags, editorial_version, trashed_at").eq("id", id).maybeSingle();
     check("Load studio candidate", cluster.error);
     if (!cluster.data) return null;
     const links = await this.client.from("cluster_signals").select("raw_signal_id").eq("cluster_id", id);
@@ -122,10 +124,13 @@ export class StudioReader {
       : { data: [], error: null };
     check("Load revision history", revisions.error);
     return {
-      id: cluster.data.id, title: cluster.data.title, nicheId: cluster.data.niche_id,
+      id: cluster.data.id, title: (working.data?.content as unknown as Partial<StoryDraft>)?.title ?? cluster.data.title, nicheId: (working.data?.content as unknown as Partial<StoryDraft>)?.nicheId ?? cluster.data.niche_id,
       heat: Number(cluster.data.heat), confidence: Number(cluster.data.confidence), sensitiveFlags: cluster.data.sensitive_flags,
       evidence: (signals.data ?? []).map((row) => ({ id: row.id, title: row.title, sourceName: row.source_name, sourceUrl: row.canonical_url, trustTier: row.trust_tier, availability: row.availability })),
       revisions: (revisions.data ?? []).map((row) => ({ revision: row.revision, createdAt: row.created_at, editorId: row.editor_id })),
+      trashedAt: cluster.data.trashed_at,
+      everPublished: Boolean(story.data?.original_published_at),
+      needsReviewReason: story.data?.needs_review_reason,
       editorialVersion: cluster.data.editorial_version ?? 0,
       mediaId: working.data ? (working.data.content as unknown as StoryDraft).mediaId ?? null : story.data?.media_id ?? null,
       storyLifecycle: story.data?.lifecycle,

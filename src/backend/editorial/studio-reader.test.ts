@@ -100,3 +100,9 @@ describe("StudioReader", () => {
     ]);
   });
 });
+
+it("shows private working title and niche in dashboard and candidate header", async()=>{
+ const data={...fixtures,editorial_working_drafts:[{candidate_id:"cluster-1",revision:2,content:{title:"Working title",nicheId:"books"}}]};
+ expect((await new StudioReader(clientFor(data)).dashboard()).candidates[0]).toMatchObject({title:"Working title",nicheName:"Books"});
+ expect(await new StudioReader(clientFor(data)).candidate("cluster-1")).toMatchObject({title:"Working title",nicheId:"books"});
+});

@@ -37,7 +37,7 @@ end; $$;
 reset role;
 -- Full versioned publication/schedule contract against a real starter's retained receipts.
 do $$
-declare c uuid; reviewer uuid := '00000000-0000-0000-0000-000000000401'; draft jsonb; v integer; result record; original_slug text; original_date timestamptz; schedule timestamptz := now()+interval '1 day'; snapshot jsonb; blocked boolean:=false;
+declare c uuid; reviewer uuid := '00000000-0000-0000-0000-000000000401'; draft jsonb; v integer; result record; initial_slug text; original_date timestamptz; schedule timestamptz := now()+interval '1 day'; snapshot jsonb; blocked boolean:=false;
 begin
  select s.cluster_id into c from public.stories s where starter_key='books';
  select value->'draft' into draft from test_starters,jsonb_array_elements(content) where value->>'key'='books';
@@ -56,13 +56,13 @@ begin
  select * into result from public.approve_editorial_version(c,reviewer,draft,result.revision,'story',null,'cancel_schedule');
  if exists(select 1 from public.stories where cluster_id=c and scheduled_for is not null) then raise exception 'Explicit schedule cancellation failed'; end if;
  select * into result from public.approve_editorial_version(c,reviewer,draft,result.revision,'story');
- select slug,published_at into original_slug,original_date from public.stories where cluster_id=c;
+ select slug,published_at into initial_slug,original_date from public.stories where cluster_id=c;
  select to_jsonb(s) into snapshot from public.stories s where cluster_id=c;
  perform * from public.save_editorial_working_draft(c,reviewer,draft || '{"title":"Private live title"}'::jsonb,result.revision);
  if (select to_jsonb(s) from public.stories s where cluster_id=c)<>snapshot then raise exception 'Save changed live version'; end if;
  select editorial_version into v from public.topic_clusters where id=c;
  select * into result from public.approve_editorial_version(c,reviewer,draft || '{"title":"Approved live title","slug":"attempted-new-url"}'::jsonb,v,'story');
- if not exists(select 1 from public.stories where cluster_id=c and title='Approved live title' and slug=original_slug and published_at=original_date) then raise exception 'Live update lost original URL/date'; end if;
+ if not exists(select 1 from public.stories where cluster_id=c and title='Approved live title' and slug=initial_slug and published_at=original_date) then raise exception 'Live update lost original URL/date'; end if;
  -- An approval error must leave both working/public/version untouched.
  select to_jsonb(s) into snapshot from public.stories s where cluster_id=c;
  blocked:=false;

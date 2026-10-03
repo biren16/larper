@@ -63,7 +63,7 @@ export async function buildTopicDetail(
   slug: string,
 ): Promise<TopicDetailViewModel | null> {
   const topic = await repository.getTopicBySlug(slug);
-  if (!topic) return null;
+  if (!topic || topic.status !== "published") return null;
 
   const [niches, topics, media, sources] = await Promise.all([
     repository.listNiches(),

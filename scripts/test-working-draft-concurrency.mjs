@@ -7,8 +7,8 @@ const run=(command,args,options={})=>{const r=spawnSync(command,args,{encoding:'
 run('createdb',[database]); const env={...process.env,PGDATABASE:database};
 try {
  const files=readdirSync(new URL('../supabase/migrations/',import.meta.url)).filter(f=>f.endsWith('.sql')).sort();
- const old=files.filter(f=>f!=='202610030002_editorial_working_snapshots.sql').map(f=>read(`supabase/migrations/${f}`).replace(/^create extension if not exists (pg_cron|pg_net).*;$/gm,'')).join('\n');
- const sql=`${read('supabase/tests/fresh-platform-stubs.sql.inc')}\n${old}\n${read('supabase/seed.sql')}\ncreate temporary table before_stories as select id,to_jsonb(s) snapshot from stories s;\n${read('supabase/migrations/202610030002_editorial_working_snapshots.sql')}\ndo $$ begin if exists(select 1 from before_stories b join stories s using(id) where b.snapshot<>to_jsonb(s)) then raise exception 'Backfill modified stories'; end if; end $$;\ninsert into topic_clusters(id,title,state) values('00000000-0000-0000-0000-000000000091','Concurrent draft','reviewing'); commit;`;
+ const old=files.filter(f=>f<'202610030002_editorial_working_snapshots.sql').map(f=>read(`supabase/migrations/${f}`).replace(/^create extension if not exists (pg_cron|pg_net).*;$/gm,'')).join('\n');
+ const sql=`${read('supabase/tests/fresh-platform-stubs.sql.inc')}\n${old}\n${read('supabase/seed.sql')}\ncreate temporary table before_stories as select id,to_jsonb(s) snapshot from stories s;\n${files.filter(f=>f>='202610030002_editorial_working_snapshots.sql').map(f=>read(`supabase/migrations/${f}`)).join('\n')}\ndo $$ begin if exists(select 1 from before_stories b join stories s using(id) where b.snapshot<>to_jsonb(s)) then raise exception 'Backfill modified stories'; end if; end $$;\ninsert into topic_clusters(id,title,state) values('00000000-0000-0000-0000-000000000091','Concurrent draft','reviewing'); commit;`;
  run('psql',['-v','ON_ERROR_STOP=1'],{env,input:sql});
  const first=spawn('psql',['-v','ON_ERROR_STOP=1','-At'],{env,stdio:['pipe','pipe','pipe']});
  let errors='';first.stderr.on('data',chunk=>errors+=chunk);

@@ -30,7 +30,7 @@ export function rankCurrentTopics(
   followedNicheIds: ReadonlySet<string>,
 ): RankedTopic[] {
   return topics
-    .filter((topic) => topic.status === "published" && topic.mode === "current")
+    .filter((topic) => topic.status === "published" && topic.mode === "current" && !topic.needsReviewAt)
     .map((topic) => {
       const topicSignals = signalsForTopic(sourceSignals, topic.id);
       const evidenceScore = calculateEvidenceScore(topicSignals);

@@ -55,6 +55,7 @@ export interface TopicSignals {
 }
 
 export interface DiscoveryTopic {
+  needsReviewAt?: string;
   id: string;
   slug: string;
   nicheId: string;

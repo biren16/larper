@@ -19,6 +19,10 @@ export interface StudioCandidateDetail {
   confidence: number;
   sensitiveFlags: string[];
   evidence: Array<{ id: string; title: string; sourceName: string; sourceUrl: string; trustTier: string; availability: string }>;
+  trashedAt?: string | null;
+  everPublished?: boolean;
+  needsReviewReason?: string | null;
+  returnTo?: string;
   revisions?: Array<{ revision: number; createdAt: string; editorId: string }>;
   mediaId?: string | null;
   draft?: StoryDraft;
@@ -83,6 +87,8 @@ export function StoryEditor({
       </header>
 
       {candidate.sensitiveFlags.length > 0 && <div className={styles.alert} role="alert"><strong>Mandatory review</strong><span>{candidate.sensitiveFlags.join(", ")}</span></div>}
+      <p><Link href={candidate.returnTo ?? "/studio/posts"}>Back to Posts</Link> · <Link href={`/studio/candidates/${candidate.id}/history?returnTo=${encodeURIComponent(candidate.returnTo ?? "/studio/posts")}`}>Activity and revision differences</Link></p>
+      {candidate.needsReviewReason && <p role="status">Needs review: {candidate.needsReviewReason}</p>}
       {published && draft?.slug && <p><Link href={`/discover/${draft.slug}`}>View public story</Link> · Writing edits are private until you update the live post.</p>}
       <StatusNotice notice={notice} />
       <p role="status" aria-live="polite">{protection.status}</p>
@@ -96,8 +102,8 @@ export function StoryEditor({
             const target=event.target as unknown as HTMLInputElement;
             const form=event.currentTarget;
             const slug=form.elements.namedItem("slug") as HTMLInputElement;
-            if (!published && target.name === "slug") slug.dataset.manual="true";
-            if (!published && target.name === "title" && !draft?.slug && slug.dataset.manual !== "true") slug.value=target.value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+            if (!published && !candidate.everPublished && target.name === "slug") slug.dataset.manual="true";
+            if (!published && !candidate.everPublished && target.name === "title" && !draft?.slug && slug.dataset.manual !== "true") slug.value=target.value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
             protection.changed();
           }} onSubmit={event => {
             event.preventDefault();
@@ -128,7 +134,7 @@ export function StoryEditor({
             <legend>Classification</legend>
             <div className={styles.twoCol}>
               <label>Niche ID<input name="nicheId" required defaultValue={draft?.nicheId ?? candidate.nicheId ?? ""} /></label>
-              <label>Slug<input readOnly={published} name="slug" defaultValue={draft?.slug ?? ""} required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
+              <label>Slug<input readOnly={published || candidate.everPublished} name="slug" defaultValue={draft?.slug ?? ""} required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
             </div>
             <div className={styles.twoCol}>
               <label>Discovery type<select name="discoveryType" defaultValue={draft?.discoveryType ?? "TREND"}><option>TREND</option><option>MEME</option><option>DROP</option><option>LORE</option><option>DEBATE</option><option>COMEBACK</option><option>PRODUCT</option><option>EVENT</option><option>PERSON</option><option>AESTHETIC</option><option>DRAMA</option><option>RABBIT_HOLE</option></select></label>

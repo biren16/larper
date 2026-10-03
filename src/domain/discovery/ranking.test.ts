@@ -100,3 +100,9 @@ describe("discovery ranking", () => {
     expect(ranked.map(({ topic: item }) => item.id)).toEqual(["high", "low"]);
   });
 });
+
+it("keeps needs-review current stories out of current rankings without moving them into lore",()=>{
+ const ageing={...topic(),needsReviewAt:"2026-10-01",mode:"current" as const};
+ expect(rankCurrentTopics([ageing],[],new Set())).toEqual([]);
+ expect(rankDeepLore([ageing],[])).toEqual([]);
+});
