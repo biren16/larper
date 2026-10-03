@@ -130,7 +130,7 @@ export function HeaderMenu({ account, signOutAction }: HeaderMenuProps) {
                 <span className={styles.accountIdentity} title={account.label}>{account.label}</span>
                 <div className={styles.accountActions}>
                   {account.canOpenStudio && <Link href="/studio" onClick={closeMenu}>Open Studio</Link>}
-                  {signOutAction && <form action={signOutAction}><button type="submit">Sign out</button></form>}
+                  {signOutAction && <form action={signOutAction} onSubmit={() => { for (const key of Object.keys(sessionStorage)) if (key.startsWith("larper-draft:")) sessionStorage.removeItem(key); }}><button type="submit">Sign out</button></form>}
                 </div>
               </div>
             )}

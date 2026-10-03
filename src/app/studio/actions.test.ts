@@ -111,7 +111,7 @@ describe("uploadEditorialMediaAction", () => {
     const form = new FormData();
     form.set("candidateId", "00000000-0000-0000-0000-000000000101");
     form.set("image", new File(["not a webp"], "cover.png", { type: "image/png" }));
-    await expect(uploadEditorialMediaAction(form)).rejects.toThrow(/redirect:.*Upload%20a%20WebP/);
+    await expect(uploadEditorialMediaAction(form)).resolves.toMatchObject({ ok: false, error: expect.stringContaining("WebP") });
     expect(upload).not.toHaveBeenCalled();
   });
 
@@ -132,7 +132,7 @@ describe("uploadEditorialMediaAction", () => {
     form.set("licenseCode", "permission");
     form.set("commercialUseAllowed", "on");
     const { uploadEditorialMediaAction } = await import("./actions");
-    await expect(uploadEditorialMediaAction(form)).rejects.toThrow(/notice=image-uploaded/);
+    await expect(uploadEditorialMediaAction(form)).resolves.toMatchObject({ ok: true, mediaId: expect.any(String) });
     expect(upload).toHaveBeenCalledOnce();
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({
       alt: "Race car at the circuit", credit_line: "Photo by Artist",
@@ -152,12 +152,12 @@ describe("candidate action notices", () => {
     const { publishCandidateAction } = await import("./actions");
     const story = new FormData();
     story.set("candidateId", "cluster-1");
-    await expect(publishCandidateAction(story)).rejects.toThrow("redirect:/studio?notice=story-published");
+    await expect(publishCandidateAction(story)).resolves.toMatchObject({ ok: true, destination: "/studio?notice=story-published" });
 
     const brief = new FormData();
     brief.set("candidateId", "cluster-1");
     brief.set("format", "brief");
-    await expect(publishCandidateAction(brief)).rejects.toThrow("redirect:/studio?notice=brief-published");
+    await expect(publishCandidateAction(brief)).resolves.toMatchObject({ ok: true, destination: "/studio?notice=brief-published" });
   });
 });
 

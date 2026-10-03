@@ -8,15 +8,17 @@ import type { BriefDraft, CandidateRecord, EditorialActor, StoryDraft } from "./
 
 export interface PublicationCommand {
   candidateId: string;
+  expectedVersion?: number;
   reviewerId: string;
   lifecycle: Extract<TopicLifecycle, "published_story" | "published_brief">;
   publicationFormat: PublicationFormat;
   draft: StoryDraft | BriefDraft;
 }
 
-export interface DraftCommand { candidateId: string; reviewerId: string; draft: StoryDraft; }
+export interface DraftCommand { expectedVersion?: number; candidateId: string; reviewerId: string; draft: StoryDraft; }
 
 export interface ReviewEvent {
+  expectedVersion?: number;
   candidateId: string;
   reviewerId: string;
   action: string;
@@ -24,6 +26,8 @@ export interface ReviewEvent {
 }
 
 export interface EditorialStore {
+  createWorkingStory?(reviewerId: string): Promise<string>;
+  changeSchedule?(command: DraftCommand & { operation: "cancel_schedule" | "update_schedule" }): Promise<{storyId: string; revision: number}>;
   commitStarterDraft(command: { reviewerId: string; starter: StarterDraft }): Promise<string>;
   getSourceDefinition(id: string): Promise<SourceDefinition | null>;
   commitDraft(command: DraftCommand): Promise<{ storyId: string; revision: number }>;
@@ -36,6 +40,13 @@ export interface EditorialStore {
   splitCluster(clusterId: string, signalIds: string[], reviewerId: string): Promise<string>;
   addManualSignal(signal: NormalizedSignal): Promise<string>;
   schedulePublication(command: PublicationCommand & { scheduledFor: string }): Promise<{ storyId: string; revision: number }>;
+}
+
+export function validateWorkingDraft(draft: StoryDraft) {
+ if (draft.slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(draft.slug)) throw new Error("Slug must contain lowercase words separated by hyphens");
+ for (const [key, value] of Object.entries(draft)) {
+  if (typeof value === "string" && value.length > 100000) throw new Error(`${key} is too long`);
+ }
 }
 
 const REQUIRED_STORY_FIELDS: Array<keyof StoryDraft> = [
@@ -93,6 +104,11 @@ export class EditorialService {
     return { actor, candidate };
   }
 
+  async createWorkingStory(actor: EditorialActor | null) {
+    assertEditorialAccess(actor, this.allowlistedEmails);
+    if (!this.store.createWorkingStory) throw new Error("Story creation unavailable");
+    return this.store.createWorkingStory(actor.id);
+  }
   async prepareStarterDraft(actor: EditorialActor | null, key: string, receiptsChecked: boolean) {
     assertEditorialAccess(actor, this.allowlistedEmails);
     if (!receiptsChecked) throw new Error("Open both source receipts before importing this draft");
@@ -101,14 +117,13 @@ export class EditorialService {
     return this.store.commitStarterDraft({ reviewerId: actor.id, starter });
   }
 
-  async saveDraft(actor: EditorialActor | null, candidateId: string, draft: StoryDraft) {
+  async saveDraft(actor: EditorialActor | null, candidateId: string, draft: StoryDraft, expectedVersion?: number) {
     const context = await this.candidate(actor, candidateId);
-    if (!["detected", "reviewing"].includes(context.candidate.state)) throw new Error("Draft saves require an unpublished candidate");
-    validateStory(draft);
-    return this.store.commitDraft({ candidateId, reviewerId: context.actor.id, draft: { ...draft, independentSourcesConfirmed: false } });
+    validateWorkingDraft(draft);
+    return this.store.commitDraft({ candidateId, expectedVersion, reviewerId: context.actor.id, draft: { ...draft, independentSourcesConfirmed: false } });
   }
 
-  async publishStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft) {
+  async publishStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft, expectedVersion?: number) {
     const context = await this.candidate(actor, candidateId);
     validateStory(draft);
     confirmIndependentOrigins(draft.independentSourcesConfirmed);
@@ -118,7 +133,7 @@ export class EditorialService {
       throw new Error("A factual story requires at least one credible source");
     }
     const result = await this.store.commitPublication({
-      candidateId,
+      candidateId, expectedVersion,
       reviewerId: context.actor.id,
       lifecycle: "published_story",
       publicationFormat: "story",
@@ -127,7 +142,7 @@ export class EditorialService {
     return result;
   }
 
-  async scheduleStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft, scheduledFor: string, now: string) {
+  async scheduleStory(actor: EditorialActor | null, candidateId: string, draft: StoryDraft, scheduledFor: string, now: string, expectedVersion?: number) {
     const context = await this.candidate(actor, candidateId);
     if (!["detected", "reviewing"].includes(context.candidate.state)) throw new Error("Scheduling requires an unpublished candidate; unpublish first");
     validateStory(draft);
@@ -138,13 +153,25 @@ export class EditorialService {
     const target = Date.parse(scheduledFor);
     if (!Number.isFinite(target) || target <= Date.parse(now)) throw new Error("Scheduled publication must be in the future");
     const result = await this.store.schedulePublication({
-      candidateId, reviewerId: context.actor.id, lifecycle: "published_story", publicationFormat: "story", draft,
+      candidateId, expectedVersion, reviewerId: context.actor.id, lifecycle: "published_story", publicationFormat: "story", draft,
       scheduledFor: new Date(target).toISOString(),
     });
     return result;
   }
 
-  async publishBrief(actor: EditorialActor | null, candidateId: string, draft: BriefDraft) {
+  async changeSchedule(actor: EditorialActor | null, candidateId: string, draft: StoryDraft, expectedVersion: number, operation: "cancel_schedule" | "update_schedule") {
+    const context = await this.candidate(actor, candidateId);
+    if (operation === "update_schedule") {
+      validateStory(draft); confirmIndependentOrigins(draft.independentSourcesConfirmed);
+      const evidence = [...independentEvidence(context.candidate)];
+      if (evidence.length < 2) throw new Error("A story requires two independent available sources");
+      if (!evidence.some(item => ["primary", "publication"].includes(item.trustTier))) throw new Error("A factual story requires at least one credible source");
+    }
+    if (!this.store.changeSchedule) throw new Error("Schedule changes unavailable");
+    return this.store.changeSchedule({ candidateId, reviewerId: context.actor.id, draft, expectedVersion, operation });
+  }
+
+  async publishBrief(actor: EditorialActor | null, candidateId: string, draft: BriefDraft, expectedVersion?: number) {
     const context = await this.candidate(actor, candidateId);
     validateBrief(draft);
     confirmIndependentOrigins(draft.independentSourcesConfirmed);
@@ -158,7 +185,7 @@ export class EditorialService {
     });
     if (!eligibility.eligible) throw new Error(`Brief cannot publish: ${eligibility.reasons.join(", ")}`);
     const result = await this.store.commitPublication({
-      candidateId,
+      candidateId, expectedVersion,
       reviewerId: context.actor.id,
       lifecycle: "published_brief",
       publicationFormat: "brief",
@@ -167,15 +194,15 @@ export class EditorialService {
     return result;
   }
 
-  private async transition(actor: EditorialActor | null, candidateId: string, state: TopicLifecycle, action: string, notes: string) {
+  private async transition(actor: EditorialActor | null, candidateId: string, state: TopicLifecycle, action: string, notes: string, expectedVersion?: number) {
     const context = await this.candidate(actor, candidateId);
     if (!notes.trim()) throw new Error("A review note is required");
-    await this.store.commitTransition({ candidateId, reviewerId: context.actor.id, state, action, notes: notes.trim() });
+    await this.store.commitTransition({ candidateId, reviewerId: context.actor.id, state, action, expectedVersion, notes: notes.trim() });
   }
 
-  reject(actor: EditorialActor | null, candidateId: string, notes: string) { return this.transition(actor, candidateId, "rejected", "reject", notes); }
-  expire(actor: EditorialActor | null, candidateId: string, notes: string) { return this.transition(actor, candidateId, "expired", "expire", notes); }
-  unpublish(actor: EditorialActor | null, candidateId: string, notes: string) { return this.transition(actor, candidateId, "reviewing", "unpublish", notes); }
+  reject(actor: EditorialActor | null, candidateId: string, notes: string, expectedVersion?: number) { return this.transition(actor, candidateId, "rejected", "reject", notes, expectedVersion); }
+  expire(actor: EditorialActor | null, candidateId: string, notes: string, expectedVersion?: number) { return this.transition(actor, candidateId, "expired", "expire", notes, expectedVersion); }
+  unpublish(actor: EditorialActor | null, candidateId: string, notes: string, expectedVersion?: number) { return this.transition(actor, candidateId, "reviewing", "unpublish", notes, expectedVersion); }
 
   async merge(actor: EditorialActor | null, targetId: string, sourceId: string) {
     const target = await this.candidate(actor, targetId);

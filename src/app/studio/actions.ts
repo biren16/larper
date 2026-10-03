@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createEditorialActions, storyDraftFromForm, editorialDate } from "@/backend/editorial/actions";
+import { createEditorialActions, storyDraftFromForm, editorialDate, editorialVersionFromForm } from "@/backend/editorial/actions";
 import { getEditorialRuntime } from "@/backend/editorial/runtime";
 import { invalidatePublicDiscovery } from "@/backend/editorial/cache-invalidation";
 import { CULTURE_BEATS, CULTURE_SOURCE_PRESETS, hasUsageReview, validateUsageReview } from "@/backend/ingestion/source-catalog";
@@ -13,7 +13,7 @@ import { validateEditorialUpload, validateMediaRights } from "@/backend/media/up
 export async function uploadEditorialMediaAction(form: FormData) {
   const runtime = await getEditorialRuntime();
   const candidateId = String(form.get("candidateId") ?? "").trim();
-  const destination = `/studio/candidates/${encodeURIComponent(candidateId)}`;
+
   try {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(candidateId)) throw new Error("A valid candidate is required");
     const file = form.get("image");
@@ -43,20 +43,16 @@ export async function uploadEditorialMediaAction(form: FormData) {
       await bucket.remove([objectPath]);
       throw new Error(`Image record failed: ${recorded.error.message}`);
     }
+    return { ok: true as const, mediaId: id };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Could not upload image";
-    redirect(`${destination}?error=${encodeURIComponent(message)}`);
+    return { ok: false as const, error: error instanceof Error ? error.message : "Could not upload image" };
   }
-  redirect(`${destination}?notice=image-uploaded`);
 }
 
 export async function saveCandidateDraftAction(form: FormData) {
   const runtime = await getEditorialRuntime();
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString() });
-  const destination = `/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}`;
-  const result = await actions.saveDraft(form);
-  if (!result.ok) redirect(`${destination}?error=${encodeURIComponent(result.error)}`);
-  redirect(`${destination}?notice=draft-saved`);
+  return actions.saveDraft(form);
 }
 
 export async function publishCandidateAction(form: FormData) {
@@ -64,20 +60,25 @@ export async function publishCandidateAction(form: FormData) {
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString(), invalidatePublicContent: invalidatePublicDiscovery });
   const isBrief = form.get("format") === "brief";
   const result = isBrief ? await actions.publishBrief(form) : await actions.publishStory(form);
-  if (!result.ok) redirect(`/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}?error=${encodeURIComponent(result.error)}`);
-  redirect(`/studio?notice=${isBrief ? "brief-published" : "story-published"}`);
+  return { ...result, ...(!result.ok ? { conflict: result.error.includes("EDITORIAL_CONFLICT") } : { destination: `/studio?notice=${isBrief ? "brief-published" : "story-published"}` }) };
 }
 
 export async function scheduleCandidateAction(form: FormData) {
   const runtime = await getEditorialRuntime();
-  const scheduledFor = editorialDate(String(form.get("scheduledFor") ?? "").trim());
   try {
-    await runtime.service.scheduleStory(runtime.actor, String(form.get("candidateId") ?? ""), storyDraftFromForm(form), scheduledFor, new Date().toISOString());
+    const version = editorialVersionFromForm(form);
+    if (version === undefined) throw new Error("Editorial version is required");
+    const candidateId = String(form.get("candidateId") ?? "");
+    const operation = String(form.get("intent") ?? "schedule");
+    const draft = storyDraftFromForm(form, operation === "cancel_schedule");
+    const result = operation === "cancel_schedule" || operation === "update_schedule"
+      ? await runtime.service.changeSchedule(runtime.actor, candidateId, draft, version, operation)
+      : await runtime.service.scheduleStory(runtime.actor, candidateId, draft, editorialDate(String(form.get("scheduledFor") ?? "")), new Date().toISOString(), version);
+    return { ok: true as const, revision: result.revision, destination: "/studio?notice=story-scheduled" };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not schedule story";
-    redirect(`/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}?error=${encodeURIComponent(message)}`);
+    return { ok: false as const, error: message, conflict: message.includes("EDITORIAL_CONFLICT") };
   }
-  redirect("/studio?notice=story-scheduled");
 }
 
 export async function addManualSignalAction(form: FormData) {
@@ -153,9 +154,9 @@ export async function transitionCandidateAction(form: FormData) {
   const runtime = await getEditorialRuntime();
   const actions = createEditorialActions({ service: runtime.service, getActor: async () => runtime.actor, now: () => new Date().toISOString(), invalidatePublicContent: invalidatePublicDiscovery });
   const result = await actions.transition(form);
-  if (!result.ok) redirect(`/studio/candidates/${encodeURIComponent(String(form.get("candidateId") ?? ""))}?error=${encodeURIComponent(result.error)}`);
+  if (!result.ok) return result;
   const notice = form.get("action") === "reject" ? "candidate-rejected" : form.get("action") === "expire" ? "candidate-expired" : "story-unpublished";
-  redirect(`/studio?notice=${notice}`);
+  return { ok: true as const, destination: `/studio?notice=${notice}` };
 }
 
 export async function mergeCandidateAction(form: FormData) {
@@ -207,4 +208,10 @@ export async function prepareStarterDraftAction(form: FormData) {
     redirect(`/studio/starters?error=${encodeURIComponent(error instanceof Error ? error.message : "Could not prepare starter draft")}`);
   }
   redirect(`/studio/candidates/${encodeURIComponent(candidateId)}?notice=draft-saved`);
+}
+
+export async function createPrivateStoryAction() {
+ const runtime=await getEditorialRuntime();
+ const id=await runtime.service.createWorkingStory(runtime.actor);
+ redirect(`/studio/candidates/${id}`);
 }

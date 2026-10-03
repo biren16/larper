@@ -10,12 +10,13 @@ type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
 export interface Database {
   public: {
     Tables: {
+      editorial_working_drafts: Table<{ candidate_id: string; content: Json; revision: number; editor_id: string | null; created_at: string; updated_at: string }>;
       niches: Table<{ id: string; slug: string; name: string; description: string; curiosity_hook: string; parent_category: string; related_niche_ids: string[]; hero_media_id: string | null; status: string; origin: string; created_at: string; updated_at: string }>;
       media_assets: Table<{ id: string; src: string; alt: string; width: number; height: number; focal_position: string | null; kind: string; source_url: string | null; credit_line: string | null; license_code: string | null; commercial_use_allowed: boolean; modification_allowed: boolean; social_use_allowed: boolean; object_path: string | null; created_at: string }>;
       source_definitions: Table<{ id: string; name: string; adapter_type: string; config: Json; trust_tier: string; locale: string; region: string; poll_minutes: number; allowlisted: boolean; active: boolean; watchlist_beat: string | null; last_polled_at: string | null; created_at: string; updated_at: string }>;
       raw_signals: Table<{ id: string; source_definition_id: string; canonical_url: string; external_id: string | null; source_type: string; source_name: string; author: string | null; title: string; body: string | null; locale: string; region: string; suggested_niche_id: string | null; published_at: string; observed_at: string; trust_tier: string; availability: string; metrics: Json; sensitive_flags: string[]; created_at: string; updated_at: string }>;
       signal_snapshots: Table<{ id: string; raw_signal_id: string; metrics: Json; captured_at: string }>;
-      topic_clusters: Table<{ id: string; niche_id: string | null; title: string; normalized_terms: string[]; regions: string[]; state: string; editorial_stage: string; momentum: number; source_diversity: number; freshness: number; novelty: number; india_relevance: number; crossover: number; heat: number; confidence: number; sensitive_flags: string[]; first_detected_at: string; last_checked_at: string; expires_at: string | null; created_at: string; updated_at: string }>;
+      topic_clusters: Table<{ editorial_version: number; id: string; niche_id: string | null; title: string; normalized_terms: string[]; regions: string[]; state: string; editorial_stage: string; momentum: number; source_diversity: number; freshness: number; novelty: number; india_relevance: number; crossover: number; heat: number; confidence: number; sensitive_flags: string[]; first_detected_at: string; last_checked_at: string; expires_at: string | null; created_at: string; updated_at: string }>;
       cluster_signals: Table<{ cluster_id: string; raw_signal_id: string; match_score: number; match_reasons: string[]; created_at: string }>;
       stories: Table<{ starter_key: string | null; id: string; cluster_id: string | null; niche_id: string; slug: string; title: string; hook: string; summary: string; why_it_matters: string; lore: string; beginner_context: string; conversation_line: string; discovery_type: string; mode: string; publication_format: string; lifecycle: string; regions: string[]; freshness_label: string; confidence: number; evidence_summary: string; signals: Json; media_id: string | null; tags: string[]; related_story_ids: string[]; first_detected_at: string; last_updated_at: string; last_checked_at: string; published_at: string | null; scheduled_for: string | null; reviewed_by: string | null; created_at: string; updated_at: string }>;
       story_revisions: Table<{ id: string; story_id: string; revision: number; snapshot: Json; editor_id: string; created_at: string }>;
@@ -30,6 +31,10 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      create_editorial_working_story: { Args: {p_reviewer_id: string}; Returns: string };
+      transition_editorial_version: { Args: { p_candidate_id: string; p_reviewer_id: string; p_state: string; p_action: string; p_notes: string; p_expected_version: number }; Returns: undefined };
+      save_editorial_working_draft: { Args: { p_candidate_id: string; p_reviewer_id: string; p_draft: Json; p_expected_version: number }; Returns: Array<{story_id: string; revision: number}> };
+      approve_editorial_version: { Args: { p_candidate_id: string; p_reviewer_id: string; p_draft: Json; p_expected_version: number; p_format: string; p_scheduled_for?: string; p_operation?: string }; Returns: Array<{story_id: string; revision: number}> };
       merge_editorial_clusters: { Args: { p_target_id: string; p_source_id: string; p_reviewer_id: string }; Returns: undefined };
       split_editorial_cluster: { Args: { p_cluster_id: string; p_signal_ids: string[]; p_reviewer_id: string }; Returns: string };
       ingestion_schedule_evidence: { Args: Record<string, never>; Returns: Json };

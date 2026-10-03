@@ -190,7 +190,7 @@ it("saves a private draft without publication approval", async () => {
   expect(store.drafts).toHaveLength(1);
   await expect(service.saveDraft(null, "cluster-1", draft)).rejects.toThrow();
   store.current.state = "published_story";
-  await expect(service.saveDraft(actor, "cluster-1", draft)).rejects.toThrow("unpublished");
+  await expect(service.saveDraft(actor, "cluster-1", { ...draft, nicheId: "", slug: "", title: "", summary: "" })).resolves.toMatchObject({ revision: 2 });
 });
 
 it("imports only reviewed starter receipts for an authenticated editorial actor", async () => {
@@ -223,4 +223,11 @@ describe("evidence editing guards", () => {
     await expect(service.split(actor, "cluster-1", ["not-linked"])).rejects.toThrow(/belong/);
     expect(store.splits).toHaveLength(0);
   });
+});
+
+it("saves incomplete private edits even on live candidates and carries the expected version", async () => {
+ const store = new MemoryStore(); store.current = candidate({ state: "published_story" });
+ await new EditorialService(store, new Set([actor.email])).saveDraft(actor, "cluster-1", { ...draft, nicheId: "", slug: "", hook: "" }, 7);
+ expect(store.drafts[0]).toMatchObject({ expectedVersion: 7, draft: { nicheId: "", independentSourcesConfirmed: false } });
+ expect(store.publications).toEqual([]);
 });

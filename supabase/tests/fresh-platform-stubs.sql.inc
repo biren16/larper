@@ -1,5 +1,5 @@
 begin;
-create role anon; create role authenticated; create role service_role;
+do $$ declare role_name text; begin foreach role_name in array array['anon','authenticated','service_role'] loop if not exists(select 1 from pg_roles where rolname=role_name) then execute format('create role %I',role_name); end if; end loop; end $$;
 create schema auth; create schema storage; create schema extensions; create schema cron;
 create table auth.users(id uuid primary key, email text, raw_user_meta_data jsonb default '{}');
 create function auth.uid() returns uuid language sql stable as $$select null::uuid$$;

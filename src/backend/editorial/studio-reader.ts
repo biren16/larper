@@ -101,7 +101,7 @@ export class StudioReader {
   }
 
   async candidate(id: string): Promise<StudioCandidateDetail | null> {
-    const cluster = await this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, sensitive_flags").eq("id", id).maybeSingle();
+    const cluster = await this.client.from("topic_clusters").select("id, title, niche_id, heat, confidence, sensitive_flags, editorial_version").eq("id", id).maybeSingle();
     check("Load studio candidate", cluster.error);
     if (!cluster.data) return null;
     const links = await this.client.from("cluster_signals").select("raw_signal_id").eq("cluster_id", id);
@@ -113,6 +113,8 @@ export class StudioReader {
     check("Load studio evidence", signals.error);
     const story = await this.client.from("stories").select("*").eq("cluster_id", id).maybeSingle();
     check("Load candidate story", story.error);
+    const working = await this.client.from("editorial_working_drafts").select("content, revision").eq("candidate_id", id).maybeSingle();
+    check("Load private working draft", working.error);
     const media = await this.client.from("media_assets").select("id, alt, credit_line, kind, commercial_use_allowed").order("created_at", { ascending: false }).limit(100);
     check("Load approved media", media.error);
     const revisions = story.data
@@ -124,10 +126,11 @@ export class StudioReader {
       heat: Number(cluster.data.heat), confidence: Number(cluster.data.confidence), sensitiveFlags: cluster.data.sensitive_flags,
       evidence: (signals.data ?? []).map((row) => ({ id: row.id, title: row.title, sourceName: row.source_name, sourceUrl: row.canonical_url, trustTier: row.trust_tier, availability: row.availability })),
       revisions: (revisions.data ?? []).map((row) => ({ revision: row.revision, createdAt: row.created_at, editorId: row.editor_id })),
-      mediaId: story.data?.media_id ?? null,
+      editorialVersion: cluster.data.editorial_version ?? 0,
+      mediaId: working.data ? (working.data.content as unknown as StoryDraft).mediaId ?? null : story.data?.media_id ?? null,
       storyLifecycle: story.data?.lifecycle,
       scheduledFor: story.data?.scheduled_for,
-      draft: story.data ? {
+      draft: working.data ? working.data.content as unknown as StoryDraft : story.data ? {
         mediaId: story.data.media_id, nicheId: story.data.niche_id, slug: story.data.slug, title: story.data.title,
         hook: story.data.hook, summary: story.data.summary, whyItMatters: story.data.why_it_matters,
         lore: story.data.lore, beginnerContext: story.data.beginner_context, conversationLine: story.data.conversation_line,

@@ -12,6 +12,10 @@ function failure(operation: string, error: { message: string } | null) {
 export class PostgresEditorialStore implements EditorialStore {
   constructor(private readonly client: SupabaseClient<Database>) {}
 
+  async createWorkingStory(reviewerId: string) {
+    const result=await this.client.rpc("create_editorial_working_story", { p_reviewer_id: reviewerId });
+    failure("Create story",result.error); if (!result.data) throw new Error("No candidate returned"); return result.data;
+  }
   async commitStarterDraft(command: { reviewerId: string; starter: import("./starters").StarterDraft }) {
     const result = await this.client.rpc("prepare_starter_draft", { p_reviewer_id: command.reviewerId, p_starter: command.starter as unknown as Json });
     failure("Prepare starter draft", result.error);
@@ -42,6 +46,7 @@ export class PostgresEditorialStore implements EditorialStore {
   }
 
   async commitPublication(command: PublicationCommand) {
+    if (command.expectedVersion !== undefined) return this.approveVersion(command);
     const result = await this.client.rpc("publish_editorial_story", {
       p_candidate_id: command.candidateId, p_reviewer_id: command.reviewerId,
       p_lifecycle: command.lifecycle, p_publication_format: command.publicationFormat,
@@ -53,6 +58,7 @@ export class PostgresEditorialStore implements EditorialStore {
     return { storyId: row.story_id, revision: row.revision };
   }
   async schedulePublication(command: PublicationCommand & { scheduledFor: string }) {
+    if (command.expectedVersion !== undefined) return this.approveVersion(command, command.scheduledFor);
     const result = await this.client.rpc("schedule_editorial_story", {
       p_candidate_id: command.candidateId, p_reviewer_id: command.reviewerId,
       p_draft: command.draft as unknown as Json, p_scheduled_for: command.scheduledFor,
@@ -60,6 +66,26 @@ export class PostgresEditorialStore implements EditorialStore {
     failure("Schedule story", result.error);
     const row = result.data?.[0];
     if (!row) throw new Error("Schedule story: no revision returned");
+    return { storyId: row.story_id, revision: row.revision };
+  }
+  private async approveVersion(command: PublicationCommand, scheduledFor?: string) {
+    const result = await this.client.rpc("approve_editorial_version", {
+      p_candidate_id: command.candidateId, p_reviewer_id: command.reviewerId, p_draft: command.draft as unknown as Json,
+      p_expected_version: command.expectedVersion!, p_format: command.publicationFormat,
+      ...(scheduledFor ? { p_scheduled_for: scheduledFor, p_operation: "schedule" } : {}),
+    });
+    failure("Approve version", result.error);
+    const row = result.data?.[0];
+    if (!row) throw new Error("Approve version: no revision returned");
+    return { storyId: row.story_id, revision: row.revision };
+  }
+  async changeSchedule(command: DraftCommand & { operation: "cancel_schedule" | "update_schedule" }) {
+    const result = await this.client.rpc("approve_editorial_version", {
+      p_candidate_id: command.candidateId, p_reviewer_id: command.reviewerId, p_draft: command.draft as unknown as Json,
+      p_expected_version: command.expectedVersion!, p_format: "story", p_operation: command.operation,
+    });
+    failure("Change schedule", result.error);
+    const row = result.data?.[0]; if (!row) throw new Error("Change schedule: no version returned");
     return { storyId: row.story_id, revision: row.revision };
   }
   async recordReview(event: ReviewEvent) {
@@ -75,7 +101,8 @@ export class PostgresEditorialStore implements EditorialStore {
     }
   }
   async commitTransition(event: ReviewEvent & { state: CandidateRecord["state"] }) {
-    const result = await this.client.rpc("transition_editorial_candidate", {
+    const result = await this.client.rpc(event.expectedVersion === undefined ? "transition_editorial_candidate" : "transition_editorial_version", {
+      ...(event.expectedVersion === undefined ? {} : { p_expected_version: event.expectedVersion }),
       p_candidate_id: event.candidateId, p_reviewer_id: event.reviewerId,
       p_state: event.state, p_action: event.action, p_notes: event.notes ?? "",
     });
@@ -102,7 +129,8 @@ export class PostgresEditorialStore implements EditorialStore {
   }
 
   async commitDraft(command: DraftCommand) {
-    const result = await this.client.rpc("save_editorial_draft", {
+    const result = await this.client.rpc("save_editorial_working_draft", {
+      p_expected_version: command.expectedVersion ?? 0,
       p_candidate_id: command.candidateId, p_reviewer_id: command.reviewerId,
       p_draft: command.draft as unknown as Json,
     });

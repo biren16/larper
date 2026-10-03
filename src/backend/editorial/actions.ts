@@ -14,6 +14,12 @@ function list(form: FormData, key: string): string[] {
   return String(form.get(key) ?? "").split(",").map((value) => value.trim()).filter(Boolean);
 }
 
+function failureDetails(error: unknown) {
+ const text = message(error);
+ const field = /^([a-zA-Z]+) (?:is required|is invalid|is too long)/.exec(text)?.[1];
+ return { error: text, conflict: text.includes("EDITORIAL_CONFLICT"), fieldErrors: field ? { [field]: text } : {}, blockers: [text] };
+}
+
 function message(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong";
 }
@@ -25,30 +31,39 @@ function storyTagsFromForm(form: FormData): string[] {
     ])];
 }
 
-export function storyDraftFromForm(form: FormData): StoryDraft {
+export function storyDraftFromForm(form: FormData, working = false): StoryDraft {
+ const text = (key: string) => working ? String(form.get(key) ?? "") : required(form, key);
   const discoveryType = required(form, "discoveryType") as DiscoveryType;
   const mode = required(form, "mode") as TopicMode;
   if (!DISCOVERY_TYPES.has(discoveryType)) throw new Error("discoveryType is invalid");
   if (mode !== "current" && mode !== "deep-lore") throw new Error("mode is invalid");
   return {
     mediaId: String(form.get("mediaId") ?? "").trim() || null,
-    nicheId: required(form, "nicheId"),
-    slug: required(form, "slug"),
-    title: required(form, "title"),
-    hook: required(form, "hook"),
-    summary: required(form, "summary"),
-    whyItMatters: required(form, "whyItMatters"),
-    lore: required(form, "lore"),
-    beginnerContext: required(form, "beginnerContext"),
-    conversationLine: required(form, "conversationLine"),
+    nicheId: text("nicheId"),
+    slug: text("slug"),
+    title: text("title"),
+    hook: text("hook"),
+    summary: text("summary"),
+    whyItMatters: text("whyItMatters"),
+    lore: text("lore"),
+    beginnerContext: text("beginnerContext"),
+    conversationLine: text("conversationLine"),
     discoveryType,
     mode,
     regions: list(form, "regions"),
-    freshnessLabel: required(form, "freshnessLabel"),
-    evidenceSummary: required(form, "evidenceSummary"),
+    freshnessLabel: text("freshnessLabel"),
+    evidenceSummary: text("evidenceSummary"),
     independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on",
     tags: storyTagsFromForm(form),
   };
+}
+
+export function editorialVersionFromForm(form: FormData): number {
+ const raw = form.get("editorialVersion");
+ if (raw === null) throw new Error("editorialVersion is required");
+ const version = Number(raw);
+ if (!Number.isSafeInteger(version) || version < 0) throw new Error("Invalid editorial version");
+ return version;
 }
 
 export function editorialDate(value: string): string {
@@ -65,18 +80,18 @@ export function createEditorialActions(dependencies: {
   return {
     saveDraft: async (form: FormData) => {
       try {
-        const result = await dependencies.service.saveDraft(await dependencies.getActor(), required(form, "candidateId"), storyDraftFromForm(form));
-        return { ok: true as const, storyId: result.storyId };
-      } catch (error) { return { ok: false as const, error: message(error) }; }
+        const result = await dependencies.service.saveDraft(await dependencies.getActor(), required(form, "candidateId"), storyDraftFromForm(form, true), editorialVersionFromForm(form));
+        return { ok: true as const, storyId: result.storyId, revision: result.revision };
+      } catch (error) { return { ok: false as const, ...failureDetails(error) }; }
     },
     publishStory: async (form: FormData) => {
       try {
         const candidateId = required(form, "candidateId");
-        const result = await dependencies.service.publishStory(await dependencies.getActor(), candidateId, storyDraftFromForm(form));
+        const result = await dependencies.service.publishStory(await dependencies.getActor(), candidateId, storyDraftFromForm(form), editorialVersionFromForm(form));
         await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });
-        return { ok: true as const, storyId: result.storyId };
+        return { ok: true as const, storyId: result.storyId, revision: result.revision };
       } catch (error) {
-        return { ok: false as const, error: message(error) };
+        return { ok: false as const, ...failureDetails(error) };
       }
     },
     publishBrief: async (form: FormData) => {
@@ -91,11 +106,11 @@ export function createEditorialActions(dependencies: {
           evidenceSummary: required(form, "evidenceSummary"),
           independentSourcesConfirmed: form.get("independentSourcesConfirmed") === "on",
           tags: storyTagsFromForm(form),
-        });
+        }, editorialVersionFromForm(form));
         await dependencies.invalidatePublicContent?.({ slug: required(form, "slug") });
-        return { ok: true as const, storyId: result.storyId };
+        return { ok: true as const, storyId: result.storyId, revision: result.revision };
       } catch (error) {
-        return { ok: false as const, error: message(error) };
+        return { ok: false as const, ...failureDetails(error) };
       }
     },
     transition: async (form: FormData) => {
@@ -104,14 +119,14 @@ export function createEditorialActions(dependencies: {
         const candidateId = required(form, "candidateId");
         const notes = required(form, "notes");
         const action = required(form, "action");
-        if (action === "reject") await dependencies.service.reject(actor, candidateId, notes);
-        else if (action === "expire") await dependencies.service.expire(actor, candidateId, notes);
-        else if (action === "unpublish") await dependencies.service.unpublish(actor, candidateId, notes);
+        if (action === "reject") await dependencies.service.reject(actor, candidateId, notes, editorialVersionFromForm(form));
+        else if (action === "expire") await dependencies.service.expire(actor, candidateId, notes, editorialVersionFromForm(form));
+        else if (action === "unpublish") await dependencies.service.unpublish(actor, candidateId, notes, editorialVersionFromForm(form));
         else throw new Error("action is invalid");
         await dependencies.invalidatePublicContent?.({ slug: String(form.get("slug") ?? "").trim() || undefined });
         return { ok: true as const };
       } catch (error) {
-        return { ok: false as const, error: message(error) };
+        return { ok: false as const, ...failureDetails(error) };
       }
     },
     merge: async (form: FormData) => {
@@ -119,7 +134,7 @@ export function createEditorialActions(dependencies: {
         await dependencies.service.merge(await dependencies.getActor(), required(form, "targetId"), required(form, "sourceId"));
         return { ok: true as const };
       } catch (error) {
-        return { ok: false as const, error: message(error) };
+        return { ok: false as const, ...failureDetails(error) };
       }
     },
     split: async (form: FormData) => {
@@ -127,7 +142,7 @@ export function createEditorialActions(dependencies: {
         const clusterId = await dependencies.service.split(await dependencies.getActor(), required(form, "clusterId"), list(form, "signalIds"));
         return { ok: true as const, clusterId };
       } catch (error) {
-        return { ok: false as const, error: message(error) };
+        return { ok: false as const, ...failureDetails(error) };
       }
     },
     addManualSignal: async (form: FormData) => {
@@ -152,7 +167,7 @@ export function createEditorialActions(dependencies: {
         }, required(form, "sourceDefinitionId"), dependencies.now());
         return { ok: true as const, signalId };
       } catch (error) {
-        return { ok: false as const, error: message(error) };
+        return { ok: false as const, ...failureDetails(error) };
       }
     },
   };

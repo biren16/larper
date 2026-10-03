@@ -1,3 +1,6 @@
+"use client";
+
+import { useDraftProtection, type EditorAction } from "./use-draft-protection";
 import Link from "next/link";
 import type { StoryDraft } from "@/backend/editorial/types";
 import { StatusNotice } from "../status-notice";
@@ -7,6 +10,9 @@ import { StoryPreview } from "./story-preview";
 
 export interface StudioCandidateDetail {
   id: string;
+  editorialVersion?: number;
+  accountId?: string;
+  environment?: string;
   title: string;
   nicheId: string | null;
   heat: number;
@@ -21,18 +27,18 @@ export interface StudioCandidateDetail {
   mediaOptions?: Array<{ id: string; alt: string; creditLine: string | null }>;
 }
 
-type Action = (formData: FormData) => void | Promise<void>;
+type Action = EditorAction;
 
-function MoreActions({ candidate, transitionAction, mergeAction, splitAction }: { candidate: StudioCandidateDetail; transitionAction?: Action; mergeAction?: Action; splitAction?: Action }) {
+function MoreActions({ candidate, transitionAction, mergeAction, splitAction, run }: { run: (action: Action, data: FormData) => Promise<void>; candidate: StudioCandidateDetail; transitionAction?: Action; mergeAction?: Action; splitAction?: Action }) {
   const published = ["published_story", "published_brief"].includes(candidate.storyLifecycle ?? "");
   if (!transitionAction && (!mergeAction || published) && (!splitAction || published)) return null;
   return (
     <details className={styles.moreActions} role="group" aria-label="More actions">
       <summary>More actions</summary>
       <p>These actions change the cluster or remove it from the editorial flow.</p>
-      {mergeAction && !published && <form action={mergeAction}><input type="hidden" name="targetId" value={candidate.id} /><label>Duplicate cluster ID<input name="sourceId" required /></label><PendingButton type="submit" pendingLabel="Merging…">Merge into this cluster</PendingButton></form>}
-      {splitAction && !published && <form action={splitAction}><input type="hidden" name="clusterId" value={candidate.id} /><label>Signal IDs to move<input name="signalIds" required placeholder="id-1,id-2" /></label><PendingButton type="submit" pendingLabel="Splitting…">Split evidence</PendingButton></form>}
-      {transitionAction && <form action={transitionAction}><input type="hidden" name="candidateId" value={candidate.id} /><label>Review note<textarea name="notes" required rows={3} /></label><div className={styles.secondaryActions}><PendingButton type="submit" name="action" value="reject" intentField="action" intentValue="reject" pendingLabel="Rejecting…">Reject</PendingButton><PendingButton type="submit" name="action" value="expire" intentField="action" intentValue="expire" pendingLabel="Expiring…">Expire</PendingButton><PendingButton type="submit" name="action" value="unpublish" intentField="action" intentValue="unpublish" pendingLabel="Unpublishing…">Unpublish</PendingButton></div></form>}
+      {mergeAction && !published && <form onSubmit={event => { event.preventDefault(); const data=new FormData(event.currentTarget); const button=(event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null; if (button?.name) data.set(button.name,button.value); void run(mergeAction,data); }}><input type="hidden" name="targetId" value={candidate.id} /><label>Duplicate cluster ID<input name="sourceId" required /></label><PendingButton type="submit" pendingLabel="Merging…">Merge into this cluster</PendingButton></form>}
+      {splitAction && !published && <form onSubmit={event => { event.preventDefault(); const data=new FormData(event.currentTarget); const button=(event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null; if (button?.name) data.set(button.name,button.value); void run(splitAction,data); }}><input type="hidden" name="clusterId" value={candidate.id} /><label>Signal IDs to move<input name="signalIds" required placeholder="id-1,id-2" /></label><PendingButton type="submit" pendingLabel="Splitting…">Split evidence</PendingButton></form>}
+      {transitionAction && <form onSubmit={event => { event.preventDefault(); const data=new FormData(event.currentTarget); const button=(event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null; if (button?.name) data.set(button.name,button.value); void run(transitionAction,data); }}><input type="hidden" name="candidateId" value={candidate.id} /><input type="hidden" name="editorialVersion" value={candidate.editorialVersion ?? 0} /><label>Review note<textarea name="notes" required rows={3} /></label><div className={styles.secondaryActions}><PendingButton type="submit" name="action" value="reject" intentField="action" intentValue="reject" pendingLabel="Rejecting…">Reject</PendingButton><PendingButton type="submit" name="action" value="expire" intentField="action" intentValue="expire" pendingLabel="Expiring…">Expire</PendingButton><PendingButton type="submit" name="action" value="unpublish" intentField="action" intentValue="unpublish" pendingLabel="Unpublishing…">Unpublish</PendingButton></div></form>}
     </details>
   );
 }
@@ -60,6 +66,7 @@ export function StoryEditor({
   scheduleAction?: Action;
   uploadMediaAction?: Action;
 }) {
+  const protection = useDraftProtection(`larper-draft:${candidate.environment ?? "local"}:${candidate.accountId ?? "unknown"}:${candidate.id}`, candidate.editorialVersion ?? 0, saveDraftAction);
   const draft = candidate.draft;
   const published = ["published_story", "published_brief"].includes(candidate.storyLifecycle ?? "");
   return (
@@ -76,16 +83,34 @@ export function StoryEditor({
       </header>
 
       {candidate.sensitiveFlags.length > 0 && <div className={styles.alert} role="alert"><strong>Mandatory review</strong><span>{candidate.sensitiveFlags.join(", ")}</span></div>}
-      {published && draft?.slug && <p><Link href={`/discover/${draft.slug}`}>View public story</Link> · Unpublish under More actions before changing evidence or scheduling.</p>}
+      {published && draft?.slug && <p><Link href={`/discover/${draft.slug}`}>View public story</Link> · Writing edits are private until you update the live post.</p>}
       <StatusNotice notice={notice} />
+      <p role="status" aria-live="polite">{protection.status}</p>
+      {protection.failure && <p role="alert">{protection.failure}{protection.status === "Conflict" && " · Your writing is retained. Open the latest version in another tab and compare before retrying."}</p>}
+      {protection.recovery && <aside aria-label="Recover unsaved writing"><p>Unsaved writing from your last session is available.</p><button type="button" onClick={protection.restore}>Recover writing</button><button type="button" onClick={protection.discard}>Discard recovery</button></aside>}
+      <nav aria-label="Editor sections"><a href="#write">Write</a> · <a href="#evidence-heading">Evidence &amp; cover</a> · <a href="#publish">Preview &amp; publish</a></nav>
       {error && <div className={styles.alert} role="alert"><strong>Could not complete that action</strong><span>{error}</span></div>}
 
       <div className={styles.workspace}>
-        <form className={styles.editor} action={publishAction} aria-label="Story editor">
+        <form className={styles.editor} ref={element => protection.attachForm(element)} onChange={event => {
+            const target=event.target as unknown as HTMLInputElement;
+            const form=event.currentTarget;
+            const slug=form.elements.namedItem("slug") as HTMLInputElement;
+            if (!published && target.name === "slug") slug.dataset.manual="true";
+            if (!published && target.name === "title" && !draft?.slug && slug.dataset.manual !== "true") slug.value=target.value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+            protection.changed();
+          }} onSubmit={event => {
+            event.preventDefault();
+            const button = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+            const data = new FormData(event.currentTarget);
+            if (button?.name) data.set(button.name, button.value);
+            const selected = button?.value === "draft" ? saveDraftAction : ["schedule", "update_schedule", "cancel_schedule"].includes(button?.value ?? "") ? scheduleAction : publishAction;
+            void protection.save(selected, data);
+          }} aria-label="Story editor">
           <input type="hidden" name="candidateId" value={candidate.id} />
 
           <fieldset>
-            <legend>Story</legend>
+            <legend id="write">Story</legend>
             <label>Title<input name="title" required maxLength={140} defaultValue={draft?.title ?? candidate.title} /></label>
             <label>Hook<textarea name="hook" defaultValue={draft?.hook ?? ""} required rows={3} /></label>
             <label>What happened?<textarea name="summary" defaultValue={draft?.summary ?? ""} required rows={5} /></label>
@@ -103,7 +128,7 @@ export function StoryEditor({
             <legend>Classification</legend>
             <div className={styles.twoCol}>
               <label>Niche ID<input name="nicheId" required defaultValue={draft?.nicheId ?? candidate.nicheId ?? ""} /></label>
-              <label>Slug<input name="slug" defaultValue={draft?.slug ?? ""} required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
+              <label>Slug<input readOnly={published} name="slug" defaultValue={draft?.slug ?? ""} required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
             </div>
             <div className={styles.twoCol}>
               <label>Discovery type<select name="discoveryType" defaultValue={draft?.discoveryType ?? "TREND"}><option>TREND</option><option>MEME</option><option>DROP</option><option>LORE</option><option>DEBATE</option><option>COMEBACK</option><option>PRODUCT</option><option>EVENT</option><option>PERSON</option><option>AESTHETIC</option><option>DRAMA</option><option>RABBIT_HOLE</option></select></label>
@@ -136,21 +161,22 @@ export function StoryEditor({
 
           <StoryPreview />
 
-          <div className={styles.actionBar} role="group" aria-label="Publication actions">
+          <div id="publish" className={styles.actionBar} role="group" aria-label="Publication actions">
             {scheduleAction && !published && <label>Schedule for (IST)<input name="scheduledFor" type="datetime-local" /></label>}
-            {candidate.scheduledFor && <p>Saving a draft cancels its pending publication schedule.</p>}
+            {candidate.scheduledFor && <p>Scheduled for {candidate.scheduledFor}. Private saves preserve this approved version and time.</p>}
             <div>
-              {saveDraftAction && !["published_story", "published_brief"].includes(candidate.storyLifecycle ?? "") && <PendingButton type="submit" name="intent" value="draft" intentValue="draft" pendingLabel="Saving draft…" formAction={saveDraftAction} formNoValidate className={styles.secondary}>Save draft</PendingButton>}
-              <PendingButton type="submit" name="intent" value="story" intentValue="story" pendingLabel="Publishing…">Publish story</PendingButton>
-              <PendingButton type="submit" name="format" value="brief" intentField="format" intentValue="brief" pendingLabel="Publishing brief…" formNoValidate className={styles.secondary}>Publish brief</PendingButton>
-              {scheduleAction && !published && <PendingButton type="submit" name="intent" value="schedule" intentValue="schedule" pendingLabel="Scheduling…" formAction={scheduleAction} className={styles.secondary}>Schedule</PendingButton>}
+              {saveDraftAction && <PendingButton disabled={protection.status === "Saving" || protection.status === "Conflict"} type="submit" name="intent" value="draft" intentValue="draft" pendingLabel="Saving draft…"  formNoValidate className={styles.secondary}>Save draft</PendingButton>}
+              <PendingButton disabled={protection.status === "Saving" || protection.status === "Conflict"} type="submit" name="intent" value="story" intentValue="story" pendingLabel="Publishing…">{published ? "Update live post" : "Publish story"}</PendingButton>
+              <PendingButton disabled={protection.status === "Saving" || protection.status === "Conflict"} type="submit" name="format" value="brief" intentField="format" intentValue="brief" pendingLabel="Publishing brief…" formNoValidate className={styles.secondary}>Publish brief</PendingButton>
+              {scheduleAction && !published && <PendingButton disabled={protection.status === "Saving" || protection.status === "Conflict"} type="submit" name="intent" value="schedule" intentValue="schedule" pendingLabel="Scheduling…"  className={styles.secondary}>Schedule</PendingButton>}
+              {candidate.scheduledFor && scheduleAction && <><button type="submit" name="intent" value="update_schedule">Update scheduled version</button><button type="submit" name="intent" value="cancel_schedule" formNoValidate>Cancel schedule</button></>}
             </div>
           </div>
         </form>
 
         <aside className={styles.evidence} aria-labelledby="evidence-heading">
           <div className={styles.evidenceSticky}>
-            {uploadMediaAction && <form className={styles.uploadForm} aria-label="Upload approved image" action={uploadMediaAction}>
+            {uploadMediaAction && <form className={styles.uploadForm} aria-label="Upload approved image" onSubmit={event => { event.preventDefault(); void protection.save(uploadMediaAction, new FormData(event.currentTarget)); }}>
               <h2>Upload a cover</h2>
               <input type="hidden" name="candidateId" value={candidate.id} />
               <label>Image file (WebP, under 400 KB)<input type="file" name="image" accept="image/webp" required /></label>
@@ -177,7 +203,7 @@ export function StoryEditor({
               {!candidate.revisions?.length && <p>No saved revisions yet.</p>}
             </section>
 
-            <MoreActions candidate={candidate} transitionAction={transitionAction} mergeAction={mergeAction} splitAction={splitAction} />
+            <MoreActions run={protection.runExternal} candidate={{ ...candidate, editorialVersion: protection.currentVersion }} transitionAction={transitionAction} mergeAction={mergeAction} splitAction={splitAction} />
           </div>
         </aside>
       </div>

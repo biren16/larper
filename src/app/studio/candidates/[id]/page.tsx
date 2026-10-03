@@ -9,5 +9,5 @@ export default async function StudioCandidatePage({ params, searchParams }: { pa
   const runtime = await authorizedStudioRuntime(`/studio/candidates/${id}`);
   const candidate = await runtime.reader.candidate(id);
   if (!candidate) notFound();
-  return <StoryEditor candidate={candidate} publishAction={publishCandidateAction} saveDraftAction={saveCandidateDraftAction} notice={query.notice} scheduleAction={scheduleCandidateAction} transitionAction={transitionCandidateAction} mergeAction={mergeCandidateAction} splitAction={splitCandidateAction} uploadMediaAction={uploadEditorialMediaAction} error={query.error} />;
+  return <StoryEditor candidate={{ ...candidate, accountId: runtime.actor.id, environment: process.env.NEXT_PUBLIC_SITE_URL ?? "local" }} publishAction={publishCandidateAction} saveDraftAction={saveCandidateDraftAction} notice={query.notice} scheduleAction={scheduleCandidateAction} transitionAction={transitionCandidateAction} mergeAction={mergeCandidateAction} splitAction={splitCandidateAction} uploadMediaAction={uploadEditorialMediaAction} error={query.error} />;
 }

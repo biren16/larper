@@ -80,9 +80,9 @@ it("reloads a saved Style draft with named subtopics and fresh publication confi
   expect(screen.getByRole("button", { name: "Save draft" })).toHaveAttribute("formnovalidate");
 });
 
-it("does not offer draft saving for a published story", () => {
+it("offers private draft saving for a published story", () => {
   render(<StoryEditor candidate={{ ...candidate, storyLifecycle: "published_story" }} saveDraftAction={() => undefined} />);
-  expect(screen.queryByRole("button", { name: "Save draft" })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Save draft" })).toBeInTheDocument();
 });
 
 it("links a published story and hides evidence editing and scheduling until unpublish", () => {

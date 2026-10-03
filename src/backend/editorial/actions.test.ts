@@ -12,16 +12,16 @@ describe("editorial action factory", () => {
       service: { publishStory } as never,
       invalidatePublicContent,
     });
-    const form = new FormData();
+    const form = new FormData(); form.set("editorialVersion", "0");
     Object.entries({
       candidateId: "cluster-1", nicheId: "books", slug: "f1-books", title: "F1 books", hook: "Hook", summary: "Summary",
       whyItMatters: "Why", lore: "Lore", beginnerContext: "Context", discoveryType: "TREND", mode: "current", regions: "india,global",
       conversationLine: "Mention the crossover, not just the headline.", freshnessLabel: "Moving", evidenceSummary: "Two sources", tags: "books,f1", independentSourcesConfirmed: "on",
     }).forEach(([key, value]) => form.set(key, value));
 
-    await expect(actions.publishStory(form)).resolves.toEqual({ ok: true, storyId: "story-1" });
+    await expect(actions.publishStory(form)).resolves.toEqual({ ok: true, storyId: "story-1", revision: 1 });
     expect(getActor).toHaveBeenCalledOnce();
-    expect(publishStory).toHaveBeenCalledWith(expect.objectContaining({ id: "editor-1" }), "cluster-1", expect.objectContaining({ regions: ["india", "global"], tags: ["books", "f1"], independentSourcesConfirmed: true }));
+    expect(publishStory).toHaveBeenCalledWith(expect.objectContaining({ id: "editor-1" }), "cluster-1", expect.objectContaining({ regions: ["india", "global"], tags: ["books", "f1"], independentSourcesConfirmed: true }), 0);
     expect(invalidatePublicContent).toHaveBeenCalledWith({ slug: "f1-books" });
   });
 
@@ -32,7 +32,7 @@ describe("editorial action factory", () => {
       now: () => "2026-09-20T10:00:00.000Z",
       service: { publishStory } as never,
     });
-    await expect(actions.publishStory(new FormData())).resolves.toEqual({ ok: false, error: "candidateId is required" });
+    await expect(actions.publishStory(new FormData())).resolves.toMatchObject({ ok: false, error: "candidateId is required", fieldErrors: { candidateId: "candidateId is required" } });
     expect(publishStory).not.toHaveBeenCalled();
   });
 
@@ -44,7 +44,7 @@ describe("editorial action factory", () => {
       now: () => "2026-09-20T10:00:00.000Z",
       service: { unpublish } as never, invalidatePublicContent,
     });
-    const form = new FormData();
+    const form = new FormData(); form.set("editorialVersion", "0");
     form.set("candidateId", "cluster-1");
     form.set("action", "unpublish");
     form.set("notes", "Evidence removed");
@@ -59,7 +59,7 @@ describe("editorial action factory", () => {
       getActor: async () => ({ id: "editor-1", email: "founder@example.com", role: "founder" as const }),
       now: () => "2026-09-21T10:00:00.000Z", service: { addManualSignal } as never,
     });
-    const form = new FormData();
+    const form = new FormData(); form.set("editorialVersion", "0");
     Object.entries({ url: "https://www.instagram.com/reel/a/", title: "F1 edit", sourceName: "Founder", publishedAt: "2026-09-21T09:00", region: "india", sourceDefinitionId: "manual-1", platform: "instagram", suggestedNicheId: "f1", observationNote: "Crossing feeds", visibleLikes: "1200" }).forEach(([key, value]) => form.set(key, value));
 
     await expect(actions.addManualSignal(form)).resolves.toEqual({ ok: true, signalId: "signal-1" });
@@ -71,10 +71,10 @@ describe("Style briefs", () => {
   it("keeps overlapping Sneakers and Streetwear filters when publishing a brief", async () => {
     const publishBrief = vi.fn(async () => ({ storyId: "style-brief", revision: 1 }));
     const actions = createEditorialActions({ getActor: async () => null, now: () => "2026-10-03T00:00:00Z", service: { publishBrief } as never });
-    const form = new FormData();
+    const form = new FormData(); form.set("editorialVersion", "0");
     for (const [key, value] of Object.entries({candidateId:"style-cluster", nicheId:"style", slug:"style-brief", title:"A collaboration", regions:"global", freshnessLabel:"Archive", evidenceSummary:"Independent sources", tags:"archive", styleSubtopicsPresent:"true", independentSourcesConfirmed:"on"})) form.set(key,value);
     form.append("styleSubtopics", "sneakers"); form.append("styleSubtopics", "streetwear");
-    expect(await actions.publishBrief(form)).toEqual({ok:true, storyId:"style-brief"});
-    expect(publishBrief).toHaveBeenCalledWith(null,"style-cluster",expect.objectContaining({tags:["archive","sneakers","streetwear"]}));
+    expect(await actions.publishBrief(form)).toEqual({ok:true, storyId:"style-brief", revision:1});
+    expect(publishBrief).toHaveBeenCalledWith(null,"style-cluster",expect.objectContaining({tags:["archive","sneakers","streetwear"]}), 0);
   });
 });
