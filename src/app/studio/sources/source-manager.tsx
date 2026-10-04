@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import Link from "next/link";
 import { PendingButton } from "../pending-button";
 import { StatusNotice } from "../status-notice";
@@ -24,6 +26,9 @@ const time = (value: string | null) => value
 type Action = (form: FormData) => void | Promise<void>;
 
 function SourceRow({ source, toggleSourceAction, reviewSourceAction }: { source: StudioSource; toggleSourceAction?: Action; reviewSourceAction?: Action }) {
+  const grouped = [...new Map((source.failures ?? []).map(failure => [failure.message, failure])).values()];
+  const latest = [...(source.failures ?? [])].sort((a,b)=>b.occurredAt.localeCompare(a.occurredAt))[0];
+  const explanation = latest?.message.toLowerCase().includes("redirect") ? "The feed URL redirects. Use the publisher’s final feed URL before collecting again." : latest?.message.toLowerCase().includes("403") ? "The publisher blocked collection. Check its access policy and use manual intake if automated collection is restricted." : latest?.message.toLowerCase().includes("timed out") ? "The publisher did not respond in time. Check the source before the next collection." : latest?.message;
   const canToggle = source.status !== "waiting" && source.adapterType !== "manual";
   return (
     <article id={`source-${source.id}`} className={styles.sourceRow}>
@@ -37,7 +42,7 @@ function SourceRow({ source, toggleSourceAction, reviewSourceAction }: { source:
         <div><dt>Usage review</dt><dd>{source.usageReviewed ? "Recorded" : "Required before collection"}</dd></div>
         <div><dt>Failures</dt><dd>{source.failureCount === 1 ? "1 unresolved failure" : `${source.failureCount} unresolved failures`}</dd></div>
       </dl>
-      {source.failures?.map((failure,index)=><div key={`${failure.occurredAt}-${index}`}><p>Collection failed: {failure.message}</p><details><summary>Failure diagnostics</summary><p>{failure.code} · {time(failure.occurredAt)}</p></details></div>)}
+      {latest && <div className={styles.failureSummary}><p>{explanation}</p><details><summary>Failure diagnostics ({source.failureCount} unresolved)</summary>{grouped.map(failure=><p key={failure.message}>{failure.message}<br/><small>{failure.code} · {time(failure.occurredAt)} · {(source.failures ?? []).filter(item=>item.message===failure.message).length} occurrences</small></p>)}</details></div>}
       {toggleSourceAction && canToggle && (
         <form action={toggleSourceAction}>
           <input type="hidden" name="sourceId" value={source.id} />
@@ -94,6 +99,7 @@ export function SourceManager({
   registerPresetsAction,
   notice,
   error,
+  initialFilter = "all",
 }: {
   data: StudioSourcesData;
   createSourceAction?: (form: FormData) => void | Promise<void>;
@@ -102,11 +108,17 @@ export function SourceManager({
   registerPresetsAction?: Action;
   notice?: string;
   error?: string;
+  initialFilter?: string;
 }) {
+  const [search,setSearch]=useState("");
+  const [filter,setFilter]=useState(initialFilter);
+  const failing=data.sources.filter(source=>source.failureCount>0);
+  const reviewNeeded=data.sources.filter(source=>!source.usageReviewed && ["rss","youtube"].includes(source.adapterType));
+  const visible=data.sources.filter(source=>source.name.toLowerCase().includes(search.toLowerCase()) && (filter==="all" || filter==="attention" && source.failureCount>0 || filter==="review" && !source.usageReviewed && ["rss","youtube"].includes(source.adapterType) || filter==="active" && source.active || filter==="paused" && !source.active));
   return (
     <main id="main-content" className={styles.main}>
       <header className={styles.header}>
-        <div><p className={styles.kicker}>Studio / sources</p><h1>Watchlists</h1><p>Keep collection narrow, credible, and useful to the editorial desk.</p></div>
+        <div><p className={styles.kicker}>Studio / sources</p><h1>Sources</h1><p>Manage collection, review permissions, and resolve feed problems.</p></div>
         <Link href="/studio">Back to Studio</Link>
       </header>
       <StatusNotice notice={notice} error={error} />
@@ -115,12 +127,18 @@ export function SourceManager({
         <p>Register 21 feed presets and four manual references across these seven lanes. Existing source settings are preserved.</p>
         <PendingButton type="submit" pendingLabel="Registering sources…">Register seven-lane sources</PendingButton>
       </form></details>}
-      <section role="region" aria-label="Source priorities" className={styles.configPanel}><h2>Needs attention first</h2><ul>{data.sources.filter(source=>source.failureCount>0 || (!source.usageReviewed && ["rss","youtube"].includes(source.adapterType))).sort((a,b)=>b.failureCount-a.failureCount).map(source=><li key={source.id}><a href={`#source-${source.id}`}>{source.name}</a> · {source.failureCount>0 ? `${source.failureCount} unresolved failures` : "Usage review needed"}{source.failures?.map((failure,index)=><p key={index}>{failure.message}</p>)}</li>)}</ul>{!data.sources.some(source=>source.failureCount>0 || (!source.usageReviewed && ["rss","youtube"].includes(source.adapterType))) && <p>No unresolved failures or missing usage reviews.</p>}</section>
+      <div className={styles.toolbar}>
+        <div className={styles.filters} aria-label="Source filters">{[["all",`All sources (${data.sources.length})`],["attention",`Failures (${failing.length})`],["review",`Usage review (${reviewNeeded.length})`],["active","Active"],["paused","Paused"]].map(([value,label])=><button key={value} type="button" aria-pressed={filter===value} onClick={()=>setFilter(value)}>{label}</button>)}</div>
+        <label>Search sources<input value={search} onChange={event=>setSearch(event.target.value)} placeholder="Publisher or creator name"/></label>
+      </div>
+      <p className={styles.filterResult} role="status">{visible.length} sources shown{filter==="review" ? " · Record permission before activating automated collection." : filter==="attention" ? " · Open diagnostics or pause a failing source while investigating." : ""}</p>
+      <details className={styles.addSource}><summary>Add a source</summary><SourceForm action={createSourceAction}/></details>
 
       <div className={styles.workspace}>
         <div className={styles.beatList}>
           {beats.map((beat) => {
-            const sources = data.sources.filter((source) => source.watchlistBeat === beat.id);
+            const sources = visible.filter((source) => source.watchlistBeat === beat.id);
+            if (!sources.length) return null;
             return (
               <section key={beat.id} className={styles.beat} role="region" aria-labelledby={`${beat.id}-heading`} aria-label={`${beat.label} sources`}>
                 <header><div><h2 id={`${beat.id}-heading`}>{beat.label}</h2><p>{beat.description}</p></div><span>{sources.length}</span></header>
@@ -130,12 +148,12 @@ export function SourceManager({
               </section>
             );
           })}
-          {data.sources.some((source) => !beats.some((beat) => beat.id === source.watchlistBeat)) && <section className={styles.beat} aria-label="Other registered sources">
+          {visible.some((source) => !beats.some((beat) => beat.id === source.watchlistBeat)) && <section className={styles.beat} aria-label="Other registered sources">
             <h2>Other registered sources</h2><p>Existing registry history outside these seven lanes.</p>
-            {data.sources.filter((source) => !beats.some((beat) => beat.id === source.watchlistBeat)).map((source) => <SourceRow key={source.id} source={source} toggleSourceAction={toggleSourceAction} reviewSourceAction={reviewSourceAction} />)}
+            {visible.filter((source) => !beats.some((beat) => beat.id === source.watchlistBeat)).map((source) => <SourceRow key={source.id} source={source} toggleSourceAction={toggleSourceAction} reviewSourceAction={reviewSourceAction} />)}
           </section>}
         </div>
-        <aside><SourceForm action={createSourceAction} /></aside>
+        {visible.length===0 && <p className={styles.empty}>No sources match. Try another filter or search.</p>}
       </div>
 
       <section id="operations" className={styles.operations} aria-labelledby="operations-heading">

@@ -169,3 +169,11 @@ do $$ begin
  if not exists(select 1 from public.search_editorial_merge_candidates('Legacy title fallback',null,50)) then raise exception 'Service role cannot execute private merge search'; end if;
 end $$;
 reset role;
+
+do $$
+declare candidate uuid:=gen_random_uuid();
+begin
+ insert into public.topic_clusters(id,title,state,editorial_stage) values(candidate,'Unwritten inbox candidate','detected','watching');
+ if not exists(select 1 from jsonb_array_elements(public.list_editorial_posts('{"tab":"candidate","search":"Unwritten inbox candidate"}')->'items') p where p->>'id'=candidate::text) then raise exception 'Unwritten candidate missing from inbox'; end if;
+ if exists(select 1 from jsonb_array_elements(public.list_editorial_posts('{"tab":"draft","search":"Unwritten inbox candidate"}')->'items') p where p->>'id'=candidate::text) then raise exception 'Unwritten candidate mislabelled as writing draft'; end if;
+end $$;

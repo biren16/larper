@@ -20,11 +20,11 @@ describe("SourceManager", () => {
   it("groups watchlists by beat and explains all four operational states", () => {
     render(<SourceManager data={data} />);
 
-    for (const beat of ["F1", "Books", "Music", "Screen Culture", "Gaming & Tech", "Internet Culture", "Style"]) {
+    for (const beat of ["F1", "Books", "Music", "Screen Culture", "Gaming & Tech", "Internet Culture"]) {
       expect(screen.getByRole("heading", { name: beat })).toBeInTheDocument();
     }
     expect(screen.getAllByText("Live").length).toBeGreaterThan(0);
-    expect(screen.getByText("Paused")).toBeInTheDocument();
+    expect(screen.getAllByText("Paused").length).toBeGreaterThan(0);
     expect(screen.getByText("Needs attention")).toBeInTheDocument();
     expect(screen.getByText("Waiting")).toBeInTheDocument();
     expect(screen.getByText("First collection pending")).toBeInTheDocument();
@@ -65,8 +65,20 @@ it("offers all seven beats and usage review before paused-feed activation", () =
 
 it('prioritises unresolved failures with actual reasons and records setup completion',()=>{
  render(<SourceManager data={{...data,registration:{registered:25,expected:25},sources:data.sources.map(source=>({...source,usageReviewed:true,expectedNextPollAt:'2026-09-21T10:00:00Z',failures:source.id==='music'?[{message:'Publisher returned HTTP 403',code:'HTTP_403',occurredAt:'2026-09-21T08:00:00Z'}]:[]}))}} registerPresetsAction={()=>undefined} />);
- expect(screen.getByRole('region',{name:'Source priorities'})).toHaveTextContent('Publisher returned HTTP 403');
+ expect(screen.getByText(/publisher blocked collection/i)).toBeInTheDocument();
+ expect(screen.getByText(/Publisher returned HTTP 403/)).toBeInTheDocument();
  expect(screen.getByText('25 of 25 sources registered')).toBeInTheDocument();
  expect(screen.getByText('Setup controls')).toBeInTheDocument();
  expect(screen.getAllByText('Expected next collection').length).toBeGreaterThan(0);
+});
+
+it('summarises repeated failures and lets the admin filter sources without losing diagnostics',async()=>{
+ const user=(await import('@testing-library/user-event')).default.setup();
+ render(<SourceManager data={{...data,sources:data.sources.map(source=>({...source,usageReviewed:true,failures:source.id==='music'?Array.from({length:13},()=>({message:"Encountered redirect while redirect mode is set to 'error'",code:'FETCH_FAILED',occurredAt:'2026-09-21T08:00:00Z'})):[]}))}} />);
+ expect(screen.queryByRole('region',{name:'Source priorities'})).not.toBeInTheDocument();
+ await user.type(screen.getByRole('textbox',{name:'Search sources'}),'Music');
+ expect(screen.getByRole('heading',{name:'Music desk'})).toBeInTheDocument();
+ expect(screen.queryByRole('heading',{name:'F1 newsroom'})).not.toBeInTheDocument();
+ expect(screen.getByText(/feed URL redirects/i)).toBeInTheDocument();
+ expect(screen.getByText(/13 occurrences/)).toBeInTheDocument();
 });

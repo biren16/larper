@@ -90,7 +90,7 @@ export function StoryEditor({
     <main id="main-content" className={styles.main}>
       <nav className={styles.breadcrumb} aria-label="Studio breadcrumb"><Link href="/studio">Studio</Link><span>/</span><span>Candidate</span></nav>
       <header className={styles.header}>
-        <div><p>{candidate.nicheId ?? "Unassigned"}</p><h1>{candidate.title}</h1></div>
+        <div><p>{candidate.niches?.find(niche=>niche.id===candidate.nicheId)?.name ?? "Unassigned"}</p><h1>{candidate.title}</h1></div>
         <dl>
           <div><dt>Heat</dt><dd>{candidate.heat}</dd></div>
           <div><dt>Confidence</dt><dd>{candidate.confidence}</dd></div>
@@ -109,7 +109,7 @@ export function StoryEditor({
       {protection.failure && <p role="alert">{protection.failure}{protection.status === "Conflict" && " · Your writing is retained. Open the latest version in another tab and compare before retrying."}</p>}
       {protection.feedback && <div aria-label="Field feedback"><ul>{Object.entries(protection.feedback.fieldErrors ?? {}).map(([field,message])=><li key={field}><a href={`#field-${field}`}>{message}</a></li>)}</ul>{protection.feedback.diagnostic && <details><summary>Action diagnostics</summary><p>{protection.feedback.diagnostic}</p></details>}</div>}
       {protection.recovery && <aside aria-label="Recover unsaved writing"><p>Unsaved writing from your last session is available.</p><button type="button" onClick={protection.restore}>Recover writing</button><button type="button" onClick={protection.discard}>Discard recovery</button></aside>}
-      <nav aria-label="Editor sections"><a href="#write">Write</a> · <a href="#evidence-heading">Evidence &amp; cover</a> · <a href="#publish">Preview &amp; publish</a></nav>
+      <nav className={styles.sectionNav} aria-label="Editor sections"><a href="#write">Write</a> · <a href="#evidence-heading">Evidence &amp; cover</a> · <a href="#publish">Preview &amp; publish</a></nav>
       {error && <div className={styles.alert} role="alert"><strong>Could not complete that action</strong><span>{error}</span></div>}
 
       <div className={styles.workspace}>

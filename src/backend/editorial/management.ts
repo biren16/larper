@@ -18,5 +18,5 @@ export function differenceFields(before:Record<string,unknown>,after:Record<stri
 
 export function normalizePostQuery(query:Record<string,string|undefined>) {
  const date=(value:string|undefined)=>{if(!value||!/^\d{4}-\d{2}-\d{2}$/.test(value))return "";const parsed=new Date(`${value}T00:00:00Z`);return Number.isFinite(parsed.getTime())&&parsed.toISOString().slice(0,10)===value?value:"";};
- return {tab:["all","draft","scheduled","published","trash","needs_review"].includes(query.tab??"")?query.tab!:"all",page:Math.max(1,Math.min(100000,Math.floor(Number(query.page))||1)),search:(query.search??"").slice(0,200),niche:query.niche??"",from:date(query.from),to:date(query.to)};
+ return {tab:["all","candidate","draft","scheduled","published","trash","needs_review"].includes(query.tab??"")?query.tab!:"all",page:Math.max(1,Math.min(100000,Math.floor(Number(query.page))||1)),search:(query.search??"").slice(0,200),niche:query.niche??"",from:date(query.from),to:date(query.to)};
 }

@@ -104,3 +104,8 @@ it("does not count an active unreviewed feed as live coverage", () => {
   expect(screen.getByText("Style").closest("li")!.querySelector("strong")).toHaveTextContent("1");
   expect(screen.getByText("Live feeds after successful collection")).toBeInTheDocument();
 });
+it('reports source problems even when the collector run succeeded',()=>{
+ render(<StudioDashboard data={{...data,sources:[{...data.sources[0],failureCount:13,status:'attention'}]}}/>);
+ expect(screen.getByText('1 source needs attention')).toBeInTheDocument();
+ expect(screen.getByRole('link',{name:'Review source issues'})).toHaveAttribute('href','/studio/sources?filter=attention');
+});

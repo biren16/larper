@@ -325,3 +325,40 @@
 /* Keep field values legible without changing the page's typography. */
 .main label { min-width: 0; }
 .main input:not([type="checkbox"]):not([type="hidden"]), .main select, .main textarea { font: 400 1rem/1.45 var(--font-sans); min-width: 0; width: 100%; }
+
+/* Studio is a work surface: modest headings and compact, readable rows. */
+.header h1 { font-size:clamp(2rem,4vw,3rem); line-height:1.1; }
+.sectionHeading h2, .watchlist h2 { font-size:1.6rem; line-height:1.2; }
+.candidateCopy h3 { font-size:1.15rem; line-height:1.4; letter-spacing:-.015em; }
+.candidateCopy h3 a { text-decoration:none; }
+.candidateCopy h3 a:hover { text-decoration:underline; }
+.candidate { padding:1rem 0; gap:1rem; }
+.meta, .checked { font-size:.78rem; line-height:1.5; }
+.queueIntro { max-width:44rem; font-size:.875rem; line-height:1.6; color:var(--muted); margin:.6rem 0; }
+.tasks { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1rem; padding-top:1.5rem; }
+.tasks a { display:grid; gap:.3rem; padding:1.1rem; background:var(--surface); border:1px solid var(--line); text-decoration:none; }
+.tasks a:hover { border-color:var(--ink); }
+.tasks strong { font-size:1.65rem; }
+.tasks span { font-size:.9rem; font-weight:650; }
+.tasks small { font-size:.75rem; color:var(--muted); }
+.tabs { display:flex; flex-wrap:wrap; gap:.35rem; padding:1.25rem 0; }
+.tabs a { border:1px solid var(--line); padding:.65rem .9rem; text-decoration:none; font-size:.85rem; }
+.tabs a[aria-current="page"] { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+.postFilters { display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; align-items:end; gap:.8rem; background:var(--surface); padding:1rem; }
+.postFilters label { display:grid; gap:.4rem; font-size:.75rem; }
+.postFilters input, .postFilters select, .bulkPanel select { border:1px solid var(--line); padding:.55rem; background:var(--paper); color:var(--ink); min-height:2.75rem; }
+.header button, .postFilters button, .bulkPanel button { background:var(--ink); color:var(--paper); border:1px solid var(--ink); padding:.65rem 1rem; min-height:2.75rem; font:600 .85rem/1.4 var(--font-sans); cursor:pointer; }
+.postFieldset { border:0; padding:0; margin:0; min-width:0; }
+.postFieldset legend { color:var(--muted); font-size:.8rem; padding:.5rem 0; }
+.postRow { display:grid; grid-template-columns:1.5rem minmax(0,1fr); gap:1rem; align-items:start; padding:1rem 0; border-bottom:1px solid var(--line); }
+.postSelect input { width:1.2rem; height:1.2rem; margin:0; }
+.postRow a { font-size:1rem; font-weight:650; line-height:1.45; text-decoration:none; }
+.postRow a:hover { text-decoration:underline; }
+.postRow p { color:var(--muted); font-size:.8rem; margin:.3rem 0 0; line-height:1.5; }
+.bulkPanel { border:1px solid var(--line); background:var(--surface); margin-top:1rem; padding:1rem; display:grid; gap:.8rem; }
+.bulkPanel label { display:grid; gap:.3rem; }
+.bulkPanel .confirmBulk { display:flex; gap:.65rem; align-items:center; font-size:.85rem; }
+@media(max-width:1000px) { .postFilters { grid-template-columns:1fr 1fr; } .postFilters button { justify-self:start; } }
+@media(max-width:760px) { .tasks { grid-template-columns:1fr 1fr; } }
+@media(max-width:480px) { .postFilters { grid-template-columns:1fr; } .tasks { gap:.5rem; } .tasks a { padding:.85rem; } }
+@media(max-width:760px) { .composer { z-index:62; } .composerScrim { z-index:61; } }

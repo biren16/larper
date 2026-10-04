@@ -5,6 +5,7 @@ import { StatusNotice } from "./status-notice";
 import styles from "./studio.module.css";
 
 export interface StudioDashboardData {
+  taskCounts?: {drafts:number;scheduled:number;needsReview:number;published:number};
   niches?: Array<{ id: string; name: string }>;
   candidates: Array<{ id: string; title: string; nicheName: string; heat: number; confidence: number; state: string; sourceCount: number; lastCheckedAt: string; sensitiveFlags: string[] }>;
   sources: StudioSource[];
@@ -49,15 +50,15 @@ function ReviewQueue({ candidates }: Pick<StudioDashboardData, "candidates">) {
   return (
     <section className={styles.queue} aria-labelledby="queue-heading">
       <div className={styles.sectionHeading}>
-        <div><p className={styles.kicker}>Ranked by heat</p><h2 id="queue-heading">Review queue</h2><p><Link href="/studio/posts?tab=draft">Drafts</Link> · <Link href="/studio/posts?tab=scheduled">Scheduled releases</Link> · <Link href="/studio/posts?tab=needs_review">Needs review</Link> · <Link href="/studio/sources">Source issues</Link></p><Link href="/studio/starters">Seven starter drafts</Link></div>
+        <div><p className={styles.kicker}>Ranked by heat</p><h2 id="queue-heading">Review queue</h2><p className={styles.queueIntro}>Open a candidate to check its evidence and start writing. Heat measures attention; it does not establish accuracy.</p><Link className={styles.reviewLink} href="/studio/posts">Browse all posts</Link></div>
         <span>{candidates.length} {candidates.length === 1 ? "candidate" : "candidates"}</span>
       </div>
       <div className={styles.candidateList}>
-        {candidates.map((candidate) => (
+        {candidates.slice(0,8).map((candidate) => (
           <article className={styles.candidate} key={candidate.id}>
             <div className={styles.candidateCopy}>
               <p className={styles.meta}>{candidate.nicheName} / {candidate.state.replaceAll("_", " ")}</p>
-              <h3>{candidate.title}</h3>
+              <h3><Link href={`/studio/candidates/${candidate.id}`}>{candidate.title}</Link></h3>
               <p className={styles.checked}>Checked {time(candidate.lastCheckedAt)}</p>
               {candidate.sensitiveFlags.length > 0 && <p className={styles.warning}>Mandatory review: {candidate.sensitiveFlags.join(", ")}</p>}
             </div>
@@ -125,13 +126,15 @@ export function StudioDashboard({
   error?: string;
 }) {
   const latestRun = data.runs[0];
+  const failingSources=data.sources.filter(source=>source.failureCount>0).length;
+  const unreviewed=data.sources.filter(source=>!source.usageReviewed && ["rss","youtube"].includes(source.adapterType)).length;
   return (
     <main id="main-content" className={styles.main}>
       <header className={styles.header}>
         <div><p className={styles.kicker}>Founder workspace</p><h1>Studio</h1></div>
         <div className={styles.collectionStatus} data-status={latestRun?.status ?? "idle"}>
           <span>Last collection</span>
-          <strong>{latestRun ? latestRun.status.replaceAll("_", " ") : "Waiting"}</strong>
+          <strong>{failingSources ? `${failingSources} ${failingSources===1?"source needs":"sources need"} attention` : latestRun ? latestRun.status.replaceAll("_", " ") : "Waiting"}</strong>
           <time>{latestRun ? time(latestRun.startedAt) : "No run yet"}</time>
         </div>
       </header>
@@ -139,6 +142,12 @@ export function StudioDashboard({
       <StatusNotice notice={notice} error={error} />
       {latestRun?.status === "failed" && !error && <div className={styles.pipelineNotice} role="status"><strong>Collection needs attention.</strong><span>{latestRun.errorCount} errors in the latest run.</span><Link href="/studio/sources#operations">Review operations</Link></div>}
 
+      <section className={styles.tasks} aria-label="Daily tasks">
+        <Link href="/studio/posts?tab=draft"><strong>{data.taskCounts?.drafts ?? "Open"}</strong><span>Drafts</span><small>Continue writing</small></Link>
+        <Link href="/studio/posts?tab=scheduled"><strong>{data.taskCounts?.scheduled ?? "Open"}</strong><span>Scheduled</span><small>Check upcoming releases</small></Link>
+        <Link href="/studio/posts?tab=needs_review"><strong>{data.taskCounts?.needsReview ?? "Open"}</strong><span>Needs review</span><small>Refresh published evidence</small></Link>
+        <Link aria-label="Review source issues" href="/studio/sources?filter=attention"><strong>{failingSources}</strong><span>Review source issues</span><small>{unreviewed} awaiting usage review</small></Link>
+      </section>
       <div className={styles.deskGrid}>
         <div className={styles.primaryDesk}>
           <ReviewQueue candidates={data.candidates} />

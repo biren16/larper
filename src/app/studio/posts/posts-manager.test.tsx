@@ -17,3 +17,10 @@ it("renders working metadata, confirmed controls and per-record bulk outcomes",a
  expect(await screen.findByText(/Edited title: Saved revision 4/)).toBeInTheDocument();
  expect(screen.getByText(/Other title: Conflict/)).toBeInTheDocument();
 });
+it('keeps bulk actions unavailable until posts are selected and only asks for niche when needed',async()=>{
+ render(<PostsManager posts={[{id:'one',title:'A post',nicheId:null,status:'draft',lastEditedAt:'2026-10-02',editorialVersion:2}]} niches={[]} returnTo='/studio/posts'/>);
+ expect(screen.queryByRole('combobox',{name:'Operation'})).not.toBeInTheDocument();
+ await userEvent.setup().click(screen.getByRole('checkbox',{name:'Select A post'}));
+ expect(screen.getByText('1 selected')).toBeInTheDocument();
+ expect(screen.queryByRole('combobox',{name:'Niche for change'})).not.toBeInTheDocument();
+});

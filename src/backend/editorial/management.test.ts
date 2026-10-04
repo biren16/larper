@@ -8,6 +8,7 @@ const posts = [
 describe("post management",()=>{
  it("normalizes status, bounded integer page and real date filters",()=>{
   expect(normalizePostQuery({tab:"unknown",page:"1.5",from:"2026-99-99",to:"2026-02-30"})).toMatchObject({tab:"all",page:1,from:"",to:""});
+  expect(normalizePostQuery({tab:"candidate"})).toMatchObject({tab:"candidate"});
   expect(normalizePostQuery({tab:"trash",page:"2",from:"2026-10-01"})).toMatchObject({tab:"trash",page:2,from:"2026-10-01"});
  });
  it("returns each bulk conflict without rolling back independent successes",async()=>{
