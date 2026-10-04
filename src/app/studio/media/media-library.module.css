@@ -7,4 +7,4 @@
 .library > label { display:grid; gap:.5rem; max-width:40rem; font-weight:600; }
 .library input { padding:.65rem .8rem; min-height:2.75rem; background:var(--paper); color:var(--ink); border:1px solid var(--line); }
 .library button { justify-self:start; padding:.65rem 1rem; min-height:2.75rem; background:var(--ink); color:var(--paper); border:1px solid var(--ink); font:600 .85rem/1.4 var(--font-sans); cursor:pointer; }
-.library :where(input,button,a):focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.library :where(input,button,a):focus-visible { outline:2px solid var(--cobalt); outline-offset:3px; }
