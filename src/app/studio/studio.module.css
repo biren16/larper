@@ -362,3 +362,7 @@
 @media(max-width:760px) { .tasks { grid-template-columns:1fr 1fr; } }
 @media(max-width:480px) { .postFilters { grid-template-columns:1fr; } .tasks { gap:.5rem; } .tasks a { padding:.85rem; } }
 @media(max-width:760px) { .composer { z-index:62; } .composerScrim { z-index:61; } }
+
+.loadingState { padding:2rem 0; min-height:18rem; font:400 1rem/1.5 var(--font-sans); }
+.loadingState strong { font-weight:600; }
+.loadingState p { color:var(--muted); margin-top:.5rem; }
