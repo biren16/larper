@@ -39,7 +39,7 @@ function SourceRow({ source, toggleSourceAction, reviewSourceAction }: { source:
       <dl>
         <div><dt>Last collection</dt><dd>{time(source.lastPolledAt)}</dd></div>
         <div><dt>Expected next collection</dt><dd>{source.expectedNextPollAt ? time(source.expectedNextPollAt) : source.adapterType === "manual" ? "Manual intake — no polling" : !source.active ? "Paused — no collection scheduled" : !source.usageReviewed ? "Usage review required" : "Next collector run (first collection pending)"}</dd></div>
-        <div><dt>Usage review</dt><dd>{source.usageReviewed ? "Recorded" : "Required before collection"}</dd></div>
+        <div><dt>Usage review</dt><dd>{source.adapterType === "manual" ? "Manual reference — no automated collection" : source.usageReviewed ? "Recorded" : "Required before collection"}</dd></div>
         <div><dt>Failures</dt><dd>{source.failureCount === 1 ? "1 unresolved failure" : `${source.failureCount} unresolved failures`}</dd></div>
       </dl>
       {latest && <div className={styles.failureSummary}><p>{explanation}</p><details><summary>Failure diagnostics ({source.failureCount} unresolved)</summary>{grouped.map(failure=><p key={failure.message}>{failure.message}<br/><small>{failure.code} · {time(failure.occurredAt)} · {(source.failures ?? []).filter(item=>item.message===failure.message).length} occurrences</small></p>)}</details></div>}
