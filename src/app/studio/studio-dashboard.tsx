@@ -127,6 +127,7 @@ export function StudioDashboard({
 }) {
   const latestRun = data.runs[0];
   const failingSources=data.sources.filter(source=>source.failureCount>0).length;
+  const issues=data.sources.filter(source=>source.failureCount>0 || !source.usageReviewed && ["rss","youtube"].includes(source.adapterType)).length;
   const unreviewed=data.sources.filter(source=>!source.usageReviewed && ["rss","youtube"].includes(source.adapterType)).length;
   return (
     <main id="main-content" className={styles.main}>
@@ -146,7 +147,7 @@ export function StudioDashboard({
         <Link href="/studio/posts?tab=draft"><strong>{data.taskCounts?.drafts ?? "Open"}</strong><span>Drafts</span><small>Continue writing</small></Link>
         <Link href="/studio/posts?tab=scheduled"><strong>{data.taskCounts?.scheduled ?? "Open"}</strong><span>Scheduled</span><small>Check upcoming releases</small></Link>
         <Link href="/studio/posts?tab=needs_review"><strong>{data.taskCounts?.needsReview ?? "Open"}</strong><span>Needs review</span><small>Refresh published evidence</small></Link>
-        <Link aria-label="Review source issues" href="/studio/sources?filter=attention"><strong>{failingSources}</strong><span>Review source issues</span><small>{unreviewed} awaiting usage review</small></Link>
+        <Link aria-label="Review source issues" href="/studio/sources?filter=issues"><strong>{issues}</strong><span>Review source issues</span><small>{unreviewed} awaiting usage review</small></Link>
       </section>
       <div className={styles.deskGrid}>
         <div className={styles.primaryDesk}>

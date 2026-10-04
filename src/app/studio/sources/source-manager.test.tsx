@@ -25,7 +25,7 @@ describe("SourceManager", () => {
     }
     expect(screen.getAllByText("Live").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Paused").length).toBeGreaterThan(0);
-    expect(screen.getByText("Needs attention")).toBeInTheDocument();
+    expect(screen.getAllByText("Needs attention").length).toBeGreaterThan(0);
     expect(screen.getByText("Waiting")).toBeInTheDocument();
     expect(screen.getByText("First collection pending")).toBeInTheDocument();
     expect(screen.getByText("Manual intake")).toBeInTheDocument();

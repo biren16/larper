@@ -24,3 +24,10 @@ it('keeps bulk actions unavailable until posts are selected and only asks for ni
  expect(screen.getByText('1 selected')).toBeInTheDocument();
  expect(screen.queryByRole('combobox',{name:'Niche for change'})).not.toBeInTheDocument();
 });
+it('never counts selected records that are absent from the current result set',async()=>{
+ const post={id:'one',title:'A post',nicheId:null,status:'draft',lastEditedAt:'2026-10-02',editorialVersion:2};
+ const {rerender}=render(<PostsManager posts={[post]} niches={[]} returnTo='/studio/posts'/>);
+ await userEvent.setup().click(screen.getByRole('checkbox',{name:'Select A post'}));
+ rerender(<PostsManager posts={[]} niches={[]} returnTo='/studio/posts'/>);
+ expect(screen.queryByRole('combobox',{name:'Operation'})).not.toBeInTheDocument();
+});

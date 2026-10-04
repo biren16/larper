@@ -114,7 +114,7 @@ export function SourceManager({
   const [filter,setFilter]=useState(initialFilter);
   const failing=data.sources.filter(source=>source.failureCount>0);
   const reviewNeeded=data.sources.filter(source=>!source.usageReviewed && ["rss","youtube"].includes(source.adapterType));
-  const visible=data.sources.filter(source=>source.name.toLowerCase().includes(search.toLowerCase()) && (filter==="all" || filter==="attention" && source.failureCount>0 || filter==="review" && !source.usageReviewed && ["rss","youtube"].includes(source.adapterType) || filter==="active" && source.active || filter==="paused" && !source.active));
+  const visible=data.sources.filter(source=>source.name.toLowerCase().includes(search.toLowerCase()) && (filter==="all" || filter==="issues" && (source.failureCount>0 || !source.usageReviewed && ["rss","youtube"].includes(source.adapterType)) || filter==="attention" && source.failureCount>0 || filter==="review" && !source.usageReviewed && ["rss","youtube"].includes(source.adapterType) || filter==="active" && source.active || filter==="paused" && !source.active));
   return (
     <main id="main-content" className={styles.main}>
       <header className={styles.header}>
@@ -128,7 +128,7 @@ export function SourceManager({
         <PendingButton type="submit" pendingLabel="Registering sources…">Register seven-lane sources</PendingButton>
       </form></details>}
       <div className={styles.toolbar}>
-        <div className={styles.filters} aria-label="Source filters">{[["all",`All sources (${data.sources.length})`],["attention",`Failures (${failing.length})`],["review",`Usage review (${reviewNeeded.length})`],["active","Active"],["paused","Paused"]].map(([value,label])=><button key={value} type="button" aria-pressed={filter===value} onClick={()=>setFilter(value)}>{label}</button>)}</div>
+        <div className={styles.filters} aria-label="Source filters">{[["all",`All sources (${data.sources.length})`],["issues","Needs attention"],["attention",`Failures (${failing.length})`],["review",`Usage review (${reviewNeeded.length})`],["active","Active"],["paused","Paused"]].map(([value,label])=><button key={value} type="button" aria-pressed={filter===value} onClick={()=>setFilter(value)}>{label}</button>)}</div>
         <label>Search sources<input value={search} onChange={event=>setSearch(event.target.value)} placeholder="Publisher or creator name"/></label>
       </div>
       <p className={styles.filterResult} role="status">{visible.length} sources shown{filter==="review" ? " · Record permission before activating automated collection." : filter==="attention" ? " · Open diagnostics or pause a failing source while investigating." : ""}</p>
